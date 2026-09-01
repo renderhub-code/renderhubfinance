@@ -15,10 +15,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCentrosDeCustoRouteImport } from './routes/_authenticated/centros-de-custo'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDreRouteImport } from './routes/_authenticated/dre'
+import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFluxoDeCaixaRouteImport } from './routes/_authenticated/fluxo-de-caixa'
 import { Route as AuthenticatedLancamentosRouteImport } from './routes/_authenticated/lancamentos'
 import { Route as AuthenticatedPlanoDeContasRouteImport } from './routes/_authenticated/plano-de-contas'
 import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
+import { Route as BlingCallbackRouteImport } from './routes/bling.callback'
 import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
 import { Route as AuthenticatedSimulacoesIdRouteImport } from './routes/_authenticated/simulacoes.$id'
 
@@ -52,6 +54,11 @@ const AuthenticatedDreRoute = AuthenticatedDreRouteImport.update({
   path: '/dre',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFluxoDeCaixaRoute =
   AuthenticatedFluxoDeCaixaRouteImport.update({
     id: '/fluxo-de-caixa',
@@ -75,6 +82,11 @@ const AuthenticatedSimulacoesRoute = AuthenticatedSimulacoesRouteImport.update({
   path: '/simulacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const BlingCallbackRoute = BlingCallbackRouteImport.update({
+  id: '/bling/callback',
+  path: '/bling/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLancamentosImportarRoute =
   AuthenticatedLancamentosImportarRouteImport.update({
     id: '/importar',
@@ -94,10 +106,12 @@ export interface FileRoutesByFullPath {
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dre': typeof AuthenticatedDreRoute
+  '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/bling/callback': typeof BlingCallbackRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
 }
@@ -107,10 +121,12 @@ export interface FileRoutesByTo {
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/dre': typeof AuthenticatedDreRoute
+  '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/bling/callback': typeof BlingCallbackRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
 }
@@ -122,10 +138,12 @@ export interface FileRoutesById {
   '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/dre': typeof AuthenticatedDreRoute
+  '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
   '/_authenticated/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/_authenticated/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/bling/callback': typeof BlingCallbackRoute
   '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/_authenticated/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
 }
@@ -137,10 +155,12 @@ export interface FileRouteTypes {
     | '/centros-de-custo'
     | '/dashboard'
     | '/dre'
+    | '/financeiro'
     | '/fluxo-de-caixa'
     | '/lancamentos'
     | '/plano-de-contas'
     | '/simulacoes'
+    | '/bling/callback'
     | '/lancamentos/importar'
     | '/simulacoes/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -150,10 +170,12 @@ export interface FileRouteTypes {
     | '/centros-de-custo'
     | '/dashboard'
     | '/dre'
+    | '/financeiro'
     | '/fluxo-de-caixa'
     | '/lancamentos'
     | '/plano-de-contas'
     | '/simulacoes'
+    | '/bling/callback'
     | '/lancamentos/importar'
     | '/simulacoes/$id'
   id:
@@ -164,10 +186,12 @@ export interface FileRouteTypes {
     | '/_authenticated/centros-de-custo'
     | '/_authenticated/dashboard'
     | '/_authenticated/dre'
+    | '/_authenticated/financeiro'
     | '/_authenticated/fluxo-de-caixa'
     | '/_authenticated/lancamentos'
     | '/_authenticated/plano-de-contas'
     | '/_authenticated/simulacoes'
+    | '/bling/callback'
     | '/_authenticated/lancamentos/importar'
     | '/_authenticated/simulacoes/$id'
   fileRoutesById: FileRoutesById
@@ -176,6 +200,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  BlingCallbackRoute: typeof BlingCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -222,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDreRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financeiro': {
+      id: '/_authenticated/financeiro'
+      path: '/financeiro'
+      fullPath: '/financeiro'
+      preLoaderRoute: typeof AuthenticatedFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/fluxo-de-caixa': {
       id: '/_authenticated/fluxo-de-caixa'
       path: '/fluxo-de-caixa'
@@ -249,6 +281,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/simulacoes'
       preLoaderRoute: typeof AuthenticatedSimulacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/bling/callback': {
+      id: '/bling/callback'
+      path: '/bling/callback'
+      fullPath: '/bling/callback'
+      preLoaderRoute: typeof BlingCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/lancamentos/importar': {
       id: '/_authenticated/lancamentos/importar'
@@ -300,6 +339,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCentrosDeCustoRoute: typeof AuthenticatedCentrosDeCustoRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDreRoute: typeof AuthenticatedDreRoute
+  AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFluxoDeCaixaRoute: typeof AuthenticatedFluxoDeCaixaRoute
   AuthenticatedLancamentosRoute: typeof AuthenticatedLancamentosRouteWithChildren
   AuthenticatedPlanoDeContasRoute: typeof AuthenticatedPlanoDeContasRoute
@@ -310,6 +350,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCentrosDeCustoRoute: AuthenticatedCentrosDeCustoRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDreRoute: AuthenticatedDreRoute,
+  AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFluxoDeCaixaRoute: AuthenticatedFluxoDeCaixaRoute,
   AuthenticatedLancamentosRoute: AuthenticatedLancamentosRouteWithChildren,
   AuthenticatedPlanoDeContasRoute: AuthenticatedPlanoDeContasRoute,
@@ -323,6 +364,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  BlingCallbackRoute: BlingCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
