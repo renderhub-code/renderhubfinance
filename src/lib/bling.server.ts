@@ -105,9 +105,11 @@ export async function exchangeCodeForTokens(code: string, userId: string) {
 }
 
 export async function getConnection() {
+  const companyId = await getBlingCompanyId();
   const { data } = await supabaseAdmin
     .from("bling_tokens")
     .select("id, expires_at, updated_at, access_token, refresh_token")
+    .eq("company_id", companyId)
     .limit(1)
     .maybeSingle();
   return data ?? null;
@@ -162,5 +164,6 @@ export async function consumeState(state: string, userId: string) {
 }
 
 export async function clearConnection() {
-  await supabaseAdmin.from("bling_tokens").delete().not("id", "is", null);
+  const companyId = await getBlingCompanyId();
+  await supabaseAdmin.from("bling_tokens").delete().eq("company_id", companyId);
 }
