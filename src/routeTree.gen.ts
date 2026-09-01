@@ -10,33 +10,172 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedCentrosDeCustoRouteImport } from './routes/_authenticated/centros-de-custo'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDreRouteImport } from './routes/_authenticated/dre'
+import { Route as AuthenticatedFluxoDeCaixaRouteImport } from './routes/_authenticated/fluxo-de-caixa'
+import { Route as AuthenticatedLancamentosRouteImport } from './routes/_authenticated/lancamentos'
+import { Route as AuthenticatedPlanoDeContasRouteImport } from './routes/_authenticated/plano-de-contas'
+import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
+import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
+import { Route as AuthenticatedSimulacoesIdRouteImport } from './routes/_authenticated/simulacoes.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCentrosDeCustoRoute =
+  AuthenticatedCentrosDeCustoRouteImport.update({
+    id: '/centros-de-custo',
+    path: '/centros-de-custo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDreRoute = AuthenticatedDreRouteImport.update({
+  id: '/dre',
+  path: '/dre',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFluxoDeCaixaRoute =
+  AuthenticatedFluxoDeCaixaRouteImport.update({
+    id: '/fluxo-de-caixa',
+    path: '/fluxo-de-caixa',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLancamentosRoute =
+  AuthenticatedLancamentosRouteImport.update({
+    id: '/lancamentos',
+    path: '/lancamentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPlanoDeContasRoute =
+  AuthenticatedPlanoDeContasRouteImport.update({
+    id: '/plano-de-contas',
+    path: '/plano-de-contas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSimulacoesRoute = AuthenticatedSimulacoesRouteImport.update({
+  id: '/simulacoes',
+  path: '/simulacoes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLancamentosImportarRoute =
+  AuthenticatedLancamentosImportarRouteImport.update({
+    id: '/importar',
+    path: '/importar',
+    getParentRoute: () => AuthenticatedLancamentosRoute,
+  } as any)
+const AuthenticatedSimulacoesIdRoute =
+  AuthenticatedSimulacoesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedSimulacoesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dre': typeof AuthenticatedDreRoute
+  '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
+  '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
+  '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
+  '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
+  '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/dre': typeof AuthenticatedDreRoute
+  '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
+  '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
+  '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
+  '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
+  '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/dre': typeof AuthenticatedDreRoute
+  '/_authenticated/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
+  '/_authenticated/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
+  '/_authenticated/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
+  '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
+  '/_authenticated/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/centros-de-custo'
+    | '/dashboard'
+    | '/dre'
+    | '/fluxo-de-caixa'
+    | '/lancamentos'
+    | '/plano-de-contas'
+    | '/simulacoes'
+    | '/lancamentos/importar'
+    | '/simulacoes/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/centros-de-custo'
+    | '/dashboard'
+    | '/dre'
+    | '/fluxo-de-caixa'
+    | '/lancamentos'
+    | '/plano-de-contas'
+    | '/simulacoes'
+    | '/lancamentos/importar'
+    | '/simulacoes/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/centros-de-custo'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/dre'
+    | '/_authenticated/fluxo-de-caixa'
+    | '/_authenticated/lancamentos'
+    | '/_authenticated/plano-de-contas'
+    | '/_authenticated/simulacoes'
+    | '/_authenticated/lancamentos/importar'
+    | '/_authenticated/simulacoes/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +187,142 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/centros-de-custo': {
+      id: '/_authenticated/centros-de-custo'
+      path: '/centros-de-custo'
+      fullPath: '/centros-de-custo'
+      preLoaderRoute: typeof AuthenticatedCentrosDeCustoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dre': {
+      id: '/_authenticated/dre'
+      path: '/dre'
+      fullPath: '/dre'
+      preLoaderRoute: typeof AuthenticatedDreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/fluxo-de-caixa': {
+      id: '/_authenticated/fluxo-de-caixa'
+      path: '/fluxo-de-caixa'
+      fullPath: '/fluxo-de-caixa'
+      preLoaderRoute: typeof AuthenticatedFluxoDeCaixaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lancamentos': {
+      id: '/_authenticated/lancamentos'
+      path: '/lancamentos'
+      fullPath: '/lancamentos'
+      preLoaderRoute: typeof AuthenticatedLancamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/plano-de-contas': {
+      id: '/_authenticated/plano-de-contas'
+      path: '/plano-de-contas'
+      fullPath: '/plano-de-contas'
+      preLoaderRoute: typeof AuthenticatedPlanoDeContasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/simulacoes': {
+      id: '/_authenticated/simulacoes'
+      path: '/simulacoes'
+      fullPath: '/simulacoes'
+      preLoaderRoute: typeof AuthenticatedSimulacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lancamentos/importar': {
+      id: '/_authenticated/lancamentos/importar'
+      path: '/importar'
+      fullPath: '/lancamentos/importar'
+      preLoaderRoute: typeof AuthenticatedLancamentosImportarRouteImport
+      parentRoute: typeof AuthenticatedLancamentosRoute
+    }
+    '/_authenticated/simulacoes/$id': {
+      id: '/_authenticated/simulacoes/$id'
+      path: '/$id'
+      fullPath: '/simulacoes/$id'
+      preLoaderRoute: typeof AuthenticatedSimulacoesIdRouteImport
+      parentRoute: typeof AuthenticatedSimulacoesRoute
+    }
   }
 }
 
+interface AuthenticatedLancamentosRouteChildren {
+  AuthenticatedLancamentosImportarRoute: typeof AuthenticatedLancamentosImportarRoute
+}
+
+const AuthenticatedLancamentosRouteChildren: AuthenticatedLancamentosRouteChildren =
+  {
+    AuthenticatedLancamentosImportarRoute:
+      AuthenticatedLancamentosImportarRoute,
+  }
+
+const AuthenticatedLancamentosRouteWithChildren =
+  AuthenticatedLancamentosRoute._addFileChildren(
+    AuthenticatedLancamentosRouteChildren,
+  )
+
+interface AuthenticatedSimulacoesRouteChildren {
+  AuthenticatedSimulacoesIdRoute: typeof AuthenticatedSimulacoesIdRoute
+}
+
+const AuthenticatedSimulacoesRouteChildren: AuthenticatedSimulacoesRouteChildren =
+  {
+    AuthenticatedSimulacoesIdRoute: AuthenticatedSimulacoesIdRoute,
+  }
+
+const AuthenticatedSimulacoesRouteWithChildren =
+  AuthenticatedSimulacoesRoute._addFileChildren(
+    AuthenticatedSimulacoesRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCentrosDeCustoRoute: typeof AuthenticatedCentrosDeCustoRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDreRoute: typeof AuthenticatedDreRoute
+  AuthenticatedFluxoDeCaixaRoute: typeof AuthenticatedFluxoDeCaixaRoute
+  AuthenticatedLancamentosRoute: typeof AuthenticatedLancamentosRouteWithChildren
+  AuthenticatedPlanoDeContasRoute: typeof AuthenticatedPlanoDeContasRoute
+  AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCentrosDeCustoRoute: AuthenticatedCentrosDeCustoRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDreRoute: AuthenticatedDreRoute,
+  AuthenticatedFluxoDeCaixaRoute: AuthenticatedFluxoDeCaixaRoute,
+  AuthenticatedLancamentosRoute: AuthenticatedLancamentosRouteWithChildren,
+  AuthenticatedPlanoDeContasRoute: AuthenticatedPlanoDeContasRoute,
+  AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
