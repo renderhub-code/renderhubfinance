@@ -58,6 +58,54 @@ export type Database = {
           },
         ]
       }
+      account_mappings: {
+        Row: {
+          account_id: string | null
+          company_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          source_code: string
+          source_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          source_code: string
+          source_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          source_code?: string
+          source_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_mappings_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_mappings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       account_subgroups: {
         Row: {
           active: boolean
@@ -286,6 +334,132 @@ export type Database = {
           },
         ]
       }
+      simulation_lines: {
+        Row: {
+          account_id: string
+          amount: number
+          business_unit_id: string | null
+          client_name: string | null
+          created_at: string
+          description: string | null
+          group_key: string
+          id: string
+          margin_pct: number
+          month: number
+          qty_expected: number
+          qty_realized: number
+          simulation_id: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          amount?: number
+          business_unit_id?: string | null
+          client_name?: string | null
+          created_at?: string
+          description?: string | null
+          group_key?: string
+          id?: string
+          margin_pct?: number
+          month: number
+          qty_expected?: number
+          qty_realized?: number
+          simulation_id: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          business_unit_id?: string | null
+          client_name?: string | null
+          created_at?: string
+          description?: string | null
+          group_key?: string
+          id?: string
+          margin_pct?: number
+          month?: number
+          qty_expected?: number
+          qty_realized?: number
+          simulation_id?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulation_lines_business_unit_id_fkey"
+            columns: ["business_unit_id"]
+            isOneToOne: false
+            referencedRelation: "business_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulation_lines_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      simulations: {
+        Row: {
+          applied_at: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          applied_at?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind: string
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          applied_at?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           account_id: string
@@ -304,6 +478,7 @@ export type Database = {
           notes: string | null
           payment_method: string | null
           settled_date: string | null
+          source_simulation_id: string | null
           status: Database["public"]["Enums"]["transaction_status"]
           type: Database["public"]["Enums"]["account_type"]
           updated_at: string
@@ -325,6 +500,7 @@ export type Database = {
           notes?: string | null
           payment_method?: string | null
           settled_date?: string | null
+          source_simulation_id?: string | null
           status?: Database["public"]["Enums"]["transaction_status"]
           type: Database["public"]["Enums"]["account_type"]
           updated_at?: string
@@ -346,6 +522,7 @@ export type Database = {
           notes?: string | null
           payment_method?: string | null
           settled_date?: string | null
+          source_simulation_id?: string | null
           status?: Database["public"]["Enums"]["transaction_status"]
           type?: Database["public"]["Enums"]["account_type"]
           updated_at?: string
@@ -377,6 +554,13 @@ export type Database = {
             columns: ["cost_center_id"]
             isOneToOne: false
             referencedRelation: "cost_centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_source_simulation_id_fkey"
+            columns: ["source_simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulations"
             referencedColumns: ["id"]
           },
         ]
@@ -447,6 +631,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      bootstrap_first_controller: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
