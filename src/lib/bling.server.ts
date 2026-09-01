@@ -55,15 +55,29 @@ async function requestToken(body: Record<string, string>): Promise<TokenResponse
   return JSON.parse(text) as TokenResponse;
 }
 
+/** A integração Bling pertence à empresa Use Noronha. */
+async function getBlingCompanyId(): Promise<string> {
+  const { data, error } = await supabaseAdmin
+    .from("companies")
+    .select("id")
+    .eq("slug", "use-noronha")
+    .maybeSingle();
+  if (error || !data) throw new Error("Empresa Use Noronha não encontrada.");
+  return data.id;
+}
+
 async function saveTokens(t: TokenResponse, userId?: string) {
+  const companyId = await getBlingCompanyId();
   const expiresAt = new Date(Date.now() + (t.expires_in ?? 3600) * 1000).toISOString();
   const { data: existing } = await supabaseAdmin
     .from("bling_tokens")
     .select("id")
+    .eq("company_id", companyId)
     .limit(1)
     .maybeSingle();
 
   const row = {
+    company_id: companyId,
     access_token: t.access_token,
     refresh_token: t.refresh_token,
     expires_at: expiresAt,
