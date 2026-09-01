@@ -122,9 +122,9 @@ function FinanceiroPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Financeiro (Bling)</h1>
+        <h1 className="text-2xl font-semibold">Financeiro (Bling) — Use Noronha</h1>
         <p className="text-sm text-muted-foreground">
-          Contas a pagar e a receber, notas fiscais e pedidos direto da sua conta Bling.
+          Contas a pagar e a receber, notas fiscais e pedidos da empresa Use Noronha, direto da sua conta Bling.
         </p>
       </div>
 
