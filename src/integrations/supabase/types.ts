@@ -205,6 +205,65 @@ export type Database = {
           },
         ]
       }
+      bling_oauth_states: {
+        Row: {
+          created_at: string
+          state: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          state: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          state?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bling_tokens: {
+        Row: {
+          access_token: string
+          company_id: string | null
+          connected_by: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          refresh_token: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          company_id?: string | null
+          connected_by?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          refresh_token: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          company_id?: string | null
+          connected_by?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bling_tokens_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_units: {
         Row: {
           active: boolean
