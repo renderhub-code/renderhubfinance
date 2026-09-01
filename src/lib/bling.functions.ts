@@ -68,6 +68,7 @@ export const blingApiProxy = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { blingFetch } = await import("./bling.server");
     const json = await blingFetch(RESOURCES[data.resource], data.params ?? {});
-    const rows = Array.isArray(json?.data) ? json.data : [];
-    return { rows } as { rows: Record<string, unknown>[] };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows: any[] = Array.isArray(json?.data) ? json.data : [];
+    return { rows };
   });
