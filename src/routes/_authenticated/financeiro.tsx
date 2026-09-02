@@ -181,6 +181,30 @@ function FinanceiroPage() {
 
       {connected && (
         <Card>
+          <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+            <div>
+              <CardTitle className="text-base">Importar para Lançamentos</CardTitle>
+              <CardDescription>
+                Traz as contas a pagar e a receber de {year} para os Lançamentos da Use Noronha, alimentando
+                Dashboard, Fluxo de Caixa e DRE. Registros já importados não são duplicados.
+              </CardDescription>
+            </div>
+            <Button onClick={() => importMutation.mutate()} disabled={importMutation.isPending}>
+              {importMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 mr-2" />
+              )}
+              Importar {year}
+            </Button>
+          </CardHeader>
+        </Card>
+      )}
+
+
+
+      {connected && (
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Dados do Bling</CardTitle>
             <Button
