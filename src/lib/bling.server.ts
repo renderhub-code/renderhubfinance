@@ -183,6 +183,7 @@ type BlingConta = {
   valor?: number;
   historico?: string;
   contato?: { nome?: string };
+  categoria?: { id?: number | string; descricao?: string };
 };
 
 async function fetchAllContas(path: string, year: number): Promise<BlingConta[]> {
@@ -201,12 +202,74 @@ async function fetchAllContas(path: string, year: number): Promise<BlingConta[]>
   return out;
 }
 
+function normalizeLabel(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+/** Categorias do Bling (id -> descrição), usadas para casar com o De/Para. */
+async function fetchBlingCategorias(): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  try {
+    for (let pagina = 1; pagina <= 10; pagina++) {
+      const json = await blingFetch("/categorias/receitas-despesas", {
+        pagina: String(pagina),
+        limite: "100",
+      });
+      const rows: { id?: number | string; descricao?: string }[] = Array.isArray(json?.data)
+        ? json.data
+        : [];
+      for (const c of rows) {
+        if (c.id != null && c.descricao) map.set(String(c.id), c.descricao);
+      }
+      if (rows.length < 100) break;
+    }
+  } catch (err) {
+    console.error("[Bling] categorias", err);
+  }
+  return map;
+}
+
+/** De/Para da empresa: descrição da categoria -> conta do plano de contas. */
+async function loadMappings(companyId: string) {
+  const { data } = await supabaseAdmin
+    .from("account_mappings")
+    .select("source_code, account_id, accounts(type)")
+    .eq("company_id", companyId)
+    .not("account_id", "is", null);
+
+  const byLabel = new Map<string, { id: string; type: string | null }>();
+  for (const m of data ?? []) {
+    const acc = m.accounts as { type?: string } | null;
+    if (m.account_id) {
+      byLabel.set(normalizeLabel(m.source_code), { id: m.account_id, type: acc?.type ?? null });
+    }
+  }
+  return byLabel;
+}
+
 export async function importBlingYear(year: number, userId: string) {
   const companyId = await getBlingCompanyId();
-  const [receber, pagar] = await Promise.all([
+  const [receber, pagar, categorias, mappings] = await Promise.all([
     fetchAllContas("/contas/receber", year),
     fetchAllContas("/contas/pagar", year),
+    fetchBlingCategorias(),
+    loadMappings(await getBlingCompanyId()),
   ]);
+
+  const resolveAccount = (r: BlingConta, type: "entrada" | "saida") => {
+    const label =
+      r.categoria?.descricao ??
+      (r.categoria?.id != null ? categorias.get(String(r.categoria.id)) : undefined);
+    if (label) {
+      const hit = mappings.get(normalizeLabel(label));
+      if (hit && (hit.type === null || hit.type === type)) return hit.id;
+    }
+    return UN_ACCOUNTS[type];
+  };
 
   const rows = [
     ...receber.map((r) => ({ r, type: "entrada" as const, prefix: "receber" })),
@@ -218,7 +281,8 @@ export async function importBlingYear(year: number, userId: string) {
       const valor = Number(r.valor ?? 0);
       return {
         company_id: companyId,
-        account_id: UN_ACCOUNTS[type],
+        account_id: resolveAccount(r, type),
+
         entry_date: (r.dataEmissao && r.dataEmissao !== "0000-00-00" ? r.dataEmissao : r.vencimento) as string,
         due_date: r.vencimento as string,
         settled_date: settled ? (r.vencimento as string) : null,
