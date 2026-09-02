@@ -119,7 +119,19 @@ function FinanceiroPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const importMutation = useMutation({
+    mutationFn: () => importFn({ data: { year } }),
+    onSuccess: (r) => {
+      toast.success(
+        `Importação concluída: ${r.imported} novo(s) lançamento(s), ${r.skipped} já existente(s).`,
+      );
+      qc.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const connected = statusQuery.data?.connected === true;
+
 
   return (
     <div className="space-y-6">
