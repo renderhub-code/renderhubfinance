@@ -6,6 +6,7 @@ import {
   blingApiProxy,
   disconnectBling,
   getBlingStatus,
+  importBlingTransactions,
   startBlingAuth,
   type BlingResource,
 } from "@/lib/bling.functions";
@@ -13,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, PlugZap, RefreshCw, Unplug } from "lucide-react";
+import { Download, Loader2, PlugZap, RefreshCw, Unplug } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/financeiro")({
   head: () => ({
@@ -95,6 +97,9 @@ function FinanceiroPage() {
   const status = useServerFn(getBlingStatus);
   const start = useServerFn(startBlingAuth);
   const disconnect = useServerFn(disconnectBling);
+  const importFn = useServerFn(importBlingTransactions);
+  const year = new Date().getFullYear();
+
   const [tab, setTab] = useState<BlingResource>("contas-receber");
 
   const statusQuery = useQuery({ queryKey: ["bling-status"], queryFn: () => status({}) });
@@ -117,7 +122,19 @@ function FinanceiroPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const importMutation = useMutation({
+    mutationFn: () => importFn({ data: { year } }),
+    onSuccess: (r) => {
+      toast.success(
+        `Importação concluída: ${r.imported} novo(s) lançamento(s), ${r.skipped} já existente(s).`,
+      );
+      qc.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const connected = statusQuery.data?.connected === true;
+
 
   return (
     <div className="space-y-6">
@@ -161,6 +178,30 @@ function FinanceiroPage() {
           </div>
         </CardHeader>
       </Card>
+
+      {connected && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+            <div>
+              <CardTitle className="text-base">Importar para Lançamentos</CardTitle>
+              <CardDescription>
+                Traz as contas a pagar e a receber de {year} para os Lançamentos da Use Noronha, alimentando
+                Dashboard, Fluxo de Caixa e DRE. Registros já importados não são duplicados.
+              </CardDescription>
+            </div>
+            <Button onClick={() => importMutation.mutate()} disabled={importMutation.isPending}>
+              {importMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 mr-2" />
+              )}
+              Importar {year}
+            </Button>
+          </CardHeader>
+        </Card>
+      )}
+
+
 
       {connected && (
         <Card>

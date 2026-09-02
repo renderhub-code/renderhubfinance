@@ -72,3 +72,16 @@ export const blingApiProxy = createServerFn({ method: "POST" })
     const rows: any[] = Array.isArray(json?.data) ? json.data : [];
     return { rows };
   });
+
+/** Importa contas a pagar/receber do Bling como lançamentos da Use Noronha. */
+export const importBlingTransactions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { year: number }) => {
+    const y = Number(input?.year);
+    if (!Number.isInteger(y) || y < 2000 || y > 2100) throw new Error("Ano inválido.");
+    return { year: y };
+  })
+  .handler(async ({ data, context }) => {
+    const { importBlingYear } = await import("./bling.server");
+    return importBlingYear(data.year, context.userId);
+  });

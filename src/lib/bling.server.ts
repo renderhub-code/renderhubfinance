@@ -167,3 +167,88 @@ export async function clearConnection() {
   const companyId = await getBlingCompanyId();
   await supabaseAdmin.from("bling_tokens").delete().eq("company_id", companyId);
 }
+
+// ---------- Importação Bling -> lançamentos ----------
+
+const UN_ACCOUNTS = {
+  entrada: "e8ea8445-d22b-4ded-9025-676776fa6b9d",
+  saida: "82ebf305-173d-49d3-b4b4-bcae44fd39fc",
+} as const;
+
+type BlingConta = {
+  id: number | string;
+  situacao?: number;
+  vencimento?: string;
+  dataEmissao?: string;
+  valor?: number;
+  historico?: string;
+  contato?: { nome?: string };
+};
+
+async function fetchAllContas(path: string, year: number): Promise<BlingConta[]> {
+  const out: BlingConta[] = [];
+  for (let pagina = 1; pagina <= 30; pagina++) {
+    const json = await blingFetch(path, {
+      pagina: String(pagina),
+      limite: "100",
+      dataVencimentoInicial: `${year}-01-01`,
+      dataVencimentoFinal: `${year}-12-31`,
+    });
+    const rows: BlingConta[] = Array.isArray(json?.data) ? json.data : [];
+    out.push(...rows);
+    if (rows.length < 100) break;
+  }
+  return out;
+}
+
+export async function importBlingYear(year: number, userId: string) {
+  const companyId = await getBlingCompanyId();
+  const [receber, pagar] = await Promise.all([
+    fetchAllContas("/contas/receber", year),
+    fetchAllContas("/contas/pagar", year),
+  ]);
+
+  const rows = [
+    ...receber.map((r) => ({ r, type: "entrada" as const, prefix: "receber" })),
+    ...pagar.map((r) => ({ r, type: "saida" as const, prefix: "pagar" })),
+  ]
+    .filter((x) => x.r.vencimento && String(x.r.vencimento).startsWith(String(year)))
+    .map(({ r, type, prefix }) => {
+      const settled = r.situacao === 2 || r.situacao === 3;
+      const valor = Number(r.valor ?? 0);
+      return {
+        company_id: companyId,
+        account_id: UN_ACCOUNTS[type],
+        entry_date: (r.dataEmissao && r.dataEmissao !== "0000-00-00" ? r.dataEmissao : r.vencimento) as string,
+        due_date: r.vencimento as string,
+        settled_date: settled ? (r.vencimento as string) : null,
+        type,
+        status: (settled ? "realizado" : "previsto") as "realizado" | "previsto",
+        amount_expected: valor,
+        amount_realized: settled ? valor : 0,
+        description: r.historico || r.contato?.nome || (type === "entrada" ? "Conta a receber (Bling)" : "Conta a pagar (Bling)"),
+        notes: r.contato?.nome ?? null,
+        created_by: userId,
+        external_source: `bling:${prefix}`,
+        external_id: String(r.id),
+      };
+    });
+
+  if (rows.length === 0) return { imported: 0, skipped: 0, total: 0 };
+
+  const { data: existing } = await supabaseAdmin
+    .from("transactions")
+    .select("external_source, external_id")
+    .eq("company_id", companyId)
+    .not("external_id", "is", null);
+
+  const seen = new Set((existing ?? []).map((e) => `${e.external_source}|${e.external_id}`));
+  const fresh = rows.filter((r) => !seen.has(`${r.external_source}|${r.external_id}`));
+
+  for (let i = 0; i < fresh.length; i += 200) {
+    const { error } = await supabaseAdmin.from("transactions").insert(fresh.slice(i, i + 200));
+    if (error) throw new Error(error.message);
+  }
+
+  return { imported: fresh.length, skipped: rows.length - fresh.length, total: rows.length };
+}
