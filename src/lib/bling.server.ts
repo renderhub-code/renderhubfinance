@@ -257,7 +257,7 @@ export async function importBlingYear(year: number, userId: string) {
     fetchAllContas("/contas/receber", year),
     fetchAllContas("/contas/pagar", year),
     fetchBlingCategorias(),
-    loadMappings(await getBlingCompanyId()),
+    loadMappings(companyId),
   ]);
 
   const resolveAccount = (r: BlingConta, type: "entrada" | "saida") => {
