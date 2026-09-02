@@ -97,6 +97,9 @@ function FinanceiroPage() {
   const status = useServerFn(getBlingStatus);
   const start = useServerFn(startBlingAuth);
   const disconnect = useServerFn(disconnectBling);
+  const importFn = useServerFn(importBlingTransactions);
+  const year = new Date().getFullYear();
+
   const [tab, setTab] = useState<BlingResource>("contas-receber");
 
   const statusQuery = useQuery({ queryKey: ["bling-status"], queryFn: () => status({}) });
