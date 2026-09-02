@@ -6,6 +6,7 @@ import {
   blingApiProxy,
   disconnectBling,
   getBlingStatus,
+  importBlingTransactions,
   startBlingAuth,
   type BlingResource,
 } from "@/lib/bling.functions";
@@ -13,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, PlugZap, RefreshCw, Unplug } from "lucide-react";
+import { Download, Loader2, PlugZap, RefreshCw, Unplug } from "lucide-react";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/financeiro")({
   head: () => ({
