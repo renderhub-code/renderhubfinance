@@ -533,6 +533,8 @@ export type Database = {
           description: string | null
           due_date: string | null
           entry_date: string
+          external_id: string | null
+          external_source: string | null
           id: string
           notes: string | null
           payment_method: string | null
@@ -555,6 +557,8 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           entry_date?: string
+          external_id?: string | null
+          external_source?: string | null
           id?: string
           notes?: string | null
           payment_method?: string | null
@@ -577,6 +581,8 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           entry_date?: string
+          external_id?: string | null
+          external_source?: string | null
           id?: string
           notes?: string | null
           payment_method?: string | null
