@@ -3,6 +3,7 @@ import { LayoutDashboard, ArrowLeftRight, FileBarChart, ListTree, Building2, Log
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanies, useBusinessUnits, useUserRoles } from "@/lib/queries";
 import { useCompanyStore } from "@/lib/company-store";
+import { useFinancialStore } from "@/lib/financial-store";
 import { HUBS, getHub, useHubStore, type HubId } from "@/lib/hub-store";
 import { useEffect, type ReactNode } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,6 +29,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const loc = useLocation();
   const { data: companies, isLoading: loadingCompanies } = useCompanies();
   const { activeCompanyId, activeBusinessUnitId, initialized, setCompany, setBusinessUnit, markInitialized } = useCompanyStore();
+  const { year, setYear } = useFinancialStore();
   const { data: units } = useBusinessUnits(activeCompanyId);
   const { data: roles } = useUserRoles();
 
@@ -177,6 +179,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </SelectContent>
               </Select>
             )}
+            <Select value={String(year)} onValueChange={(value) => setYear(Number(value))}>
+              <SelectTrigger className="w-[96px]" aria-label="Ano financeiro">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 5 }, (_, index) => new Date().getFullYear() - 2 + index).map((item) => (
+                  <SelectItem key={item} value={String(item)}>{item}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="ml-auto text-xs text-muted-foreground uppercase tracking-wide">
             {primaryRole === "controller" && "Controller"}

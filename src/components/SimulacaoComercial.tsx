@@ -4,7 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, Plus, Minus, Trash2, Play, Undo2, Save, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAccounts } from "@/lib/queries";
+import { useAccounts, useTransactions } from "@/lib/queries";
+import { useFinancialStore } from "@/lib/financial-store";
 import { applySimulation, revertSimulation } from "@/lib/simulations.functions";
 import { formatBRL } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,6 @@ import { TableSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
 
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-const YEAR = new Date().getFullYear();
 const MAX_ROWS_PER_ACCOUNT = 100;
 
 interface RowState {
@@ -63,22 +63,28 @@ function emptyRow(accountId: string): RowState {
 
 export function SimulacaoComercial({ companyId }: { companyId: string }) {
   const qc = useQueryClient();
+  const year = useFinancialStore((s) => s.year);
   const { data: accounts } = useAccounts(companyId);
+  const { data: realizedTransactions, isLoading: realizedLoading } = useTransactions(companyId, {
+    from: `${year}-01-01`,
+    to: `${year}-12-31`,
+    status: "realizado",
+  });
   const revenueAccounts = useMemo(
     () => (accounts ?? []).filter((a) => a.type === "entrada" && a.active),
     [accounts],
   );
 
-  const simName = `Simulação comercial ${YEAR}`;
+  const simName = `Simulação comercial ${year}`;
 
   const simQuery = useQuery({
-    queryKey: ["sim_comercial", companyId, YEAR],
+    queryKey: ["sim_comercial", companyId, year],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("simulations")
         .select("*")
         .eq("company_id", companyId)
-        .eq("year", YEAR)
+        .eq("year", year)
         .eq("name", simName)
         .maybeSingle();
       if (error) throw error;
@@ -153,7 +159,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
           company_id: companyId,
           name: simName,
           kind: "receita",
-          year: YEAR,
+          year,
           status: "rascunho",
           created_by: userRes.user?.id ?? null,
         })
@@ -163,7 +169,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
       return data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sim_comercial", companyId, YEAR] });
+      qc.invalidateQueries({ queryKey: ["sim_comercial", companyId, year] });
       qc.invalidateQueries({ queryKey: ["simulations"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -231,7 +237,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
     onSuccess: (res) => {
       toast.success(`Aplicado ao previsto (${res.inserted} lançamentos)`);
       qc.invalidateQueries({ queryKey: ["transactions"] });
-      qc.invalidateQueries({ queryKey: ["sim_comercial", companyId, YEAR] });
+      qc.invalidateQueries({ queryKey: ["sim_comercial", companyId, year] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -241,7 +247,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
     onSuccess: () => {
       toast.success("Aplicação revertida");
       qc.invalidateQueries({ queryKey: ["transactions"] });
-      qc.invalidateQueries({ queryKey: ["sim_comercial", companyId, YEAR] });
+      qc.invalidateQueries({ queryKey: ["sim_comercial", companyId, year] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -348,33 +354,64 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
   const totalRevenue = monthTotals.revenue.reduce((a, b) => a + b, 0);
   const totalCost = monthTotals.cost.reduce((a, b) => a + b, 0);
 
+  const realizedByAccount = useMemo(() => {
+    const map = new Map<string, number[]>();
+    for (const tx of realizedTransactions ?? []) {
+      if (tx.type !== "entrada") continue;
+      const month = Number(tx.entry_date.slice(5, 7)) - 1;
+      if (month < 0 || month > 11) continue;
+      const values = map.get(tx.account_id) ?? Array(12).fill(0);
+      values[month] += Number(tx.amount_realized ?? 0);
+      map.set(tx.account_id, values);
+    }
+    return revenueAccounts
+      .map((account) => ({ account, values: map.get(account.id) ?? Array(12).fill(0) }))
+      .filter((row) => row.values.some((value) => value !== 0));
+  }, [realizedTransactions, revenueAccounts]);
+
+  const realizedBase = (
+    <Card>
+      <CardHeader><CardTitle className="text-base">Base realizada — {year}</CardTitle></CardHeader>
+      <CardContent className="overflow-x-auto">
+        {realizedLoading ? <TableSkeleton rows={4} cols={8} /> : <Table>
+          <TableHeader><TableRow><TableHead className="min-w-52">Conta de receita</TableHead>{MONTHS.map((month) => <TableHead key={month} className="text-right">{month}</TableHead>)}<TableHead className="text-right">Total</TableHead></TableRow></TableHeader>
+          <TableBody>{realizedByAccount.length === 0 ? <TableRow><TableCell colSpan={14} className="py-8 text-center text-muted-foreground">Nenhuma receita realizada no período.</TableCell></TableRow> : realizedByAccount.map(({ account, values }) => <TableRow key={account.id}><TableCell className="font-medium whitespace-nowrap">{account.code} — {account.name}</TableCell>{values.map((value, index) => <TableCell key={index} className="text-right text-xs whitespace-nowrap">{formatBRL(value)}</TableCell>)}<TableCell className="text-right font-medium whitespace-nowrap">{formatBRL(values.reduce((a, b) => a + b, 0))}</TableCell></TableRow>)}</TableBody>
+        </Table>}
+      </CardContent>
+    </Card>
+  );
+
   if (simQuery.isLoading) return <TableSkeleton rows={4} cols={6} />;
 
   if (!sim) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Simulação comercial {YEAR}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Nenhuma simulação comercial criada para {YEAR}.
-          </p>
-          <Button onClick={() => createSim.mutate()} disabled={createSim.isPending}>
-            {createSim.isPending ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4 mr-2" />
-            )}
-            Criar simulação comercial {YEAR}
-          </Button>
-        </CardContent>
-      </Card>
+      <>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Simulação comercial {year}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Nenhuma simulação comercial criada para {year}. Os valores realizados abaixo servem como base para o planejamento.
+            </p>
+            <Button onClick={() => createSim.mutate()} disabled={createSim.isPending}>
+              {createSim.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4 mr-2" />
+              )}
+              Criar simulação comercial {year}
+            </Button>
+          </CardContent>
+        </Card>
+        {realizedBase}
+      </>
     );
   }
 
   return (
     <div className="space-y-4">
+      {realizedBase}
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant={sim.status === "aplicada" ? "default" : "secondary"}>
           {sim.status === "aplicada" ? "Aplicada ao previsto" : "Rascunho"}
@@ -509,7 +546,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
         <CardHeader>
           <CardTitle className="text-base">
             Linhas — {view === "previsto" ? "quantidades previstas" : "quantidades realizadas"} (
-            {YEAR})
+            {year})
           </CardTitle>
         </CardHeader>
         <CardContent className="overflow-x-auto">

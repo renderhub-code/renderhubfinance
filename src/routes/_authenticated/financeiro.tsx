@@ -234,7 +234,9 @@ function FinanceiroPage() {
       toast.success(
         `Importação concluída: ${r.imported} novo(s) lançamento(s), ${r.skipped} já existente(s).`,
       );
-      qc.invalidateQueries();
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["accounts_with_dre"] });
+      qc.invalidateQueries({ queryKey: ["sim_comercial"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -256,7 +258,10 @@ function FinanceiroPage() {
       toast.success(
         `Reclassificação concluída: ${r.reclassified} lançamento(s) atualizados, ${r.pending} ainda sem mapeamento.`,
       );
-      qc.invalidateQueries();
+      qc.invalidateQueries({ queryKey: ["transactions"] });
+      qc.invalidateQueries({ queryKey: ["accounts"] });
+      qc.invalidateQueries({ queryKey: ["accounts_with_dre"] });
+      qc.invalidateQueries({ queryKey: ["sim_comercial"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
