@@ -174,7 +174,7 @@ function ResourceTable({ resource }: { resource: BlingResource }) {
         </Table>
       </div>
 
-      <Dialog open={detailId != null} onOpenChange={(o) => !o && setDetailId(null)}>
+      <Dialog open={detailId != null} onOpenChange={(o: boolean) => !o && setDetailId(null)}>
         <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>
