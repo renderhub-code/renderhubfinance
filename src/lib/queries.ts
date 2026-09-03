@@ -257,21 +257,29 @@ export function useTransactions(companyId: string | null, filters: TransactionFi
   return useQuery({
     queryKey: ["transactions", companyId ?? "__all__", filters],
     queryFn: async () => {
-      let q = supabase
-        .from("transactions")
-        .select("*")
-        .order("entry_date", { ascending: false })
-        .limit(2000);
-      if (companyId) q = q.eq("company_id", companyId);
-      if (filters.from) q = q.gte("entry_date", filters.from);
-      if (filters.to) q = q.lte("entry_date", filters.to);
-      if (filters.status && filters.status !== "todos") q = q.eq("status", filters.status);
-      if (filters.type && filters.type !== "todos") q = q.eq("type", filters.type);
-      if (filters.accountId) q = q.eq("account_id", filters.accountId);
-      if (filters.businessUnitId) q = q.eq("business_unit_id", filters.businessUnitId);
-      const { data, error } = await q;
-      if (error) throw error;
-      return data as Transaction[];
+      const pageSize = 1000;
+      const rows: Transaction[] = [];
+      for (let offset = 0; ; offset += pageSize) {
+        let q = supabase
+          .from("transactions")
+          .select("*")
+          .order("entry_date", { ascending: false })
+          .order("id", { ascending: false })
+          .range(offset, offset + pageSize - 1);
+        if (companyId) q = q.eq("company_id", companyId);
+        if (filters.from) q = q.gte("entry_date", filters.from);
+        if (filters.to) q = q.lte("entry_date", filters.to);
+        if (filters.status && filters.status !== "todos") q = q.eq("status", filters.status);
+        if (filters.type && filters.type !== "todos") q = q.eq("type", filters.type);
+        if (filters.accountId) q = q.eq("account_id", filters.accountId);
+        if (filters.businessUnitId) q = q.eq("business_unit_id", filters.businessUnitId);
+        const { data, error } = await q;
+        if (error) throw error;
+        const page = data as Transaction[];
+        rows.push(...page);
+        if (page.length < pageSize) break;
+      }
+      return rows;
     },
   });
 }
