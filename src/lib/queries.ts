@@ -22,6 +22,12 @@ export interface AccountGroup {
   dre_section: string;
   sort_order: number;
 }
+
+export interface AccountWithDre extends Account {
+  subgroup: {
+    group: { dre_section: string } | null;
+  } | null;
+}
 export interface AccountSubgroup {
   id: string;
   company_id: string;
@@ -200,6 +206,22 @@ export function useAccounts(companyId: string | null) {
       const { data, error } = await q;
       if (error) throw error;
       return data as Account[];
+    },
+  });
+}
+
+export function useAccountsWithDre(companyId: string | null) {
+  return useQuery({
+    queryKey: ["accounts_with_dre", companyId ?? "__all__"],
+    queryFn: async () => {
+      let q = supabase
+        .from("accounts")
+        .select("id,company_id,subgroup_id,code,name,type,sort_order,active,subgroup:account_subgroups(group:account_groups(dre_section))")
+        .order("code");
+      if (companyId) q = q.eq("company_id", companyId);
+      const { data, error } = await q;
+      if (error) throw error;
+      return data as unknown as AccountWithDre[];
     },
   });
 }
