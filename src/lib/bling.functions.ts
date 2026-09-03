@@ -61,16 +61,21 @@ export type BlingResource = keyof typeof RESOURCES;
 /** Proxy de leitura da API do Bling. */
 export const blingApiProxy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { resource: BlingResource; params?: Record<string, string> }) => {
+  .inputValidator((input: { resource: BlingResource; id?: string; params?: Record<string, string> }) => {
     if (!input || !(input.resource in RESOURCES)) throw new Error("Recurso inválido.");
     return input;
   })
   .handler(async ({ data }) => {
     const { blingFetch } = await import("./bling.server");
-    const json = await blingFetch(RESOURCES[data.resource], data.params ?? {});
+    const base = RESOURCES[data.resource];
+    if (data.id) {
+      const json = await blingFetch(`${base}/${data.id}`);
+      return { rows: [], detail: json?.data ?? null };
+    }
+    const json = await blingFetch(base, data.params ?? {});
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rows: any[] = Array.isArray(json?.data) ? json.data : [];
-    return { rows };
+    return { rows, detail: null };
   });
 
 /** Importa contas a pagar/receber do Bling como lançamentos da Use Noronha. */

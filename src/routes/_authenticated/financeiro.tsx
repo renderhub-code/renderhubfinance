@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, Loader2, PlugZap, RefreshCw, Unplug } from "lucide-react";
 import { toast } from "sonner";
@@ -40,17 +41,89 @@ const TABS: { id: BlingResource; label: string }[] = [
 ];
 
 function fmt(v: unknown): string {
-  if (v == null) return "—";
+  if (v == null || v === "") return "—";
   if (typeof v === "object") return JSON.stringify(v);
   return String(v);
 }
 
+function fmtDate(v: unknown): string {
+  if (typeof v !== "string" || !/^\d{4}-\d{2}-\d{2}/.test(v)) return fmt(v);
+  return v.slice(0, 10).split("-").reverse().join("/");
+}
+
+function fmtMoney(v: unknown): string {
+  const n = Number(v);
+  return Number.isFinite(n) ? n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—";
+}
+
+const SITUACAO_CONTA: Record<number, string> = { 1: "Em aberto", 2: "Pago", 3: "Parcial" };
+
+type Row = Record<string, unknown> & { id?: number | string };
+type Col = { label: string; render: (r: Row) => string };
+
+const contatoNome = (r: Row) => fmt((r.contato as { nome?: string } | undefined)?.nome);
+
+const COLS: Record<string, Col[]> = {
+  "contas-receber": [
+    { label: "Cliente", render: contatoNome },
+    { label: "Vencimento", render: (r) => fmtDate(r.vencimento) },
+    { label: "Valor", render: (r) => fmtMoney(r.valor) },
+    { label: "Saldo", render: (r) => fmtMoney(r.saldo) },
+    { label: "Situação", render: (r) => SITUACAO_CONTA[Number(r.situacao)] ?? fmt(r.situacao) },
+  ],
+  "contas-pagar": [
+    { label: "Fornecedor", render: contatoNome },
+    { label: "Vencimento", render: (r) => fmtDate(r.vencimento) },
+    { label: "Valor", render: (r) => fmtMoney(r.valor) },
+    { label: "Saldo", render: (r) => fmtMoney(r.saldo) },
+    { label: "Situação", render: (r) => SITUACAO_CONTA[Number(r.situacao)] ?? fmt(r.situacao) },
+  ],
+  "notas-fiscais": [
+    { label: "Número", render: (r) => fmt(r.numero) },
+    { label: "Emissão", render: (r) => fmtDate(r.dataEmissao ?? r.data) },
+    { label: "Cliente", render: contatoNome },
+    { label: "Valor", render: (r) => fmtMoney(r.valorNota ?? r.valor) },
+    { label: "Situação", render: (r) => fmt(r.situacao) },
+  ],
+  "pedidos-venda": [
+    { label: "Número", render: (r) => fmt(r.numero) },
+    { label: "Data", render: (r) => fmtDate(r.data) },
+    { label: "Cliente", render: contatoNome },
+    { label: "Total", render: (r) => fmtMoney(r.total) },
+    { label: "Situação", render: (r) => fmt(r.situacao) },
+  ],
+};
+
+function DetailView({ detail }: { detail: unknown }) {
+  if (!detail || typeof detail !== "object") return <p className="text-sm text-muted-foreground">Sem detalhes.</p>;
+  const entries = Object.entries(detail as Record<string, unknown>).filter(([, v]) => v != null && v !== "");
+  return (
+    <dl className="grid grid-cols-[160px_1fr] gap-x-4 gap-y-1.5 text-sm">
+      {entries.map(([k, v]) => (
+        <div key={k} className="contents">
+          <dt className="text-muted-foreground">{k}</dt>
+          <dd className="break-words">{fmt(v)}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function ResourceTable({ resource }: { resource: BlingResource }) {
   const proxy = useServerFn(blingApiProxy);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const q = useQuery({
     queryKey: ["bling", resource],
     queryFn: () => proxy({ data: { resource } }),
   });
+  const detailQuery = useQuery({
+    queryKey: ["bling", resource, "detail", detailId],
+    queryFn: () => proxy({ data: { resource, id: detailId! } }),
+    enabled: detailId != null,
+  });
+
+  const cols = COLS[resource] ?? [];
+  const label = TABS.find((t) => t.id === resource)?.label ?? resource;
 
   if (q.isLoading) {
     return (
@@ -62,33 +135,64 @@ function ResourceTable({ resource }: { resource: BlingResource }) {
   if (q.error) {
     return <p className="py-6 text-sm text-destructive">{(q.error as Error).message}</p>;
   }
-  const rows = q.data?.rows ?? [];
+  const rows = (q.data?.rows ?? []) as Row[];
   if (rows.length === 0) return <p className="py-6 text-sm text-muted-foreground">Nenhum registro retornado.</p>;
 
-  const cols = Object.keys(rows[0]).slice(0, 7);
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {cols.map((c) => (
-              <TableHead key={c}>{c}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((r, i) => (
-            <TableRow key={i}>
+    <>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
               {cols.map((c) => (
-                <TableCell key={c} className="max-w-[240px] truncate">
-                  {fmt((r as Record<string, unknown>)[c])}
-                </TableCell>
+                <TableHead key={c.label}>{c.label}</TableHead>
               ))}
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {rows.map((r, i) => (
+              <TableRow key={r.id ?? i}>
+                {cols.map((c) => (
+                  <TableCell key={c.label} className="max-w-[240px] truncate">
+                    {c.render(r)}
+                  </TableCell>
+                ))}
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={r.id == null}
+                    onClick={() => setDetailId(String(r.id))}
+                  >
+                    Detalhes
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={detailId != null} onOpenChange={(o: boolean) => !o && setDetailId(null)}>
+        <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              Detalhes — {label} #{detailId}
+            </DialogTitle>
+          </DialogHeader>
+          {detailQuery.isLoading ? (
+            <p className="text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin inline mr-2" /> Buscando detalhes no Bling...
+            </p>
+          ) : detailQuery.error ? (
+            <p className="text-sm text-destructive">{(detailQuery.error as Error).message}</p>
+          ) : (
+            <DetailView detail={detailQuery.data?.detail} />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
