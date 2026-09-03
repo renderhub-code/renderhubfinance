@@ -385,23 +385,25 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
 
   if (!sim) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Simulação comercial {year}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Nenhuma simulação comercial criada para {year}. Os valores realizados abaixo servem como base para o planejamento.
-          </p>
-          <Button onClick={() => createSim.mutate()} disabled={createSim.isPending}>
-            {createSim.isPending ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4 mr-2" />
-            )}
-            Criar simulação comercial {year}
-          </Button>
-        </CardContent>
+      <>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Simulação comercial {year}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Nenhuma simulação comercial criada para {year}. Os valores realizados abaixo servem como base para o planejamento.
+            </p>
+            <Button onClick={() => createSim.mutate()} disabled={createSim.isPending}>
+              {createSim.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4 mr-2" />
+              )}
+              Criar simulação comercial {year}
+            </Button>
+          </CardContent>
+        </Card>
         {realizedBase}
       </>
     );
