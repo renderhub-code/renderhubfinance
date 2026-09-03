@@ -71,6 +71,8 @@ export interface Transaction {
   attachment_path: string | null;
   notes: string | null;
   source_simulation_id: string | null;
+  external_source: string | null;
+  external_id: string | null;
   created_at: string;
 }
 

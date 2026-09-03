@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAccounts, useTransactions } from "@/lib/queries";
 import { useCompanyStore } from "@/lib/company-store";
+import { useFinancialStore } from "@/lib/financial-store";
 import { formatBRL } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -20,9 +21,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-const YEAR = new Date().getFullYear();
 const MONTH = new Date().getMonth() + 1;
-const MONTH_LABEL = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
 function amountOf(t: { status: string; amount_realized: number; amount_expected: number }) {
   const realized = Number(t.amount_realized ?? 0);
@@ -31,9 +30,12 @@ function amountOf(t: { status: string; amount_realized: number; amount_expected:
 
 function DashboardPage() {
   const companyId = useCompanyStore((s) => s.activeCompanyId);
+  const businessUnitId = useCompanyStore((s) => s.activeBusinessUnitId);
+  const year = useFinancialStore((s) => s.year);
   const { data: txs, isLoading } = useTransactions(companyId, {
-    from: `${YEAR}-01-01`,
-    to: `${YEAR}-12-31`,
+    from: `${year}-01-01`,
+    to: `${year}-12-31`,
+    businessUnitId,
   });
   const { data: accounts } = useAccounts(companyId);
 
@@ -48,7 +50,7 @@ function DashboardPage() {
     let expense = 0;
     let cashIn = 0;
     let cashOut = 0;
-    const monthPrefix = `${YEAR}-${String(MONTH).padStart(2, "0")}`;
+    const monthPrefix = `${year}-${String(MONTH).padStart(2, "0")}`;
     for (const t of txs ?? []) {
       if (t.status === "cancelado") continue;
       const v = amountOf(t);
@@ -63,15 +65,15 @@ function DashboardPage() {
       }
     }
     return { revenue, expense, result: revenue - expense, cash: cashIn - cashOut };
-  }, [txs]);
+  }, [txs, year]);
 
   const latest = (txs ?? []).slice(0, 8);
 
   const cards = [
-    { label: `Receitas — ${MONTH_LABEL}`, value: kpis.revenue },
-    { label: `Despesas — ${MONTH_LABEL}`, value: kpis.expense },
-    { label: `Resultado — ${MONTH_LABEL}`, value: kpis.result },
-    { label: `Caixa realizado — ${YEAR}`, value: kpis.cash },
+    { label: `Receitas — mês ${MONTH}/${year}`, value: kpis.revenue },
+    { label: `Despesas — mês ${MONTH}/${year}`, value: kpis.expense },
+    { label: `Resultado — mês ${MONTH}/${year}`, value: kpis.result },
+    { label: `Caixa realizado — ${year}`, value: kpis.cash },
   ];
 
   return (
@@ -107,13 +109,15 @@ function DashboardPage() {
                 <TableHead>Data</TableHead>
                 <TableHead>Histórico</TableHead>
                 <TableHead>Conta</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Origem</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {latest.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
                     {isLoading ? "Carregando…" : "Nenhum lançamento no período."}
                   </TableCell>
                 </TableRow>
@@ -125,6 +129,8 @@ function DashboardPage() {
                     </TableCell>
                     <TableCell className="max-w-[320px] truncate">{t.description ?? "—"}</TableCell>
                     <TableCell className="text-muted-foreground">{accountName.get(t.account_id) ?? "—"}</TableCell>
+                    <TableCell className="capitalize">{t.status}</TableCell>
+                    <TableCell>{t.external_source?.startsWith("bling:") ? "Bling" : "Manual"}</TableCell>
                     <TableCell className={"text-right whitespace-nowrap " + (t.type === "saida" ? "text-destructive" : "")}>
                       {t.type === "saida" ? "−" : ""}
                       {formatBRL(amountOf(t))}
