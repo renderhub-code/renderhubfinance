@@ -90,3 +90,16 @@ export const importBlingTransactions = createServerFn({ method: "POST" })
     const { importBlingYear } = await import("./bling.server");
     return importBlingYear(data.year, context.userId);
   });
+
+/** Reclassifica lançamentos importados que ainda estão em "A Classificar (Bling)". */
+export const reclassifyBlingTransactions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { year: number }) => {
+    const y = Number(input?.year);
+    if (!Number.isInteger(y) || y < 2000 || y > 2100) throw new Error("Ano inválido.");
+    return { year: y };
+  })
+  .handler(async ({ data }) => {
+    const { reclassifyBlingYear } = await import("./bling.server");
+    return reclassifyBlingYear(data.year);
+  });

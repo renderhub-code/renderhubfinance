@@ -131,20 +131,28 @@ export async function getAccessToken(): Promise<string> {
 }
 
 export async function blingFetch(path: string, params?: Record<string, string>) {
-  const token = await getAccessToken();
   const url = new URL(`${BLING_API_BASE}${path.startsWith("/") ? path : `/${path}`}`);
   for (const [k, v] of Object.entries(params ?? {})) {
     if (v !== "" && v != null) url.searchParams.set(k, v);
   }
-  const res = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
-  });
-  const text = await res.text();
-  if (!res.ok) {
-    console.error("[Bling] api error", path, res.status, text);
-    throw new Error(`Erro na API do Bling (${res.status}).`);
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const token = await getAccessToken();
+    const res = await fetch(url.toString(), {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    });
+    if (res.status === 429 && attempt < 3) {
+      // Limite de requisições do Bling: espera progressiva e tenta de novo.
+      await new Promise((r) => setTimeout(r, 3000 * (attempt + 1)));
+      continue;
+    }
+    const text = await res.text();
+    if (!res.ok) {
+      console.error("[Bling] api error", path, res.status, text);
+      throw new Error(`Erro na API do Bling (${res.status}).`);
+    }
+    return text ? JSON.parse(text) : null;
   }
-  return text ? JSON.parse(text) : null;
+  throw new Error("Erro na API do Bling (429).");
 }
 
 export async function saveState(state: string, userId: string) {
@@ -251,6 +259,22 @@ async function loadMappings(companyId: string) {
   return byLabel;
 }
 
+const resolveAccountFor = (
+  mappings: Map<string, { id: string; type: string | null }>,
+  categorias: Map<string, string>,
+  r: BlingConta,
+  type: "entrada" | "saida",
+) => {
+  const label =
+    r.categoria?.descricao ??
+    (r.categoria?.id != null ? categorias.get(String(r.categoria.id)) : undefined);
+  if (label) {
+    const hit = mappings.get(normalizeLabel(label));
+    if (hit && (hit.type === null || hit.type === type)) return hit.id;
+  }
+  return UN_ACCOUNTS[type];
+};
+
 export async function importBlingYear(year: number, userId: string) {
   const companyId = await getBlingCompanyId();
   const [receber, pagar, categorias, mappings] = await Promise.all([
@@ -260,16 +284,8 @@ export async function importBlingYear(year: number, userId: string) {
     loadMappings(companyId),
   ]);
 
-  const resolveAccount = (r: BlingConta, type: "entrada" | "saida") => {
-    const label =
-      r.categoria?.descricao ??
-      (r.categoria?.id != null ? categorias.get(String(r.categoria.id)) : undefined);
-    if (label) {
-      const hit = mappings.get(normalizeLabel(label));
-      if (hit && (hit.type === null || hit.type === type)) return hit.id;
-    }
-    return UN_ACCOUNTS[type];
-  };
+  const resolveAccount = (r: BlingConta, type: "entrada" | "saida") =>
+    resolveAccountFor(mappings, categorias, r, type);
 
   const rows = [
     ...receber.map((r) => ({ r, type: "entrada" as const, prefix: "receber" })),
@@ -315,4 +331,57 @@ export async function importBlingYear(year: number, userId: string) {
   }
 
   return { imported: fresh.length, skipped: rows.length - fresh.length, total: rows.length };
+}
+
+const RECLASSIFY_BATCH = 100;
+
+/** Reclassifica um lote de lançamentos importados que ainda estão em "A Classificar (Bling)".
+ *  A listagem do Bling não traz a categoria, então buscamos o detalhe de cada registro. */
+export async function reclassifyBlingYear(_year: number) {
+  const companyId = await getBlingCompanyId();
+  const [categorias, mappings] = await Promise.all([
+    fetchBlingCategorias(),
+    loadMappings(companyId),
+  ]);
+
+  const { data: stuck, error: stuckErr } = await supabaseAdmin
+    .from("transactions")
+    .select("id, external_source, external_id, type")
+    .eq("company_id", companyId)
+    .not("external_id", "is", null)
+    .like("external_source", "bling:%")
+    .in("account_id", [UN_ACCOUNTS.entrada, UN_ACCOUNTS.saida])
+    .order("created_at", { ascending: true })
+    .limit(RECLASSIFY_BATCH);
+  if (stuckErr) throw new Error(stuckErr.message);
+
+  let reclassified = 0;
+  for (const tx of stuck ?? []) {
+    const prefix = tx.external_source === "bling:receber" ? "receber" : "pagar";
+    const type = tx.type === "entrada" ? "entrada" : "saida";
+    try {
+      const json = await blingFetch(`/contas/${prefix}/${tx.external_id}`);
+      const d = json?.data as BlingConta | undefined;
+      if (!d) continue;
+      const accountId = resolveAccountFor(mappings, categorias, d, type);
+      if (accountId === UN_ACCOUNTS[type]) continue;
+      const { error } = await supabaseAdmin
+        .from("transactions")
+        .update({ account_id: accountId })
+        .eq("id", tx.id)
+        .eq("account_id", UN_ACCOUNTS[type]);
+      if (!error) reclassified++;
+    } catch (err) {
+      console.error("[Bling] reclassify item", tx.external_id, err);
+    }
+  }
+
+  const { count } = await supabaseAdmin
+    .from("transactions")
+    .select("id", { count: "exact", head: true })
+    .eq("company_id", companyId)
+    .like("external_source", "bling:%")
+    .in("account_id", [UN_ACCOUNTS.entrada, UN_ACCOUNTS.saida]);
+
+  return { reclassified, pending: count ?? 0 };
 }

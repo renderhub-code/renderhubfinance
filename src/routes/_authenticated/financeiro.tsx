@@ -7,6 +7,7 @@ import {
   disconnectBling,
   getBlingStatus,
   importBlingTransactions,
+  reclassifyBlingTransactions,
   startBlingAuth,
   type BlingResource,
 } from "@/lib/bling.functions";
@@ -202,6 +203,7 @@ function FinanceiroPage() {
   const start = useServerFn(startBlingAuth);
   const disconnect = useServerFn(disconnectBling);
   const importFn = useServerFn(importBlingTransactions);
+  const reclassify = useServerFn(reclassifyBlingTransactions);
   const year = new Date().getFullYear();
 
   const [tab, setTab] = useState<BlingResource>("contas-receber");
@@ -231,6 +233,28 @@ function FinanceiroPage() {
     onSuccess: (r) => {
       toast.success(
         `Importação concluída: ${r.imported} novo(s) lançamento(s), ${r.skipped} já existente(s).`,
+      );
+      qc.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reclassifyMutation = useMutation({
+    mutationFn: async () => {
+      let total = 0;
+      let pending = 0;
+      // Processa em lotes (o servidor limita cada chamada); para quando não há mais progresso.
+      for (let i = 0; i < 25; i++) {
+        const r = await reclassify({ data: { year } });
+        total += r.reclassified;
+        pending = r.pending;
+        if (r.reclassified === 0) break;
+      }
+      return { reclassified: total, pending };
+    },
+    onSuccess: (r) => {
+      toast.success(
+        `Reclassificação concluída: ${r.reclassified} lançamento(s) atualizados, ${r.pending} ainda sem mapeamento.`,
       );
       qc.invalidateQueries();
     },
@@ -293,14 +317,28 @@ function FinanceiroPage() {
                 Dashboard, Fluxo de Caixa e DRE. Registros já importados não são duplicados.
               </CardDescription>
             </div>
-            <Button onClick={() => importMutation.mutate()} disabled={importMutation.isPending}>
-              {importMutation.isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4 mr-2" />
-              )}
-              Importar {year}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => reclassifyMutation.mutate()}
+                disabled={reclassifyMutation.isPending}
+              >
+                {reclassifyMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                )}
+                Reclassificar
+              </Button>
+              <Button onClick={() => importMutation.mutate()} disabled={importMutation.isPending}>
+                {importMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                Importar {year}
+              </Button>
+            </div>
           </CardHeader>
         </Card>
       )}
