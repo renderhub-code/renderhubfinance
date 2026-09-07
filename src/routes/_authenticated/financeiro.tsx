@@ -319,7 +319,7 @@ function FinanceiroPage() {
               <CardTitle className="text-base">Importar para Lançamentos</CardTitle>
               <CardDescription>
                 Traz as contas a pagar e a receber de {year} para os Lançamentos da Use Noronha, alimentando
-                Dashboard, Fluxo de Caixa e DRE. Registros já importados não são duplicados.
+                Dashboard e Fluxo de Caixa. Registros já importados não são duplicados.
               </CardDescription>
             </div>
             <div className="flex gap-2">

@@ -335,13 +335,24 @@ export async function importBlingYear(year: number, userId: string) {
 
 const RECLASSIFY_BATCH = 100;
 
-/** Reclassifica um lote de lançamentos importados que ainda estão em "A Classificar (Bling)".
+/** Contas que precisam ser reclassificadas: provisórias ou contas antigas desativadas. */
+async function pendingAccountIds(companyId: string) {
+  const { data } = await supabaseAdmin
+    .from("accounts")
+    .select("id, active")
+    .eq("company_id", companyId);
+  const ids = (data ?? []).filter((a) => !a.active).map((a) => a.id);
+  return Array.from(new Set([...ids, UN_ACCOUNTS.entrada, UN_ACCOUNTS.saida]));
+}
+
+/** Reclassifica lançamentos importados do Bling que ainda não usam o plano de contas atual.
  *  A listagem do Bling não traz a categoria, então buscamos o detalhe de cada registro. */
 export async function reclassifyBlingYear(_year: number) {
   const companyId = await getBlingCompanyId();
-  const [categorias, mappings] = await Promise.all([
+  const [categorias, mappings, pendingIds] = await Promise.all([
     fetchBlingCategorias(),
     loadMappings(companyId),
+    pendingAccountIds(companyId),
   ]);
 
   const { data: stuck, error: stuckErr } = await supabaseAdmin
@@ -350,7 +361,7 @@ export async function reclassifyBlingYear(_year: number) {
     .eq("company_id", companyId)
     .not("external_id", "is", null)
     .like("external_source", "bling:%")
-    .in("account_id", [UN_ACCOUNTS.entrada, UN_ACCOUNTS.saida])
+    .in("account_id", pendingIds)
     .order("created_at", { ascending: true })
     .limit(RECLASSIFY_BATCH);
   if (stuckErr) throw new Error(stuckErr.message);
@@ -364,13 +375,11 @@ export async function reclassifyBlingYear(_year: number) {
       const d = json?.data as BlingConta | undefined;
       if (!d) continue;
       const accountId = resolveAccountFor(mappings, categorias, d, type);
-      if (accountId === UN_ACCOUNTS[type]) continue;
       const { error } = await supabaseAdmin
         .from("transactions")
         .update({ account_id: accountId })
-        .eq("id", tx.id)
-        .eq("account_id", UN_ACCOUNTS[type]);
-      if (!error) reclassified++;
+        .eq("id", tx.id);
+      if (!error && accountId !== UN_ACCOUNTS[type]) reclassified++;
     } catch (err) {
       console.error("[Bling] reclassify item", tx.external_id, err);
     }
@@ -381,7 +390,8 @@ export async function reclassifyBlingYear(_year: number) {
     .select("id", { count: "exact", head: true })
     .eq("company_id", companyId)
     .like("external_source", "bling:%")
-    .in("account_id", [UN_ACCOUNTS.entrada, UN_ACCOUNTS.saida]);
+    .in("account_id", pendingIds);
 
   return { reclassified, pending: count ?? 0 };
 }
+
