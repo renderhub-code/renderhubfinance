@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCentrosDeCustoRouteImport } from './routes/_authenticated/centros-de-custo'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedDreRouteImport } from './routes/_authenticated/dre'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFluxoDeCaixaRouteImport } from './routes/_authenticated/fluxo-de-caixa'
 import { Route as AuthenticatedLancamentosRouteImport } from './routes/_authenticated/lancamentos'
@@ -47,11 +46,6 @@ const AuthenticatedCentrosDeCustoRoute =
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDreRoute = AuthenticatedDreRouteImport.update({
-  id: '/dre',
-  path: '/dre',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
@@ -105,7 +99,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/dre': typeof AuthenticatedDreRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
@@ -120,7 +113,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/dre': typeof AuthenticatedDreRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
@@ -137,7 +129,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/dre': typeof AuthenticatedDreRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
   '/_authenticated/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
@@ -154,7 +145,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/centros-de-custo'
     | '/dashboard'
-    | '/dre'
     | '/financeiro'
     | '/fluxo-de-caixa'
     | '/lancamentos'
@@ -169,7 +159,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/centros-de-custo'
     | '/dashboard'
-    | '/dre'
     | '/financeiro'
     | '/fluxo-de-caixa'
     | '/lancamentos'
@@ -185,7 +174,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/centros-de-custo'
     | '/_authenticated/dashboard'
-    | '/_authenticated/dre'
     | '/_authenticated/financeiro'
     | '/_authenticated/fluxo-de-caixa'
     | '/_authenticated/lancamentos'
@@ -238,13 +226,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dre': {
-      id: '/_authenticated/dre'
-      path: '/dre'
-      fullPath: '/dre'
-      preLoaderRoute: typeof AuthenticatedDreRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/financeiro': {
@@ -338,7 +319,6 @@ const AuthenticatedSimulacoesRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCentrosDeCustoRoute: typeof AuthenticatedCentrosDeCustoRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedDreRoute: typeof AuthenticatedDreRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFluxoDeCaixaRoute: typeof AuthenticatedFluxoDeCaixaRoute
   AuthenticatedLancamentosRoute: typeof AuthenticatedLancamentosRouteWithChildren
@@ -349,7 +329,6 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCentrosDeCustoRoute: AuthenticatedCentrosDeCustoRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedDreRoute: AuthenticatedDreRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFluxoDeCaixaRoute: AuthenticatedFluxoDeCaixaRoute,
   AuthenticatedLancamentosRoute: AuthenticatedLancamentosRouteWithChildren,

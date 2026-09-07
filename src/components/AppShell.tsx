@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, ArrowLeftRight, FileBarChart, ListTree, Building2, LogOut, Loader2, Wallet, FlaskConical, PlugZap } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, ListTree, Building2, LogOut, Loader2, Wallet, FlaskConical, PlugZap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanies, useBusinessUnits, useUserRoles } from "@/lib/queries";
 import { useCompanyStore } from "@/lib/company-store";
@@ -15,7 +15,6 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/lancamentos", label: "Lançamentos", icon: ArrowLeftRight },
   { to: "/fluxo-de-caixa", label: "Fluxo de Caixa", icon: Wallet },
-  { to: "/dre", label: "DRE", icon: FileBarChart },
   { to: "/simulacoes", label: "Simulações", icon: FlaskConical },
   { to: "/plano-de-contas", label: "Plano de Contas", icon: ListTree },
   { to: "/centros-de-custo", label: "Centros de Custo", icon: Building2 },
