@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,15 +30,14 @@ function Cells({ months, strong }: { months: MonthCell[]; strong?: boolean }) {
       {blocks.map((m, i) => {
         const delta = m.realized - m.expected;
         return (
-          <>
-            <td key={`e-${i}`} className={cn("px-2 py-1 text-right text-xs whitespace-nowrap tabular-nums", i === 12 && "border-l")}>
+          <Fragment key={i}>
+            <td className={cn("px-2 py-1 text-right text-xs whitespace-nowrap tabular-nums", i === 12 && "border-l")}>
               {formatBRL(m.expected)}
             </td>
-            <td key={`r-${i}`} className="px-2 py-1 text-right text-xs whitespace-nowrap tabular-nums">
+            <td className="px-2 py-1 text-right text-xs whitespace-nowrap tabular-nums">
               {formatBRL(m.realized)}
             </td>
             <td
-              key={`d-${i}`}
               className={cn(
                 "px-2 py-1 text-right text-xs whitespace-nowrap tabular-nums border-r",
                 delta < 0 ? "text-destructive" : delta > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground",
@@ -47,7 +46,7 @@ function Cells({ months, strong }: { months: MonthCell[]; strong?: boolean }) {
             >
               {formatBRL(delta)}
             </td>
-          </>
+          </Fragment>
         );
       })}
     </>
@@ -96,7 +95,7 @@ function FluxoCaixaPage() {
 
   const summaryRows = [
     { label: "(+) Entradas", months: summary.inflow },
-    { label: "(−) Saídas", months: summary.outflow },
+    { label: "(−) Saídas", months: summary.outflow.map((m) => ({ expected: -m.expected, realized: -m.realized })) },
     { label: "(=) Variação de caixa", months: summary.variation, strong: true },
     { label: "Saldo acumulado", months: summary.balance, strong: true },
   ];
@@ -149,11 +148,11 @@ function FluxoCaixaPage() {
                 </tr>
                 <tr>
                   {[...MONTHS_PT, "Total"].map((m) => (
-                    <>
-                      <th key={`${m}-p`} className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Prev.</th>
-                      <th key={`${m}-r`} className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Real.</th>
-                      <th key={`${m}-d`} className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b border-r whitespace-nowrap">Δ</th>
-                    </>
+                    <Fragment key={m}>
+                      <th className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Prev.</th>
+                      <th className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Real.</th>
+                      <th className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b border-r whitespace-nowrap">Δ</th>
+                    </Fragment>
                   ))}
                 </tr>
               </thead>
