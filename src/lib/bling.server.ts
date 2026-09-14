@@ -275,6 +275,48 @@ const resolveAccountFor = (
   return UN_ACCOUNTS[type];
 };
 
+/** Situações do Bling para contas a pagar/receber:
+ *  1 aberto, 2 recebido/pago, 3 parcialmente recebido/pago,
+ *  4 devolvido, 5 cancelado, 6 devolvido parcial, 7 confirmado. */
+const CANCELLED_SITUACOES = new Set([4, 5, 6]);
+const PAID_SITUACOES = new Set([2]);
+const PARTIAL_SITUACOES = new Set([3]);
+
+type Settlement = {
+  status: "previsto" | "realizado" | "cancelado";
+  settledDate: string | null;
+  amountRealized: number;
+};
+
+/** Resolve status/valor realizado a partir da situação do Bling. Contas parcialmente
+ *  recebidas/pagas (situação 3) não trazem o saldo na listagem, então buscamos o
+ *  detalhe do registro para saber quanto foi de fato liquidado. */
+async function resolveSettlement(
+  prefix: "receber" | "pagar",
+  r: BlingConta,
+  valor: number,
+): Promise<Settlement> {
+  const situacao = Number(r.situacao);
+  if (CANCELLED_SITUACOES.has(situacao)) {
+    return { status: "cancelado", settledDate: null, amountRealized: 0 };
+  }
+  if (PAID_SITUACOES.has(situacao)) {
+    return { status: "realizado", settledDate: (r.vencimento as string) ?? null, amountRealized: valor };
+  }
+  if (PARTIAL_SITUACOES.has(situacao)) {
+    try {
+      const json = await blingFetch(`/contas/${prefix}/${r.id}`);
+      const saldo = Number(json?.data?.saldo);
+      const realized = Number.isFinite(saldo) ? Math.max(0, valor - saldo) : valor;
+      return { status: "realizado", settledDate: (r.vencimento as string) ?? null, amountRealized: realized };
+    } catch (err) {
+      console.error("[Bling] saldo parcial", prefix, r.id, err);
+      return { status: "realizado", settledDate: (r.vencimento as string) ?? null, amountRealized: valor };
+    }
+  }
+  return { status: "previsto", settledDate: null, amountRealized: 0 };
+}
+
 export async function importBlingYear(year: number, userId: string) {
   const companyId = await getBlingCompanyId();
   const [receber, pagar, categorias, mappings] = await Promise.all([
@@ -287,50 +329,90 @@ export async function importBlingYear(year: number, userId: string) {
   const resolveAccount = (r: BlingConta, type: "entrada" | "saida") =>
     resolveAccountFor(mappings, categorias, r, type);
 
-  const rows = [
-    ...receber.map((r) => ({ r, type: "entrada" as const, prefix: "receber" })),
-    ...pagar.map((r) => ({ r, type: "saida" as const, prefix: "pagar" })),
-  ]
-    .filter((x) => x.r.vencimento && String(x.r.vencimento).startsWith(String(year)))
-    .map(({ r, type, prefix }) => {
-      const settled = r.situacao === 2 || r.situacao === 3;
+  const withType = [
+    ...receber.map((r) => ({ r, type: "entrada" as const, prefix: "receber" as const })),
+    ...pagar.map((r) => ({ r, type: "saida" as const, prefix: "pagar" as const })),
+  ].filter((x) => x.r.vencimento && String(x.r.vencimento).startsWith(String(year)));
+
+  const rows = await Promise.all(
+    withType.map(async ({ r, type, prefix }) => {
       const valor = Number(r.valor ?? 0);
+      const settlement = await resolveSettlement(prefix, r, valor);
       return {
         company_id: companyId,
         account_id: resolveAccount(r, type),
-
         entry_date: (r.dataEmissao && r.dataEmissao !== "0000-00-00" ? r.dataEmissao : r.vencimento) as string,
         due_date: r.vencimento as string,
-        settled_date: settled ? (r.vencimento as string) : null,
+        settled_date: settlement.settledDate,
         type,
-        status: (settled ? "realizado" : "previsto") as "realizado" | "previsto",
+        status: settlement.status,
         amount_expected: valor,
-        amount_realized: settled ? valor : 0,
+        amount_realized: settlement.amountRealized,
         description: r.historico || r.contato?.nome || (type === "entrada" ? "Conta a receber (Bling)" : "Conta a pagar (Bling)"),
         notes: r.contato?.nome ?? null,
         created_by: userId,
         external_source: `bling:${prefix}`,
         external_id: String(r.id),
       };
-    });
+    }),
+  );
 
-  if (rows.length === 0) return { imported: 0, skipped: 0, total: 0 };
+  if (rows.length === 0) return { imported: 0, updated: 0, unchanged: 0, total: 0 };
 
   const { data: existing } = await supabaseAdmin
     .from("transactions")
-    .select("external_source, external_id")
+    .select("id, external_source, external_id, status, amount_expected, amount_realized, due_date, entry_date, settled_date")
     .eq("company_id", companyId)
     .not("external_id", "is", null);
 
-  const seen = new Set((existing ?? []).map((e) => `${e.external_source}|${e.external_id}`));
-  const fresh = rows.filter((r) => !seen.has(`${r.external_source}|${r.external_id}`));
+  const existingByKey = new Map(
+    (existing ?? []).map((e) => [`${e.external_source}|${e.external_id}`, e]),
+  );
 
-  for (let i = 0; i < fresh.length; i += 200) {
-    const { error } = await supabaseAdmin.from("transactions").insert(fresh.slice(i, i + 200));
+  const toInsert: typeof rows = [];
+  const toUpdate: { id: string; row: (typeof rows)[number] }[] = [];
+  for (const row of rows) {
+    const prev = existingByKey.get(`${row.external_source}|${row.external_id}`);
+    if (!prev) {
+      toInsert.push(row);
+      continue;
+    }
+    const changed =
+      prev.status !== row.status ||
+      Number(prev.amount_expected) !== row.amount_expected ||
+      Number(prev.amount_realized) !== row.amount_realized ||
+      prev.due_date !== row.due_date ||
+      prev.entry_date !== row.entry_date ||
+      prev.settled_date !== row.settled_date;
+    if (changed) toUpdate.push({ id: prev.id, row });
+  }
+
+  for (let i = 0; i < toInsert.length; i += 200) {
+    const { error } = await supabaseAdmin.from("transactions").insert(toInsert.slice(i, i + 200));
     if (error) throw new Error(error.message);
   }
 
-  return { imported: fresh.length, skipped: rows.length - fresh.length, total: rows.length };
+  for (const { id, row } of toUpdate) {
+    const { error } = await supabaseAdmin
+      .from("transactions")
+      .update({
+        due_date: row.due_date,
+        entry_date: row.entry_date,
+        settled_date: row.settled_date,
+        status: row.status,
+        amount_expected: row.amount_expected,
+        amount_realized: row.amount_realized,
+      })
+      .eq("id", id);
+    if (error) throw new Error(error.message);
+  }
+
+  return {
+    imported: toInsert.length,
+    updated: toUpdate.length,
+    unchanged: rows.length - toInsert.length - toUpdate.length,
+    total: rows.length,
+  };
 }
 
 const RECLASSIFY_BATCH = 100;

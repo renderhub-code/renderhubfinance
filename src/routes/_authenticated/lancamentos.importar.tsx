@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/lancamentos/importar")({
   component: Importar,
 });
 
-const SAMPLE = `data;codigo_conta;descricao;valor;status
+const SAMPLE = `data;codigo_categoria;descricao;valor;status
 2026-01-05;3.1.01.001;Venda balcão;1250,00;realizado
 2026-01-10;5.2.01.002;Conta de luz;-380,50;previsto`;
 
@@ -36,9 +36,9 @@ function Importar() {
     if (lines.length < 2) { toast.error("CSV vazio"); setBusy(false); return; }
     const header = lines[0].split(";").map((h) => h.trim().toLowerCase());
     const idx = (k: string) => header.indexOf(k);
-    const iDate = idx("data"), iCode = idx("codigo_conta"), iDesc = idx("descricao"),
+    const iDate = idx("data"), iCode = idx("codigo_categoria") >= 0 ? idx("codigo_categoria") : idx("codigo_conta"), iDesc = idx("descricao"),
           iVal = idx("valor"), iStatus = idx("status");
-    if (iDate < 0 || iCode < 0 || iVal < 0) { toast.error("Cabeçalho inválido: use data;codigo_conta;descricao;valor;status"); setBusy(false); return; }
+    if (iDate < 0 || iCode < 0 || iVal < 0) { toast.error("Cabeçalho inválido: use data;codigo_categoria;descricao;valor;status"); setBusy(false); return; }
 
     const acctByCode = new Map(accounts.map((a) => [a.code, a]));
     const rows: any[] = [];
@@ -50,7 +50,7 @@ function Importar() {
       const date = cols[iDate]?.trim();
       const code = cols[iCode]?.trim();
       const acc = acctByCode.get(code);
-      if (!acc) { errors.push(`Linha ${i + 1}: conta ${code} não encontrada`); continue; }
+      if (!acc) { errors.push(`Linha ${i + 1}: categoria ${code} não encontrada`); continue; }
       const raw = parseBRLInput(cols[iVal] ?? "0");
       const value = Math.abs(raw);
       const status = (iStatus >= 0 ? cols[iStatus]?.trim() : "previsto") || "previsto";
@@ -92,7 +92,7 @@ function Importar() {
       </div>
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Importar Lançamentos</h1>
-        <p className="text-sm text-muted-foreground">Cole o CSV separado por ponto-e-vírgula com o cabeçalho: <code>data;codigo_conta;descricao;valor;status</code>.</p>
+        <p className="text-sm text-muted-foreground">Cole o CSV separado por ponto-e-vírgula com o cabeçalho: <code>data;codigo_categoria;descricao;valor;status</code>.</p>
       </div>
       <Card>
         <CardHeader><CardTitle>Amostra</CardTitle></CardHeader>

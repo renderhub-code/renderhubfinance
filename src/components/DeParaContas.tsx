@@ -124,11 +124,11 @@ export function DeParaContas({ companyId }: DeParaContasProps) {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Conta interna vinculada.");
+      toast.success("Categoria interna vinculada.");
       invalidate();
     },
     onError: (err: { message?: string }) =>
-      toast.error(err?.message ?? "Não foi possível vincular a conta."),
+      toast.error(err?.message ?? "Não foi possível vincular a categoria."),
   });
 
   const deleteMutation = useMutation({
@@ -167,11 +167,11 @@ export function DeParaContas({ companyId }: DeParaContasProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">De-Para (ERP → Conta interna)</CardTitle>
+          <CardTitle className="text-base">De-Para (ERP → Categoria interna)</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Selecione uma empresa no seletor acima para gerenciar as correspondências de contas.
+            Selecione uma empresa no seletor acima para gerenciar as correspondências de categorias.
           </p>
         </CardContent>
       </Card>
@@ -202,7 +202,7 @@ export function DeParaContas({ companyId }: DeParaContasProps) {
           onValueChange={(v) => setDraft((d) => ({ ...d, account_id: v }))}
         >
           <SelectTrigger className="h-8">
-            <SelectValue placeholder="Selecione a conta interna" />
+            <SelectValue placeholder="Selecione a categoria interna" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={NONE}>Aguardando mapeamento</SelectItem>
@@ -239,9 +239,9 @@ export function DeParaContas({ companyId }: DeParaContasProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-4">
         <div>
-          <CardTitle className="text-base">De-Para (ERP → Conta interna)</CardTitle>
+          <CardTitle className="text-base">De-Para (ERP → Categoria interna)</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Correspondência entre o plano de contas da contabilidade/ERP e as contas internas desta
+            Correspondência entre o plano de contas da contabilidade/ERP e as categorias internas desta
             empresa.
           </p>
         </div>
@@ -271,7 +271,7 @@ export function DeParaContas({ companyId }: DeParaContasProps) {
               <TableRow>
                 <TableHead className="w-40">Código de origem (ERP)</TableHead>
                 <TableHead>Descrição de origem</TableHead>
-                <TableHead>Conta interna</TableHead>
+                <TableHead>Categoria interna</TableHead>
                 <TableHead>Observação</TableHead>
                 <TableHead className="w-32 text-right">Ações</TableHead>
               </TableRow>

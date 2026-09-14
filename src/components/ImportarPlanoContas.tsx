@@ -36,7 +36,7 @@ interface Props {
   disabled?: boolean;
 }
 
-const HEADER_HINTS = ["codigo", "código", "conta", "classificacao", "classificação", "cod"];
+const HEADER_HINTS = ["codigo", "código", "conta", "categoria", "classificacao", "classificação", "cod"];
 
 function normalize(value: unknown): string {
   if (value === null || value === undefined) return "";
@@ -97,7 +97,7 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
       }
 
       if (parsed.length === 0) {
-        toast.error("Nenhuma conta analítica encontrada na primeira coluna do arquivo.");
+        toast.error("Nenhuma categoria analítica encontrada na primeira coluna do arquivo.");
         return;
       }
 
@@ -152,7 +152,7 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
       setRows([]);
     },
     onError: (err: { message?: string }) =>
-      toast.error(err?.message ?? "Não foi possível importar as contas."),
+      toast.error(err?.message ?? "Não foi possível importar as categorias."),
   });
 
   const newCount = rows.filter((r) => !r.exists).length;
@@ -183,7 +183,7 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Importar contas analíticas</DialogTitle>
+            <DialogTitle>Importar categorias analíticas</DialogTitle>
             <DialogDescription>
               {fileName} — {newCount} nova(s), {dupeCount} já existente(s), {skipped}{" "}
               linha(s) descartada(s).

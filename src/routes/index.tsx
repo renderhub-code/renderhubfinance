@@ -39,7 +39,7 @@ function Landing() {
         </div>
         <div className="mt-20 grid gap-6 md:grid-cols-3">
           <Feature icon={ListTree} title="Plano de contas unificado" desc="Estrutura hierárquica padronizada em todas as empresas do hub, com suporte a unidades de negócio." />
-          <Feature icon={BarChart3} title="DRE mês a mês" desc="Realizado, previsto e delta para cada mês, com acumulado do ano e drill-down por conta." />
+          <Feature icon={BarChart3} title="DRE mês a mês" desc="Realizado, previsto e delta para cada mês, com acumulado do ano e drill-down por categoria." />
           <Feature icon={TrendingUp} title="Simulações (em breve)" desc="Cenários de receita, custo e despesa aplicáveis ao fluxo de caixa previsto." />
         </div>
       </main>

@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/fluxo-de-caixa")({
     { title: "Fluxo de Caixa — Hub Financial Command" },
     { name: "description", content: "Fluxo de caixa detalhado por plano de contas, com previsto, realizado e delta mês a mês." },
     { property: "og:title", content: "Fluxo de Caixa — Hub Financial Command" },
-    { property: "og:description", content: "Previsto, realizado e delta por conta em cada mês do ano." },
+    { property: "og:description", content: "Previsto, realizado e delta por categoria em cada mês do ano." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),

@@ -263,12 +263,12 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
 
   function addRow(accountId: string) {
     if (!accountId) {
-      toast.error("Nenhuma conta de receita disponível");
+      toast.error("Nenhuma categoria de receita disponível");
       return;
     }
     const count = rows.filter((r) => r.accountId === accountId).length;
     if (count >= MAX_ROWS_PER_ACCOUNT) {
-      toast.error(`Limite de ${MAX_ROWS_PER_ACCOUNT} clientes por conta atingido`);
+      toast.error(`Limite de ${MAX_ROWS_PER_ACCOUNT} clientes por categoria atingido`);
       return;
     }
     setCollapsed((prev) => {
@@ -308,7 +308,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
     const known = new Set(revenueAccounts.map((a) => a.id));
     for (const [accountId, groupRows] of byAccount.entries()) {
       if (!known.has(accountId)) {
-        entries.push({ accountId, code: "—", name: "Conta não encontrada", groupRows });
+        entries.push({ accountId, code: "—", name: "Categoria não encontrada", groupRows });
       }
     }
     return entries.map(({ accountId, code, name, groupRows }) => {
@@ -374,7 +374,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
       <CardHeader><CardTitle className="text-base">Base realizada — {year}</CardTitle></CardHeader>
       <CardContent className="overflow-x-auto">
         {realizedLoading ? <TableSkeleton rows={4} cols={8} /> : <Table>
-          <TableHeader><TableRow><TableHead className="min-w-52">Conta de receita</TableHead>{MONTHS.map((month) => <TableHead key={month} className="text-right">{month}</TableHead>)}<TableHead className="text-right">Total</TableHead></TableRow></TableHeader>
+          <TableHeader><TableRow><TableHead className="min-w-52">Categoria de receita</TableHead>{MONTHS.map((month) => <TableHead key={month} className="text-right">{month}</TableHead>)}<TableHead className="text-right">Total</TableHead></TableRow></TableHeader>
           <TableBody>{realizedByAccount.length === 0 ? <TableRow><TableCell colSpan={14} className="py-8 text-center text-muted-foreground">Nenhuma receita realizada no período.</TableCell></TableRow> : realizedByAccount.map(({ account, values }) => <TableRow key={account.id}><TableCell className="font-medium whitespace-nowrap">{account.code} — {account.name}</TableCell>{values.map((value, index) => <TableCell key={index} className="text-right text-xs whitespace-nowrap">{formatBRL(value)}</TableCell>)}<TableCell className="text-right font-medium whitespace-nowrap">{formatBRL(values.reduce((a, b) => a + b, 0))}</TableCell></TableRow>)}</TableBody>
         </Table>}
       </CardContent>
@@ -420,7 +420,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 justify-start">
-              <span className="mr-1">Contas:</span>
+              <span className="mr-1">Categorias:</span>
               <span className="font-medium">
                 {selectedAccountIds.size === revenueAccounts.length
                   ? "Todas"
@@ -430,9 +430,9 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
           </PopoverTrigger>
           <PopoverContent className="w-72 p-0" align="end">
             <Command>
-              <CommandInput placeholder="Buscar conta..." />
+              <CommandInput placeholder="Buscar categoria..." />
               <CommandList>
-                <CommandEmpty>Nenhuma conta encontrada.</CommandEmpty>
+                <CommandEmpty>Nenhuma categoria encontrada.</CommandEmpty>
                 <CommandGroup>
                   <CommandItem
                     onSelect={() => {
@@ -573,13 +573,13 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                 {revenueAccounts.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={18} className="text-center text-muted-foreground">
-                      Nenhuma conta de receita cadastrada nesta empresa.
+                      Nenhuma categoria de receita cadastrada nesta empresa.
                     </TableCell>
                   </TableRow>
                 ) : visibleGroups.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={18} className="text-center text-muted-foreground">
-                      Nenhuma conta selecionada. Escolha ao menos uma conta no filtro acima.
+                      Nenhuma categoria selecionada. Escolha ao menos uma categoria no filtro acima.
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -709,7 +709,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                       {!collapsed.has(g.accountId) && g.rows.length === 0 && (
                         <TableRow>
                           <TableCell colSpan={18} className="text-sm text-muted-foreground">
-                            Nenhum cliente nesta conta ainda.
+                            Nenhum cliente nesta categoria ainda.
                           </TableCell>
                         </TableRow>
                       )}

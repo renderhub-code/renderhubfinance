@@ -260,7 +260,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
       });
     },
     onSuccess: (res) => {
-      toast.success(`Conta salva e replicada em ${res.companies} empresas.`);
+      toast.success(`Categoria salva e replicada em ${res.companies} empresas.`);
       setAccountForm(null);
       invalidate();
     },
@@ -289,7 +289,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
         <div>
           <CardTitle className="text-base">Contas</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Plano de contas compartilhado — toda alteração de grupo, subgrupo ou conta é replicada
+            Plano de contas compartilhado — toda alteração de grupo, subgrupo ou categoria é replicada
             em todas as empresas.
           </p>
 
@@ -316,7 +316,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
                 setAccountForm({ ...EMPTY_ACCOUNT, subgroup_id: subgroupList[0]?.id ?? "" })
               }
             >
-              <Plus className="mr-1 size-4" /> Nova conta
+              <Plus className="mr-1 size-4" /> Nova categoria
             </Button>
           </div>
         )}
@@ -630,11 +630,11 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
         </DialogContent>
       </Dialog>
 
-      {/* Conta */}
+      {/* Categoria */}
       <Dialog open={!!accountForm} onOpenChange={(o) => !o && setAccountForm(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{accountForm?.id ? "Editar conta" : "Nova conta"}</DialogTitle>
+            <DialogTitle>{accountForm?.id ? "Editar categoria" : "Nova categoria"}</DialogTitle>
           </DialogHeader>
           {accountForm && (
             <div className="grid gap-3">
@@ -698,7 +698,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
                   checked={accountForm.active}
                   onCheckedChange={(v) => setAccountForm({ ...accountForm, active: v })}
                 />
-                Conta ativa
+                Categoria ativa
               </label>
             </div>
           )}

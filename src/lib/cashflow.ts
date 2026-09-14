@@ -44,7 +44,7 @@ export function hasValues(months: MonthCell[]): boolean {
   return months.some((m) => m.expected !== 0 || m.realized !== 0);
 }
 
-/** Árvore Grupo → Subgrupo → Conta com previsto/realizado por mês. */
+/** Árvore Grupo → Subgrupo → Categoria com previsto/realizado por mês. */
 export function useCashflowTree() {
   const companyId = useCompanyStore((s) => s.activeCompanyId);
   const businessUnitId = useCompanyStore((s) => s.activeBusinessUnitId);

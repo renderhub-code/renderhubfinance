@@ -57,7 +57,15 @@ function fmtMoney(v: unknown): string {
   return Number.isFinite(n) ? n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—";
 }
 
-const SITUACAO_CONTA: Record<number, string> = { 1: "Em aberto", 2: "Pago", 3: "Parcial" };
+const SITUACAO_CONTA: Record<number, string> = {
+  1: "Em aberto",
+  2: "Pago",
+  3: "Parcial",
+  4: "Devolvido",
+  5: "Cancelado",
+  6: "Devolvido parcial",
+  7: "Confirmado",
+};
 
 type Row = Record<string, unknown> & { id?: number | string };
 type Col = { label: string; render: (r: Row) => string };
@@ -232,7 +240,7 @@ function FinanceiroPage() {
     mutationFn: () => importFn({ data: { year } }),
     onSuccess: (r) => {
       toast.success(
-        `Importação concluída: ${r.imported} novo(s) lançamento(s), ${r.skipped} já existente(s).`,
+        `Importação concluída: ${r.imported} novo(s), ${r.updated} atualizado(s), ${r.unchanged} sem mudança.`,
       );
       qc.invalidateQueries({ queryKey: ["transactions"] });
       qc.invalidateQueries({ queryKey: ["accounts_with_dre"] });
@@ -319,7 +327,8 @@ function FinanceiroPage() {
               <CardTitle className="text-base">Importar para Lançamentos</CardTitle>
               <CardDescription>
                 Traz as contas a pagar e a receber de {year} para os Lançamentos da Use Noronha, alimentando
-                Dashboard e Fluxo de Caixa. Registros já importados não são duplicados.
+                Dashboard e Fluxo de Caixa. Registros já importados não são duplicados — se o status mudar no
+                Bling (pago, cancelado, etc.), o lançamento existente é atualizado.
               </CardDescription>
             </div>
             <div className="flex gap-2">

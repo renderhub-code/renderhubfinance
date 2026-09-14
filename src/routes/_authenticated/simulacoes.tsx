@@ -29,7 +29,7 @@ function SimulacoesPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Simulações</h1>
         <p className="text-sm text-muted-foreground">
            {supportsCommercialSimulation
-            ? "Simulação comercial por cliente e conta. Aplique as quantidades previstas ao DRE e ao fluxo de caixa."
+            ? "Simulação comercial por cliente e categoria. Aplique as quantidades previstas ao DRE e ao fluxo de caixa."
             : "Cenários de receita, custo e despesa aplicáveis ao fluxo de caixa previsto."}
         </p>
       </div>

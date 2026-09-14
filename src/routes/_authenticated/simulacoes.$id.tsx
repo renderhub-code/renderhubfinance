@@ -20,7 +20,7 @@ function SimEditor() {
         </Link>
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Editor de simulação</h1>
-          <p className="text-sm text-muted-foreground">Distribuição mensal por conta contábil.</p>
+          <p className="text-sm text-muted-foreground">Distribuição mensal por categoria contábil.</p>
         </div>
       </div>
 
@@ -32,7 +32,7 @@ function SimEditor() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="whitespace-nowrap">Conta</TableHead>
+                <TableHead className="whitespace-nowrap">Categoria</TableHead>
                 {MONTHS.map((m) => (
                   <TableHead key={m} className="text-right">{m}</TableHead>
                 ))}

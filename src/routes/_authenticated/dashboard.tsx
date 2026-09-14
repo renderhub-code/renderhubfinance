@@ -108,7 +108,7 @@ function DashboardPage() {
               <TableRow>
                 <TableHead>Data</TableHead>
                 <TableHead>Histórico</TableHead>
-                <TableHead>Conta</TableHead>
+                <TableHead>Categoria</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Origem</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
