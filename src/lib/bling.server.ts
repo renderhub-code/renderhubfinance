@@ -359,15 +359,38 @@ export async function importBlingYear(year: number, userId: string) {
 
   if (rows.length === 0) return { imported: 0, updated: 0, unchanged: 0, total: 0 };
 
-  const { data: existing } = await supabaseAdmin
-    .from("transactions")
-    .select("id, external_source, external_id, status, amount_expected, amount_realized, due_date, entry_date, settled_date")
-    .eq("company_id", companyId)
-    .not("external_id", "is", null);
+  // Paginado: o banco devolve no máximo 1.000 linhas por consulta.
+  const existing: Array<{
+    id: string; external_source: string | null; external_id: string | null; status: string;
+    amount_expected: number; amount_realized: number; due_date: string | null; entry_date: string; settled_date: string | null;
+  }> = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabaseAdmin
+      .from("transactions")
+      .select("id, external_source, external_id, status, amount_expected, amount_realized, due_date, entry_date, settled_date")
+      .eq("company_id", companyId)
+      .not("external_id", "is", null)
+      .order("id")
+      .range(from, from + 999);
+    if (error) throw new Error(error.message);
+    existing.push(...((data ?? []) as typeof existing));
+    if (!data || data.length < 1000) break;
+  }
 
   const existingByKey = new Map(
-    (existing ?? []).map((e) => [`${e.external_source}|${e.external_id}`, e]),
+    existing.map((e) => [`${e.external_source}|${e.external_id}`, e]),
   );
+
+  // Remove repetições vindas da paginação do Bling.
+  const seen = new Set<string>();
+  const uniqueRows = rows.filter((r) => {
+    const k = `${r.external_source}|${r.external_id}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  rows.length = 0;
+  rows.push(...uniqueRows);
 
   const toInsert: typeof rows = [];
   const toUpdate: { id: string; row: (typeof rows)[number] }[] = [];
