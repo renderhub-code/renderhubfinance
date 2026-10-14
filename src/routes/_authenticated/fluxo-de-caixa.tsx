@@ -127,7 +127,7 @@ function FluxoCaixaPage() {
         <CardHeader>
           <CardTitle className="text-base">Movimentação mensal — {year}</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent className="overflow-auto max-h-[70vh]">
           {isLoading ? (
             <MatrixSkeleton rows={10} />
           ) : (
@@ -136,12 +136,12 @@ function FluxoCaixaPage() {
                 <tr>
                   <th
                     rowSpan={2}
-                    className="sticky left-0 z-20 bg-card px-2 py-2 text-left align-bottom border-b border-r min-w-[280px]"
+                    className="sticky left-0 top-0 z-40 bg-card px-2 py-2 text-left align-bottom border-b border-r min-w-[280px]"
                   >
                     Descrição
                   </th>
                   {[...MONTHS_PT, "Total"].map((m) => (
-                    <th key={m} colSpan={3} className="px-2 py-1 text-center text-xs font-medium border-b border-r whitespace-nowrap">
+                    <th key={m} colSpan={3} className="sticky top-0 z-30 h-8 bg-card px-2 py-1 text-center text-xs font-medium border-b border-r whitespace-nowrap">
                       {m}
                     </th>
                   ))}
@@ -149,9 +149,9 @@ function FluxoCaixaPage() {
                 <tr>
                   {[...MONTHS_PT, "Total"].map((m) => (
                     <Fragment key={m}>
-                      <th className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Prev.</th>
-                      <th className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Real.</th>
-                      <th className="px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b border-r whitespace-nowrap">Δ</th>
+                      <th className="sticky top-8 z-30 bg-card px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Prev.</th>
+                      <th className="sticky top-8 z-30 bg-card px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b whitespace-nowrap">Real.</th>
+                      <th className="sticky top-8 z-30 bg-card px-2 py-1 text-right text-[10px] font-normal text-muted-foreground border-b border-r whitespace-nowrap">Δ</th>
                     </Fragment>
                   ))}
                 </tr>
@@ -179,7 +179,7 @@ function FluxoCaixaPage() {
                       <td
                         className={cn(
                           "sticky left-0 z-10 px-2 py-1 border-b border-r whitespace-nowrap",
-                          node.level === 0 ? "bg-muted font-semibold" : node.level === 1 ? "bg-muted/60 font-medium" : "bg-card",
+                          node.level === 0 ? "bg-muted font-semibold" : node.level === 1 ? "bg-muted font-medium" : "bg-card",
                         )}
                         style={{ paddingLeft: 8 + node.level * 18 }}
                       >

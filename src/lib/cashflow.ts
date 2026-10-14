@@ -135,7 +135,10 @@ export function useCashflowTree() {
 
     for (const g of groupNodes) g.children.sort((a, b) => a.code.localeCompare(b.code));
 
-    return groupNodes;
+    // Entradas (receitas) primeiro, despesas (saídas) embaixo.
+    return groupNodes.sort((a, b) =>
+      a.type === b.type ? 0 : a.type === "entrada" ? -1 : 1,
+    );
   }, [txs, accounts, subgroups, groups]);
 
   const summary = useMemo(() => {
