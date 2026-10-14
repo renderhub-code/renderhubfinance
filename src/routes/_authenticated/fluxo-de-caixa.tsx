@@ -127,7 +127,7 @@ function FluxoCaixaPage() {
         <CardHeader>
           <CardTitle className="text-base">Movimentação mensal — {year}</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent className="overflow-auto max-h-[70vh]">
           {isLoading ? (
             <MatrixSkeleton rows={10} />
           ) : (
