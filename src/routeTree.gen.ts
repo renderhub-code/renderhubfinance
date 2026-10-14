@@ -22,6 +22,7 @@ import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authentic
 import { Route as BlingCallbackRouteImport } from './routes/bling.callback'
 import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
 import { Route as AuthenticatedSimulacoesIdRouteImport } from './routes/_authenticated/simulacoes.$id'
+import { Route as ApiPublicHooksBlingDailyImportRouteImport } from './routes/api/public/hooks/bling-daily-import'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -93,6 +94,12 @@ const AuthenticatedSimulacoesIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedSimulacoesRoute,
   } as any)
+const ApiPublicHooksBlingDailyImportRoute =
+  ApiPublicHooksBlingDailyImportRouteImport.update({
+    id: '/api/public/hooks/bling-daily-import',
+    path: '/api/public/hooks/bling-daily-import',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/bling/callback': typeof BlingCallbackRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
+  '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -121,6 +129,7 @@ export interface FileRoutesByTo {
   '/bling/callback': typeof BlingCallbackRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
+  '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -137,6 +146,7 @@ export interface FileRoutesById {
   '/bling/callback': typeof BlingCallbackRoute
   '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/_authenticated/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
+  '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/bling/callback'
     | '/lancamentos/importar'
     | '/simulacoes/$id'
+    | '/api/public/hooks/bling-daily-import'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/bling/callback'
     | '/lancamentos/importar'
     | '/simulacoes/$id'
+    | '/api/public/hooks/bling-daily-import'
   id:
     | '__root__'
     | '/'
@@ -182,6 +194,7 @@ export interface FileRouteTypes {
     | '/bling/callback'
     | '/_authenticated/lancamentos/importar'
     | '/_authenticated/simulacoes/$id'
+    | '/api/public/hooks/bling-daily-import'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -189,6 +202,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   BlingCallbackRoute: typeof BlingCallbackRoute
+  ApiPublicHooksBlingDailyImportRoute: typeof ApiPublicHooksBlingDailyImportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -284,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSimulacoesIdRouteImport
       parentRoute: typeof AuthenticatedSimulacoesRoute
     }
+    '/api/public/hooks/bling-daily-import': {
+      id: '/api/public/hooks/bling-daily-import'
+      path: '/api/public/hooks/bling-daily-import'
+      fullPath: '/api/public/hooks/bling-daily-import'
+      preLoaderRoute: typeof ApiPublicHooksBlingDailyImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -344,6 +365,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   BlingCallbackRoute: BlingCallbackRoute,
+  ApiPublicHooksBlingDailyImportRoute: ApiPublicHooksBlingDailyImportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
