@@ -13,6 +13,7 @@ export async function beginCashSync(year: number, userId: string) {
 
 export async function cashSyncPage(syncId: string, page: number) {
   const { data: sync, error } = await supabaseAdmin.from("cashflow_syncs").select("*").eq("id", syncId).eq("company_id", COMPANY).eq("status", "running").single();
+  if (sync && sync.phase !== "cash") return forecastPage(syncId, page, sync);
   if (error || !sync || sync.next_page !== page) throw new Error("Sincronização inválida ou página fora de ordem.");
   const result = await blingFetch("/caixas", { pagina: String(page), limite: "100", dataInicial: `${sync.year}-01-01`, dataFinal: `${sync.year}-12-31` });
   const list: Array<{ id: string; descricao?: string }> = result?.data ?? [];
@@ -44,48 +45,45 @@ export async function cashSyncPage(syncId: string, page: number) {
     const { error: writeError } = await supabaseAdmin.from("cashflow_movements").upsert(rows, { onConflict: "sync_id,external_id" });
     if (writeError) throw writeError;
   }
-  const done = list.length < 100;
-  const { error: progressError } = await supabaseAdmin.from("cashflow_syncs").update({ next_page: page + 1 }).eq("id", syncId).eq("next_page", page);
+  const cashDone = list.length < 100;
+  const { error: progressError } = await supabaseAdmin.from("cashflow_syncs").update({ next_page: cashDone ? 1 : page + 1, phase: cashDone ? "receber" : "cash" }).eq("id", syncId).eq("next_page", page);
   if (progressError) throw progressError;
-  if (done) await completeCashSync(syncId);
-  return { count: list.length, saved: rows.length, done };
+  return { count: list.length, saved: rows.length, done: false, nextPage: cashDone ? 1 : page + 1 };
 }
 
-async function completeCashSync(syncId: string) {
-  const { data: sync } = await supabaseAdmin.from("cashflow_syncs").select("year").eq("id", syncId).single();
-  if (!sync) throw new Error("Sincronização ausente.");
-  const { data: accounts } = await supabaseAdmin.from("accounts").select("id,code,type").eq("company_id", COMPANY).eq("active", true);
-  const { data: mappings } = await supabaseAdmin.from("account_mappings").select("source_code,account_id").eq("company_id", COMPANY);
+async function forecastPage(syncId: string, page: number, sync: { year: number; phase: string; next_page: number; forecasts: unknown }) {
+  if (sync.next_page !== page || !["receber", "pagar"].includes(sync.phase)) throw new Error("Página fora de ordem.");
+  const { data: accounts, error: accError } = await supabaseAdmin.from("accounts").select("id,code,type").eq("company_id", COMPANY).eq("active", true);
+  const { data: mappings, error: mapError } = await supabaseAdmin.from("account_mappings").select("source_code,account_id").eq("company_id", COMPANY);
+  if (accError || mapError) throw accError ?? mapError;
   const map = new Map((mappings ?? []).map(m => [normalize(m.source_code), m.account_id]));
-  const forecasts = [];
   const categoryNames = new Map<string, string>();
-  for (let page = 1; page <= 100; page++) {
-    const json = await blingFetch("/categorias/receitas-despesas", { pagina: String(page), limite: "100" });
+  for (let p = 1; p <= 100; p++) {
+    const json = await blingFetch("/categorias/receitas-despesas", { pagina: String(p), limite: "100" });
     for (const c of json?.data ?? []) categoryNames.set(String(c.id), c.descricao);
     if ((json?.data?.length ?? 0) < 100) break;
   }
-  for (const prefix of ["receber", "pagar"]) {
-    for (let page = 1; page <= 1000; page++) {
-      const json = await blingFetch(`/contas/${prefix}`, { pagina: String(page), limite: "100", dataVencimentoInicial: `${sync.year}-01-01`, dataVencimentoFinal: `${sync.year}-12-31` });
-      for (const item of json?.data ?? []) {
-        if (![1, 3, 7].includes(Number(item.situacao))) continue;
-        await new Promise(r => setTimeout(r, 360));
-        const { data: d } = await blingFetch(`/contas/${prefix}/${item.id}`);
-        if (!d || !Number.isFinite(Number(d.saldo))) throw new Error(`Saldo em aberto ausente: ${item.id}`);
-        const type = prefix === "receber" ? "entrada" : "saida";
-        const category = d.categoria?.descricao ?? categoryNames.get(String(d.categoria?.id)) ?? "Sem categoria";
-        const id = map.get(normalize(category));
-        const account = accounts?.find(a => a.id === id && a.type === type) ?? accounts?.find(a => a.code === (type === "entrada" ? "1.1.999" : "5.2.999"));
-        if (Number(d.saldo) > 0) forecasts.push({ external_id: `${prefix}:${item.id}`, account_id: account?.id ?? null, date: cashDate(d.vencimento), amount: Number(d.saldo), type, kind: cashKind("N", "", category, account?.code) });
-      }
-      if ((json?.data?.length ?? 0) < 100) break;
-      if (page === 1000) throw new Error("Limite de paginação atingido.");
-    }
+  const prefix = sync.phase;
+  const json = await blingFetch(`/contas/${prefix}`, { pagina: String(page), limite: "100", dataVencimentoInicial: `${sync.year}-01-01`, dataVencimentoFinal: `${sync.year}-12-31` });
+  const forecasts = Array.isArray(sync.forecasts) ? sync.forecasts : [];
+  for (const item of json?.data ?? []) {
+    if (![1, 3, 7].includes(Number(item.situacao))) continue;
+    await new Promise(r => setTimeout(r, 360));
+    const { data: d } = await blingFetch(`/contas/${prefix}/${item.id}`);
+    if (!d || d.saldo == null || !Number.isFinite(Number(d.saldo))) throw new Error(`Saldo em aberto ausente: ${item.id}`);
+    const type = prefix === "receber" ? "entrada" : "saida";
+    const category = d.categoria?.descricao ?? categoryNames.get(String(d.categoria?.id)) ?? "Sem categoria";
+    const id = map.get(normalize(category));
+    const account = accounts?.find(a => a.id === id && a.type === type) ?? accounts?.find(a => a.code === (type === "entrada" ? "1.1.999" : "5.2.999"));
+    if (Number(d.saldo) > 0) forecasts.push({ external_id: `${prefix}:${item.id}`, account_id: account?.id ?? null, date: cashDate(d.vencimento), amount: Number(d.saldo), type, kind: cashKind("N", "", category, account?.code) });
   }
-  const { count, error } = await supabaseAdmin.from("cashflow_movements").select("id", { count: "exact", head: true }).eq("sync_id", syncId);
-  if (error) throw error;
-  // Completion is called only after every page succeeds; incomplete snapshots never replace the last complete one.
-  const { error: updateError } = await supabaseAdmin.from("cashflow_syncs").update({ status: "complete", completed_at: new Date().toISOString(), movement_count: count ?? 0, forecasts }).eq("id", syncId).eq("company_id", COMPANY).eq("status", "running");
+  const phaseDone = (json?.data?.length ?? 0) < 100;
+  const done = phaseDone && prefix === "pagar";
+  const phase = phaseDone ? (done ? "complete" : "pagar") : prefix;
+  const nextPage = phaseDone ? 1 : page + 1;
+  const { count, error: countError } = await supabaseAdmin.from("cashflow_movements").select("id", { count: "exact", head: true }).eq("sync_id", syncId);
+  if (countError) throw countError;
+  const { error: updateError } = await supabaseAdmin.from("cashflow_syncs").update({ forecasts, next_page: nextPage, phase, ...(done ? { status: "complete", completed_at: new Date().toISOString(), movement_count: count ?? 0 } : {}) }).eq("id", syncId).eq("status", "running").eq("phase", prefix).eq("next_page", page);
   if (updateError) throw updateError;
-  return { count: count ?? 0 };
+  return { count: json?.data?.length ?? 0, saved: 0, done, nextPage };
 }
