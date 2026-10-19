@@ -12,7 +12,14 @@ import { ArrowLeft, Upload } from "lucide-react";
 import { parseBRLInput } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/lancamentos/importar")({
-  head: () => ({ meta: [{ title: "Importar Lançamentos — Union Financeiro" }] }),
+  head: () => ({ meta: [
+    { title: "Importar Lançamentos — Union Financeiro" },
+    { name: "description", content: "Importe lançamentos financeiros para a empresa selecionada." },
+    { property: "og:title", content: "Importar Lançamentos — Union Financeiro" },
+    { property: "og:description", content: "Importação de lançamentos financeiros por categoria." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Importar,
 });
 

@@ -8,6 +8,10 @@ export const Route = createFileRoute("/_authenticated/centros-de-custo")({
     meta: [
       { title: "Centros de Custo — Hub Financial Command" },
       { name: "description", content: "Estrutura de centros de custo para rateio gerencial." },
+      { property: "og:title", content: "Centros de Custo — Hub Financial Command" },
+      { property: "og:description", content: "Centros de custo para apropriação e rateio gerencial." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CentrosDeCustoPage,

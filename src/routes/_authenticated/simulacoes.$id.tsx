@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/simulacoes/$id")({
-  head: () => ({ meta: [{ title: "Editar simulação — Hub Financial Command" }] }),
+  head: () => ({ meta: [
+    { title: "Editar simulação — Hub Financial Command" },
+    { name: "description", content: "Distribuição mensal das categorias na simulação financeira." },
+    { property: "og:title", content: "Editar simulação — Hub Financial Command" },
+    { property: "og:description", content: "Edite a distribuição mensal da simulação financeira." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: SimEditor,
 });
 
