@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { MatrixSkeleton } from "@/components/skeletons";
-import { useCashflowTree, hasValues, totalOf, type CashflowNode, type MonthCell } from "@/lib/cashflow";
+import { useCashflowTree, hasValues, type CashflowNode, type MonthCell } from "@/lib/cashflow";
+import { periodTotal } from "@/lib/cashflow-totals";
 import { formatBRL, MONTHS_PT } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +23,8 @@ export const Route = createFileRoute("/_authenticated/fluxo-de-caixa")({
   component: FluxoCaixaPage,
 });
 
-function Cells({ months, strong }: { months: MonthCell[]; strong?: boolean }) {
-  const total = totalOf(months);
+function Cells({ months, strong, closingBalance }: { months: MonthCell[]; strong?: boolean; closingBalance?: boolean }) {
+  const total = periodTotal(months, closingBalance);
   const blocks = [...months, total];
   return (
     <>
@@ -97,7 +98,7 @@ function FluxoCaixaPage() {
     { label: "(+) Entradas", months: summary.inflow },
     { label: "(−) Saídas", months: summary.outflow.map((m) => ({ expected: -m.expected, realized: -m.realized })) },
     { label: "(=) Variação de caixa", months: summary.variation, strong: true },
-    { label: "Saldo acumulado", months: summary.balance, strong: true },
+    { label: "Saldo acumulado", months: summary.balance, strong: true, closingBalance: true },
   ];
 
   return (
@@ -206,7 +207,7 @@ function FluxoCaixaPage() {
                     <td className="sticky left-0 z-10 bg-muted px-2 py-1 font-medium border-r whitespace-nowrap text-xs">
                       {row.label}
                     </td>
-                    <Cells months={row.months} strong={row.strong} />
+                    <Cells months={row.months} strong={row.strong} closingBalance={row.closingBalance} />
                   </tr>
                 ))}
               </tbody>
