@@ -9,6 +9,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Sistema unificado de fluxo de caixa e DRE para as empresas do hub Union Contadores: Render, ERKS, Dom Pablyto, Use Noronha, A&F e Union Contadores." },
       { property: "og:title", content: "Union Contadores Financeiro" },
       { property: "og:description", content: "Fluxo de caixa realizado, previsto e simulação de cenários para o hub empresarial." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Landing,

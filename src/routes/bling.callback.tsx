@@ -13,6 +13,10 @@ export const Route = createFileRoute("/bling/callback")({
       { title: "Conectando ao Bling — RenderHub Finance" },
       { name: "description", content: "Finalizando a conexão da sua conta Bling com o RenderHub Finance." },
       { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Conectando ao Bling — RenderHub Finance" },
+      { property: "og:description", content: "Finalizando a conexão da conta Bling." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   validateSearch: (s: Record<string, unknown>) => ({
