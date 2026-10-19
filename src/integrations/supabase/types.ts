@@ -299,6 +299,158 @@ export type Database = {
           },
         ]
       }
+      cashflow_movements: {
+        Row: {
+          account_id: string | null
+          amount: number
+          category_id: string | null
+          category_name: string | null
+          company_id: string
+          description: string | null
+          external_id: string
+          financial_account: string | null
+          id: string
+          kind: string
+          movement_date: string
+          source_origin: string | null
+          sync_id: string
+          type: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount: number
+          category_id?: string | null
+          category_name?: string | null
+          company_id: string
+          description?: string | null
+          external_id: string
+          financial_account?: string | null
+          id?: string
+          kind: string
+          movement_date: string
+          source_origin?: string | null
+          sync_id: string
+          type: string
+        }
+        Update: {
+          account_id?: string | null
+          amount?: number
+          category_id?: string | null
+          category_name?: string | null
+          company_id?: string
+          description?: string | null
+          external_id?: string
+          financial_account?: string | null
+          id?: string
+          kind?: string
+          movement_date?: string
+          source_origin?: string | null
+          sync_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cashflow_movements_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cashflow_movements_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cashflow_movements_sync_id_fkey"
+            columns: ["sync_id"]
+            isOneToOne: false
+            referencedRelation: "cashflow_syncs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cashflow_opening_balances: {
+        Row: {
+          amount: number
+          company_id: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cashflow_opening_balances_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cashflow_syncs: {
+        Row: {
+          company_id: string
+          completed_at: string | null
+          created_by: string | null
+          error: string | null
+          forecasts: Json | null
+          id: string
+          movement_count: number
+          next_page: number
+          started_at: string
+          status: string
+          year: number
+        }
+        Insert: {
+          company_id: string
+          completed_at?: string | null
+          created_by?: string | null
+          error?: string | null
+          forecasts?: Json | null
+          id?: string
+          movement_count?: number
+          next_page?: number
+          started_at?: string
+          status?: string
+          year: number
+        }
+        Update: {
+          company_id?: string
+          completed_at?: string | null
+          created_by?: string | null
+          error?: string | null
+          forecasts?: Json | null
+          id?: string
+          movement_count?: number
+          next_page?: number
+          started_at?: string
+          status?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cashflow_syncs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           active: boolean
