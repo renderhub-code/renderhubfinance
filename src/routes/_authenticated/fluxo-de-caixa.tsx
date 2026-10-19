@@ -101,7 +101,7 @@ function FluxoCaixaPage() {
     { label: "(−) Saídas", months: summary.outflow.map((m) => ({ expected: -m.expected, realized: -m.realized })) },
     { label: "Aportes / Movimentações dos sócios", months: summary.shareholders },
     { label: "(=) Variação de caixa", months: summary.variation, strong: true },
-    { label: "Saldo acumulado", months: summary.balance, strong: true, closingBalance: true },
+    { label: snapshot?.opening == null ? "Variação acumulada (saldo inicial pendente)" : "Saldo acumulado", months: summary.balance, strong: true, closingBalance: true },
   ];
 
   return (

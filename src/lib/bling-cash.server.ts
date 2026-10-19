@@ -28,7 +28,7 @@ export async function cashSyncPage(syncId: string, page: number) {
     const { data: d } = await blingFetch(`/caixas/${item.id}`);
     if (!d || (!["C", "D"].includes(d.debCred) && d.saldo !== "S")) throw new Error(`Movimento ${item.id} sem sentido confirmado.`);
     if (d.situacao !== "R") return null;
-    const category = d.categoria?.descricao ?? item.descricao ?? "Sem categoria";
+    const category = d.categoria?.descricao?.trim() || item.descricao?.trim() || "Sem categoria";
     const type = d.debCred === "C" || d.saldo === "S" ? "entrada" : "saida";
     const accountId = map.get(normalize(category));
     const matched = accountId ? byId.get(accountId) : undefined;

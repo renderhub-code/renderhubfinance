@@ -3,6 +3,7 @@ export type CashKind = "operation" | "shareholder" | "transfer" | "adjustment";
 export function cashDate(value: string): string {
   const date = /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : value.split("/").reverse().join("-");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date))) throw new Error("Data de caixa inválida.");
+  if (new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10) !== date) throw new Error("Data de caixa inválida.");
   return date;
 }
 
