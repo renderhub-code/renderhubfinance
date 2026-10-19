@@ -140,7 +140,7 @@ export async function blingFetch(path: string, params?: Record<string, string>) 
     const res = await fetch(url.toString(), {
       headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
     });
-    if (res.status === 429 && attempt < 3) {
+    if ([429, 502, 503, 504].includes(res.status) && attempt < 3) {
       // Limite de requisições do Bling: espera progressiva e tenta de novo.
       await new Promise((r) => setTimeout(r, 3000 * (attempt + 1)));
       continue;

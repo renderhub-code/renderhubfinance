@@ -1,0 +1,15 @@
+CREATE TABLE public.cashflow_syncs (id uuid PRIMARY KEY DEFAULT gen_random_uuid(),company_id uuid NOT NULL REFERENCES public.companies(id),year integer NOT NULL,status text NOT NULL DEFAULT 'running' CHECK(status IN ('running','complete','failed')),started_at timestamptz NOT NULL DEFAULT now(),completed_at timestamptz,error text,movement_count integer NOT NULL DEFAULT 0,created_by uuid);
+GRANT SELECT ON public.cashflow_syncs TO authenticated; GRANT ALL ON public.cashflow_syncs TO service_role;
+ALTER TABLE public.cashflow_syncs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY cash_sync_read ON public.cashflow_syncs FOR SELECT TO authenticated USING(public.user_has_company(auth.uid(),company_id));
+CREATE TABLE public.cashflow_movements (id uuid PRIMARY KEY DEFAULT gen_random_uuid(),company_id uuid NOT NULL REFERENCES public.companies(id),external_id text NOT NULL,account_id uuid REFERENCES public.accounts(id),movement_date date NOT NULL,amount numeric(16,2) NOT NULL CHECK(amount>=0),type text NOT NULL CHECK(type IN ('entrada','saida')),kind text NOT NULL CHECK(kind IN ('operation','shareholder','transfer','adjustment')),category_id text,category_name text,description text,financial_account text,source_origin text,sync_id uuid NOT NULL REFERENCES public.cashflow_syncs(id),UNIQUE(sync_id,external_id));
+GRANT SELECT ON public.cashflow_movements TO authenticated; GRANT ALL ON public.cashflow_movements TO service_role;
+ALTER TABLE public.cashflow_movements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY cash_movement_read ON public.cashflow_movements FOR SELECT TO authenticated USING(public.user_has_company(auth.uid(),company_id));
+CREATE INDEX cash_movement_period ON public.cashflow_movements(company_id,movement_date,sync_id);
+CREATE TABLE public.cashflow_opening_balances (company_id uuid NOT NULL REFERENCES public.companies(id),year integer NOT NULL,amount numeric(16,2) NOT NULL,updated_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(company_id,year));
+GRANT SELECT,INSERT,UPDATE ON public.cashflow_opening_balances TO authenticated; GRANT ALL ON public.cashflow_opening_balances TO service_role;
+ALTER TABLE public.cashflow_opening_balances ENABLE ROW LEVEL SECURITY;
+CREATE POLICY cash_opening_read ON public.cashflow_opening_balances FOR SELECT TO authenticated USING(public.user_has_company(auth.uid(),company_id));
+CREATE POLICY cash_opening_insert ON public.cashflow_opening_balances FOR INSERT TO authenticated WITH CHECK(public.user_has_company(auth.uid(),company_id) AND NOT public.user_is_ceo_only(auth.uid()));
+CREATE POLICY cash_opening_update ON public.cashflow_opening_balances FOR UPDATE TO authenticated USING(public.user_has_company(auth.uid(),company_id) AND NOT public.user_is_ceo_only(auth.uid())) WITH CHECK(public.user_has_company(auth.uid(),company_id) AND NOT public.user_is_ceo_only(auth.uid()));

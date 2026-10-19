@@ -10,6 +10,8 @@ import { useCashflowTree, hasValues, type CashflowNode, type MonthCell } from "@
 import { periodTotal } from "@/lib/cashflow-totals";
 import { formatBRL, MONTHS_PT } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { CashflowControls } from "@/components/CashflowControls";
+import { CashflowReconciliation } from "@/components/CashflowReconciliation";
 
 export const Route = createFileRoute("/_authenticated/fluxo-de-caixa")({
   head: () => ({ meta: [
@@ -65,7 +67,7 @@ function collectIds(nodes: CashflowNode[], acc: string[] = []): string[] {
 }
 
 function FluxoCaixaPage() {
-  const { tree, summary, year, isLoading } = useCashflowTree();
+  const { tree, summary, year, isLoading, snapshot, movements, error } = useCashflowTree();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [showEmpty, setShowEmpty] = useState(false);
 
@@ -97,8 +99,9 @@ function FluxoCaixaPage() {
   const summaryRows = [
     { label: "(+) Entradas", months: summary.inflow },
     { label: "(−) Saídas", months: summary.outflow.map((m) => ({ expected: -m.expected, realized: -m.realized })) },
+    { label: "Aportes / Movimentações dos sócios", months: summary.shareholders },
     { label: "(=) Variação de caixa", months: summary.variation, strong: true },
-    { label: "Saldo acumulado", months: summary.balance, strong: true, closingBalance: true },
+    { label: snapshot?.opening == null ? "Variação acumulada (saldo inicial pendente)" : "Saldo acumulado", months: summary.balance, strong: true, closingBalance: true },
   ];
 
   return (
@@ -111,6 +114,7 @@ function FluxoCaixaPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <CashflowControls year={year} opening={snapshot?.opening ?? null} />
           <div className="flex items-center gap-2">
             <Switch id="show-empty" checked={showEmpty} onCheckedChange={setShowEmpty} />
             <Label htmlFor="show-empty" className="text-xs text-muted-foreground">Mostrar contas sem valores</Label>
@@ -124,6 +128,9 @@ function FluxoCaixaPage() {
         </div>
       </div>
 
+      {error && <p className="text-sm text-destructive">Não foi possível carregar o caixa: {error.message}</p>}
+      {!snapshot?.hasSnapshot && <p className="text-sm text-destructive">Caixa do Bling pendente de sincronização completa. Valores realizados importados não são presumidos.</p>}
+      {snapshot?.opening == null && <p className="text-sm text-muted-foreground">Saldo inicial não informado: saldo absoluto pendente. A tabela mostra a variação acumulada.</p>}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Movimentação mensal — {year}</CardTitle>
@@ -181,13 +188,13 @@ function FluxoCaixaPage() {
                         className={cn(
                           "sticky left-0 z-10 px-2 py-1 border-b border-r whitespace-nowrap",
                           node.level === 0 ? "bg-muted font-semibold" : node.level === 1 ? "bg-muted font-medium" : "bg-card",
+                          (node.code === "X5" || node.name.includes("Sem categoria")) && hasValues(node.months) && "text-destructive",
                         )}
                         style={{ paddingLeft: 8 + node.level * 18 }}
                       >
-                        <button
-                          type="button"
+                        <Button variant="ghost" size="sm"
                           onClick={() => canOpen && toggle(node.id)}
-                          className={cn("flex items-center gap-1 text-left", !canOpen && "cursor-default")}
+                          className={cn("h-auto p-0 flex items-center gap-1 text-left", !canOpen && "cursor-default")}
                         >
                           {canOpen ? (
                             isOpen ? <ChevronDown className="h-3.5 w-3.5 shrink-0" /> : <ChevronRight className="h-3.5 w-3.5 shrink-0" />
@@ -196,7 +203,7 @@ function FluxoCaixaPage() {
                           )}
                           <span className="text-xs text-muted-foreground">{node.code}</span>
                           <span className="text-xs">{node.name}</span>
-                        </button>
+                        </Button>
                       </td>
                       <Cells months={node.months} strong={node.level === 0} />
                     </tr>
@@ -215,6 +222,7 @@ function FluxoCaixaPage() {
           )}
         </CardContent>
       </Card>
+      <CashflowReconciliation year={year} movements={movements} inflow={summary.inflow} outflow={summary.outflow} syncedAt={snapshot?.syncedAt} />
     </div>
   );
 }

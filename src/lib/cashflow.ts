@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { useCashSnapshot, type CashEntry } from "./cashflow-queries";
+import { cashKind } from "./cashflow-rules";
 import { useCompanyStore } from "@/lib/company-store";
 import { useFinancialStore } from "@/lib/financial-store";
 import {
@@ -51,30 +53,43 @@ export function useCashflowTree() {
   const year = useFinancialStore((s) => s.year);
 
   const { data: txs, isLoading: loadingTx } = useTransactions(companyId, {
-    from: `${year}-01-01`,
-    to: `${year}-12-31`,
     businessUnitId,
   });
   const { data: accounts, isLoading: la } = useAccounts(companyId);
   const { data: subgroups, isLoading: ls } = useAccountSubgroups(companyId);
   const { data: groups, isLoading: lg } = useAccountGroups(companyId);
 
+  const snapshotQuery = useCashSnapshot(companyId, year);
+  const snapshot = snapshotQuery.data;
+  const entries = useMemo(() => {
+    const output: Array<CashEntry & { expected: boolean }> = [];
+    for (const e of snapshot?.movements ?? []) if (!businessUnitId) output.push({ ...e, expected: false });
+    for (const e of snapshot?.forecasts ?? []) if (!businessUnitId) output.push({ ...e, expected: true });
+    for (const t of txs ?? []) {
+      if (t.status === "cancelado") continue;
+      const imported = t.external_source?.startsWith("bling:");
+      // Bling cash is represented exclusively by verified cash movements, never by invoice face values.
+      if (imported) continue;
+      const realized = t.status === "realizado";
+      const date = realized ? t.settled_date : t.due_date;
+      if (!date?.startsWith(String(year))) continue;
+      const account = accounts?.find(a => a.id === t.account_id);
+      output.push({ account_id: t.account_id, date, amount: Number(realized ? t.amount_realized : t.amount_expected), type: t.type, kind: cashKind("N", "", "", account?.code), expected: !realized });
+    }
+    return output;
+  }, [snapshot, txs, accounts, year, businessUnitId]);
+
   const tree = useMemo<CashflowNode[]>(() => {
     if (!accounts || !subgroups || !groups) return [];
 
     const byAccount = new Map<string, MonthCell[]>();
-    for (const t of txs ?? []) {
-      if (t.status === "cancelado") continue;
-      const m = Number(t.entry_date.slice(5, 7)) - 1;
+    for (const t of entries) {
+      if (!t.account_id || ["transfer", "adjustment", "shareholder"].includes(t.kind)) continue;
+      const m = Number(t.date.slice(5, 7)) - 1;
       if (m < 0 || m > 11) continue;
       let cells = byAccount.get(t.account_id);
-      if (!cells) {
-        cells = emptyMonths();
-        byAccount.set(t.account_id, cells);
-      }
-      const sign = t.type === "entrada" ? 1 : -1;
-      if (t.status === "realizado") cells[m].realized += sign * Number(t.amount_realized ?? 0);
-      else cells[m].expected += sign * Number(t.amount_expected ?? 0);
+      if (!cells) { cells = emptyMonths(); byAccount.set(t.account_id, cells); }
+      cells[m][t.expected ? "expected" : "realized"] += (t.type === "entrada" ? 1 : -1) * t.amount;
     }
 
     const subNodes = new Map<string, CashflowNode>();
@@ -125,7 +140,8 @@ export function useCashflowTree() {
     }
 
     for (const s of subgroups) {
-      const node = subNodes.get(s.id)!;
+      const node = subNodes.get(s.id);
+      if (!node) continue;
       node.children.sort((a, b) => a.code.localeCompare(b.code));
       const parent = groupById.get(s.group_id);
       if (!parent) continue;
@@ -139,32 +155,29 @@ export function useCashflowTree() {
     return groupNodes.sort((a, b) =>
       a.type === b.type ? 0 : a.type === "entrada" ? -1 : 1,
     );
-  }, [txs, accounts, subgroups, groups]);
+  }, [entries, accounts, subgroups, groups]);
 
   const summary = useMemo(() => {
     const inflow = emptyMonths();
     const outflow = emptyMonths();
-    for (const t of txs ?? []) {
-      if (t.status === "cancelado") continue;
-      const m = Number(t.entry_date.slice(5, 7)) - 1;
+    const shareholders = emptyMonths();
+    for (const t of entries) {
+      if (["transfer", "adjustment"].includes(t.kind)) continue;
+      const m = Number(t.date.slice(5, 7)) - 1;
       if (m < 0 || m > 11) continue;
-      const bucket = t.type === "entrada" ? inflow : outflow;
-      if (t.status === "realizado") bucket[m].realized += Number(t.amount_realized ?? 0);
-      else bucket[m].expected += Number(t.amount_expected ?? 0);
+      const bucket = t.kind === "shareholder" ? shareholders : t.type === "entrada" ? inflow : outflow;
+      bucket[m][t.expected ? "expected" : "realized"] += (t.kind === "shareholder" && t.type === "saida" ? -1 : 1) * t.amount;
     }
-    const variation = inflow.map((v, i) => ({
-      expected: v.expected - outflow[i].expected,
-      realized: v.realized - outflow[i].realized,
-    }));
-    let accE = 0;
-    let accR = 0;
-    const balance = variation.map((v) => {
-      accE += v.expected;
+    const variation = inflow.map((v, i) => ({ expected: v.expected - outflow[i].expected + shareholders[i].expected, realized: v.realized - outflow[i].realized + shareholders[i].realized }));
+    let accR = snapshot?.opening ?? 0;
+    let accE = snapshot?.opening ?? 0;
+    const balance = variation.map(v => {
       accR += v.realized;
+      accE += v.realized + v.expected;
       return { expected: accE, realized: accR };
     });
-    return { inflow, outflow, variation, balance };
-  }, [txs]);
+    return { inflow, outflow, variation, balance, shareholders };
+  }, [entries, snapshot]);
 
-  return { tree, summary, year, isLoading: loadingTx || la || ls || lg };
+  return { tree, summary, year, snapshot, movements: snapshot?.movements ?? [], error: snapshotQuery.error, isLoading: loadingTx || la || ls || lg || snapshotQuery.isLoading };
 }
