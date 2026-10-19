@@ -411,6 +411,7 @@ export type Database = {
           id: string
           movement_count: number
           next_page: number
+          phase: string
           started_at: string
           status: string
           year: number
@@ -424,6 +425,7 @@ export type Database = {
           id?: string
           movement_count?: number
           next_page?: number
+          phase?: string
           started_at?: string
           status?: string
           year: number
@@ -437,6 +439,7 @@ export type Database = {
           id?: string
           movement_count?: number
           next_page?: number
+          phase?: string
           started_at?: string
           status?: string
           year?: number

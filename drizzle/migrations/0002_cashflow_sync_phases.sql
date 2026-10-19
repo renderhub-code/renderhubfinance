@@ -1,0 +1,1 @@
+ALTER TABLE public.cashflow_syncs ADD COLUMN phase text NOT NULL DEFAULT 'cash' CHECK(phase IN ('cash','receber','pagar','complete'));
