@@ -14,7 +14,7 @@ export function CashflowReconciliation({ year, movements, inflow, outflow, synce
     <p className="text-sm text-muted-foreground">Última sincronização: {syncedAt ? new Date(syncedAt).toLocaleString("pt-BR") : "Pendente"}</p>
     <div className="overflow-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left"><th className="p-2">Mês</th><th className="p-2">Movimento</th><th className="p-2">Bling</th><th className="p-2">Plataforma</th><th className="p-2">Diferença</th><th className="p-2">Referência enviada</th><th className="p-2">Δ referência</th><th className="p-2">Conferência</th></tr></thead><tbody>
       {MONTHS_PT.flatMap((label, m) => ["entrada", "saida"].map(type => {
-        const bling = movements.filter(e => e.kind === "operation" && e.type === type && Number(e.date.slice(5, 7)) - 1 === m).reduce((sum, e) => sum + e.amount, 0);
+        const bling = movements.filter(e => e.date.startsWith(`${year}-`) && e.kind === "operation" && e.type === type && Number(e.date.slice(5, 7)) - 1 === m).reduce((sum, e) => sum + e.amount, 0);
         const platform = (type === "entrada" ? inflow : outflow)[m].realized;
         const ref = year === 2026 && companyId === "0c3d7a6e-24bc-4ea1-9009-2112a2f31f6a" ? CASH_REFERENCES[m]?.[type === "entrada" ? 0 : 1] : null;
         const difference = platform - bling;
