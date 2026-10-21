@@ -1,5 +1,50 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { buildAccountSimTxs } from "./account-simulation";
+
+export const applyAccountSimulation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { simulationId: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: sim, error: sErr } = await supabase
+      .from("simulations").select("*").eq("id", data.simulationId).single();
+    if (sErr || !sim) throw new Error(sErr?.message ?? "Simulação não encontrada");
+    const { data: lines, error: lErr } = await supabase
+      .from("simulation_lines").select("account_id,month,qty_expected,unit_price").eq("simulation_id", sim.id);
+    if (lErr) throw new Error(lErr.message);
+    const { data: accs, error: aErr } = await supabase
+      .from("accounts").select("id,type").eq("company_id", sim.company_id);
+    if (aErr) throw new Error(aErr.message);
+    const types = new Map((accs ?? []).map((a) => [a.id, a.type as "entrada" | "saida"]));
+    const txs = buildAccountSimTxs(lines ?? [], types, sim.year);
+
+    // substituição: remove só os previstos gerados antes por esta simulação
+    const { error: dErr } = await supabase
+      .from("transactions").delete().eq("source_simulation_id", sim.id).eq("status", "previsto");
+    if (dErr) throw new Error(dErr.message);
+
+    const rows = txs.map((t) => ({
+      company_id: sim.company_id,
+      account_id: t.account_id,
+      entry_date: t.entry_date,
+      due_date: t.entry_date,
+      type: t.type,
+      status: "previsto" as const,
+      amount_expected: t.amount_expected,
+      amount_realized: 0,
+      description: `Simulação: ${sim.name}`,
+      source_simulation_id: sim.id,
+    }));
+    for (let i = 0; i < rows.length; i += 500) {
+      const { error } = await supabase.from("transactions").insert(rows.slice(i, i + 500));
+      if (error) throw new Error(error.message);
+    }
+    const { error: uErr } = await supabase
+      .from("simulations").update({ status: "aplicada", applied_at: new Date().toISOString() }).eq("id", sim.id);
+    if (uErr) throw new Error(uErr.message);
+    return { ok: true, inserted: rows.length };
+  });
 
 export const applySimulation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

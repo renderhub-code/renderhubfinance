@@ -36,7 +36,18 @@ interface Props {
   disabled?: boolean;
 }
 
-const HEADER_HINTS = ["codigo", "código", "conta", "categoria", "classificacao", "classificação", "cod"];
+const HEADER_HINTS = [
+  "codigo",
+  "código",
+  "conta",
+  "contas",
+  "categoria",
+  "classificacao",
+  "classificação",
+  "cod",
+  "descricao",
+  "descrição",
+];
 
 function normalize(value: unknown): string {
   if (value === null || value === undefined) return "";
@@ -44,12 +55,12 @@ function normalize(value: unknown): string {
 }
 
 function isHeaderRow(code: string, name: string): boolean {
+  if (/\d/.test(code)) return false;
   const c = code.toLowerCase();
   const n = name.toLowerCase();
-  const looksLikeCode = /\d/.test(code);
-  if (looksLikeCode) return false;
-  return HEADER_HINTS.some((h) => c.includes(h) || n.includes(h)) || (!looksLikeCode && c.length > 0);
+  return HEADER_HINTS.some((h) => c === h || n === h);
 }
+
 
 export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
   const queryClient = useQueryClient();
@@ -57,6 +68,7 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<ParsedRow[]>([]);
   const [skipped, setSkipped] = useState(0);
+  const [repeated, setRepeated] = useState(0);
   const [updateExisting, setUpdateExisting] = useState(false);
   const [fileName, setFileName] = useState("");
 
@@ -72,6 +84,8 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
       const seen = new Set<string>();
       const parsed: ParsedRow[] = [];
       let discarded = 0;
+      let dupesInFile = 0;
+      let firstDataSeen = false;
 
       for (const raw of matrix) {
         const code = normalize(raw?.[0]);
@@ -80,12 +94,14 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
           discarded++;
           continue;
         }
-        if (isHeaderRow(code, name)) {
+        if (!firstDataSeen && isHeaderRow(code, name)) {
+          firstDataSeen = true;
           discarded++;
           continue;
         }
+        firstDataSeen = true;
         if (seen.has(code)) {
-          discarded++;
+          dupesInFile++;
           continue;
         }
         seen.add(code);
@@ -104,6 +120,8 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
       setFileName(file.name);
       setRows(parsed);
       setSkipped(discarded);
+      setRepeated(dupesInFile);
+
       setUpdateExisting(false);
       setOpen(true);
     } catch {
@@ -185,9 +203,10 @@ export function ImportarPlanoContas({ companyId, mappings, disabled }: Props) {
           <DialogHeader>
             <DialogTitle>Importar categorias analíticas</DialogTitle>
             <DialogDescription>
-              {fileName} — {newCount} nova(s), {dupeCount} já existente(s), {skipped}{" "}
-              linha(s) descartada(s).
+              {fileName} — {newCount} nova(s), {dupeCount} já existente(s), {repeated}{" "}
+              repetida(s) no arquivo, {skipped} linha(s) descartada(s).
             </DialogDescription>
+
           </DialogHeader>
 
           {dupeCount > 0 && (

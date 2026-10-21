@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useHubStore } from "@/lib/hub-store";
+import { DashboardPadrao } from "@/components/padrao/DashboardPadrao";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAccounts, useTransactions } from "@/lib/queries";
@@ -28,7 +30,13 @@ function amountOf(t: { status: string; amount_realized: number; amount_expected:
   return realized !== 0 ? realized : Number(t.amount_expected ?? 0);
 }
 
+/** Use Noronha usa a tela integrada ao Bling; as demais empresas usam a estrutura padrão do hub. */
 function DashboardPage() {
+  const activeHubId = useHubStore((s) => s.activeHubId);
+  return activeHubId === "noronha" ? <DashboardNoronha /> : <DashboardPadrao />;
+}
+
+function DashboardNoronha() {
   const companyId = useCompanyStore((s) => s.activeCompanyId);
   const businessUnitId = useCompanyStore((s) => s.activeBusinessUnitId);
   const year = useFinancialStore((s) => s.year);

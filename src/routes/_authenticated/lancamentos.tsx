@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useHubStore } from "@/lib/hub-store";
+import { LancamentosPadrao } from "@/components/padrao/LancamentosPadrao";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CheckCircle2, Pencil, Plus, Trash2 } from "lucide-react";
@@ -126,7 +128,13 @@ function formFromTx(tx: Transaction): TxForm {
   };
 }
 
+/** Use Noronha usa a tela integrada ao Bling; as demais empresas usam a estrutura padrão do hub. */
 function LancamentosPage() {
+  const activeHubId = useHubStore((s) => s.activeHubId);
+  return activeHubId === "noronha" ? <LancamentosNoronha /> : <LancamentosPadrao />;
+}
+
+function LancamentosNoronha() {
   const queryClient = useQueryClient();
   const companyId = useCompanyStore((s) => s.activeCompanyId);
   const businessUnitId = useCompanyStore((s) => s.activeBusinessUnitId);

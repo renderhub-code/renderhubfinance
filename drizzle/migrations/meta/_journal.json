@@ -22,6 +22,20 @@
       "when": 1792421993480,
       "tag": "0002_cashflow_sync_phases",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792422000000,
+      "tag": "0003_transactions_import_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792422100000,
+      "tag": "0004_plano_contas_padrao",
+      "breakpoints": true
     }
   ]
 }

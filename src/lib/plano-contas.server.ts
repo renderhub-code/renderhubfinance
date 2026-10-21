@@ -31,10 +31,20 @@ export interface AccountPayload {
   subgroup: SubgroupPayload;
 }
 
-async function activeCompanyIds(supabase: Client): Promise<string[]> {
-  const { data, error } = await supabase.from("companies").select("id").eq("active", true);
+/** Empresas com plano de contas próprio (categorias do Bling), fora da replicação padrão. */
+const OWN_PLAN_SLUGS = ["use-noronha"];
+
+/**
+ * Empresas que recebem a alteração: a própria empresa quando ela tem plano próprio;
+ * caso contrário, todas as empresas ativas que compartilham o plano padrão.
+ */
+async function activeCompanyIds(supabase: Client, companyId?: string | null): Promise<string[]> {
+  const { data, error } = await supabase.from("companies").select("id,slug").eq("active", true);
   if (error) throw new Error(error.message);
-  return (data ?? []).map((c) => c.id);
+  const rows = data ?? [];
+  const source = companyId ? rows.find((c) => c.id === companyId) : undefined;
+  if (source && OWN_PLAN_SLUGS.includes(source.slug)) return [source.id];
+  return rows.filter((c) => !OWN_PLAN_SLUGS.includes(c.slug)).map((c) => c.id);
 }
 
 function fail(message: string): never {
@@ -109,20 +119,32 @@ async function ensureSubgroup(supabase: Client, companyId: string, sg: SubgroupP
   return ins.id;
 }
 
-export async function replicateGroup(supabase: Client, payload: GroupPayload) {
-  const ids = await activeCompanyIds(supabase);
+export async function replicateGroup(
+  supabase: Client,
+  payload: GroupPayload,
+  companyId?: string | null,
+) {
+  const ids = await activeCompanyIds(supabase, companyId);
   for (const companyId of ids) await ensureGroup(supabase, companyId, payload);
   return { companies: ids.length };
 }
 
-export async function replicateSubgroup(supabase: Client, payload: SubgroupPayload) {
-  const ids = await activeCompanyIds(supabase);
+export async function replicateSubgroup(
+  supabase: Client,
+  payload: SubgroupPayload,
+  companyId?: string | null,
+) {
+  const ids = await activeCompanyIds(supabase, companyId);
   for (const companyId of ids) await ensureSubgroup(supabase, companyId, payload);
   return { companies: ids.length };
 }
 
-export async function replicateAccount(supabase: Client, payload: AccountPayload) {
-  const ids = await activeCompanyIds(supabase);
+export async function replicateAccount(
+  supabase: Client,
+  payload: AccountPayload,
+  companyId?: string | null,
+) {
+  const ids = await activeCompanyIds(supabase, companyId);
   for (const companyId of ids) {
     const subgroupId = await ensureSubgroup(supabase, companyId, payload.subgroup);
     const codes = [
@@ -161,8 +183,13 @@ export async function replicateAccount(supabase: Client, payload: AccountPayload
   return { companies: ids.length };
 }
 
-export async function replicateAccountActive(supabase: Client, code: string, active: boolean) {
-  const ids = await activeCompanyIds(supabase);
+export async function replicateAccountActive(
+  supabase: Client,
+  code: string,
+  active: boolean,
+  companyId?: string | null,
+) {
+  const ids = await activeCompanyIds(supabase, companyId);
   const { error } = await supabase
     .from("accounts")
     .update({ active })
@@ -170,4 +197,59 @@ export async function replicateAccountActive(supabase: Client, code: string, act
     .in("company_id", ids);
   if (error) fail(error.message);
   return { companies: ids.length };
+}
+
+export async function deleteAccountByCode(
+  supabase: Client,
+  code: string,
+  companyId?: string | null,
+) {
+  const ids = await activeCompanyIds(supabase, companyId);
+  const { data: rows, error: aErr } = await supabase
+    .from("accounts")
+    .select("id")
+    .eq("code", code)
+    .in("company_id", ids);
+  if (aErr) fail(aErr.message);
+  const accountIds = (rows ?? []).map((r) => r.id);
+  if (accountIds.length === 0) return { deleted: 0, companies: 0, blocked: false as const };
+
+  const { count: txCount, error: tErr } = await supabase
+    .from("transactions")
+    .select("id", { count: "exact", head: true })
+    .in("account_id", accountIds);
+  if (tErr) fail(tErr.message);
+
+  const { count: simCount, error: sErr } = await supabase
+    .from("simulation_lines")
+    .select("id", { count: "exact", head: true })
+    .in("account_id", accountIds);
+  if (sErr) fail(sErr.message);
+
+  if ((txCount ?? 0) > 0 || (simCount ?? 0) > 0) {
+    return {
+      blocked: true as const,
+      transactions: txCount ?? 0,
+      simulationLines: simCount ?? 0,
+      deleted: 0,
+      companies: 0,
+    };
+  }
+
+  const { error: mErr } = await supabase
+    .from("account_mappings")
+    .update({ account_id: null })
+    .in("account_id", accountIds);
+  if (mErr) fail(mErr.message);
+
+  const { error: dErr } = await supabase.from("accounts").delete().in("id", accountIds);
+  if (dErr) fail(dErr.message);
+
+  return {
+    blocked: false as const,
+    deleted: accountIds.length,
+    companies: accountIds.length,
+    transactions: 0,
+    simulationLines: 0,
+  };
 }

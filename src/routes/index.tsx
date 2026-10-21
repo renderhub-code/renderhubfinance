@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Union Contadores Financeiro — Controle do Hub Empresarial" },
-      { name: "description", content: "Sistema unificado de fluxo de caixa e DRE para as empresas do hub Union Contadores: Render, ERKS, Dom Pablyto, Use Noronha, A&F e Union Contadores." },
+      { name: "description", content: "Sistema unificado de fluxo de caixa para as empresas do hub Union Contadores: Render, ERKS, Dom Pablyto, Use Noronha, A&F e Union Contadores." },
       { property: "og:title", content: "Union Contadores Financeiro" },
       { property: "og:description", content: "Fluxo de caixa realizado, previsto e simulação de cenários para o hub empresarial." },
       { property: "og:type", content: "website" },
@@ -41,7 +41,7 @@ function Landing() {
         </div>
         <div className="mt-20 grid gap-6 md:grid-cols-3">
           <Feature icon={ListTree} title="Plano de contas unificado" desc="Estrutura hierárquica padronizada em todas as empresas do hub, com suporte a unidades de negócio." />
-          <Feature icon={BarChart3} title="DRE mês a mês" desc="Realizado, previsto e delta para cada mês, com acumulado do ano e drill-down por categoria." />
+          <Feature icon={BarChart3} title="Fluxo de caixa mês a mês" desc="Realizado e previsto para cada mês, com acumulado do ano por conta." />
           <Feature icon={TrendingUp} title="Simulações (em breve)" desc="Cenários de receita, custo e despesa aplicáveis ao fluxo de caixa previsto." />
         </div>
       </main>

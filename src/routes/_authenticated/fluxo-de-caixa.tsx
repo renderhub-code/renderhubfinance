@@ -1,5 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useHubStore } from "@/lib/hub-store";
+import { FluxoCaixaPadrao } from "@/components/padrao/FluxoCaixaPadrao";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -66,7 +68,13 @@ function collectIds(nodes: CashflowNode[], acc: string[] = []): string[] {
   return acc;
 }
 
+/** Use Noronha usa a tela integrada ao Bling; as demais empresas usam a estrutura padrão do hub. */
 function FluxoCaixaPage() {
+  const activeHubId = useHubStore((s) => s.activeHubId);
+  return activeHubId === "noronha" ? <FluxoCaixaNoronha /> : <FluxoCaixaPadrao />;
+}
+
+function FluxoCaixaNoronha() {
   const { tree, summary, year, isLoading, snapshot, movements, error } = useCashflowTree();
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [showEmpty, setShowEmpty] = useState(false);

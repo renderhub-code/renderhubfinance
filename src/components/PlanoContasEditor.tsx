@@ -1,9 +1,10 @@
 import { Fragment, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
+  deleteAccountAllCompanies,
   setAccountActiveAllCompanies,
   upsertAccountAllCompanies,
   upsertGroupAllCompanies,
@@ -38,6 +39,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { TableSkeleton } from "@/components/skeletons";
 import {
   useAccountGroups,
@@ -160,11 +171,17 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
   const upsertSubgroup = useServerFn(upsertSubgroupAllCompanies);
   const upsertAccount = useServerFn(upsertAccountAllCompanies);
   const setAccountActive = useServerFn(setAccountActiveAllCompanies);
+  const deleteAccountFn = useServerFn(deleteAccountAllCompanies);
+  const [accountToDelete, setAccountToDelete] = useState<{ code: string; name: string } | null>(
+    null,
+  );
 
   const invalidate = () => {
     queryClient.invalidateQueries({
       predicate: (q) =>
-        ["account_groups", "account_subgroups", "accounts"].includes(String(q.queryKey[0])),
+        ["account_groups", "account_subgroups", "accounts", "account_mappings"].includes(
+          String(q.queryKey[0]),
+        ),
     });
   };
 
@@ -206,6 +223,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
       const original = f.id ? (groupList.find((g) => g.id === f.id)?.code ?? null) : null;
       return upsertGroup({
         data: {
+          companyId,
           code: f.code.trim(),
           name: f.name.trim(),
           type: f.type,
@@ -228,6 +246,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
       const original = f.id ? (subgroupList.find((s) => s.id === f.id)?.code ?? null) : null;
       return upsertSubgroup({
         data: {
+          companyId,
           code: f.code.trim(),
           name: f.name.trim(),
           sort_order: Number(f.sort_order) || 0,
@@ -249,6 +268,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
       const original = f.id ? (accountList.find((a) => a.id === f.id)?.code ?? null) : null;
       return upsertAccount({
         data: {
+          companyId,
           code: f.code.trim(),
           name: f.name.trim(),
           type: f.type,
@@ -269,12 +289,40 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
 
   const toggleAccount = useMutation({
     mutationFn: async ({ code, active }: { code: string; active: boolean }) =>
-      setAccountActive({ data: { code, active } }),
+      setAccountActive({ data: { code, active, companyId } }),
     onSuccess: (res) => {
       toast.success(`Situação atualizada em ${res.companies} empresas.`);
       invalidate();
     },
     onError,
+  });
+
+  const deleteAccount = useMutation({
+    mutationFn: async (code: string) => deleteAccountFn({ data: { code, companyId } }),
+    onSuccess: (res, code) => {
+      if (res.blocked) {
+        toast.error(
+          `Conta em uso: ${res.transactions} lançamento(s) e ${res.simulationLines} linha(s) de simulação. ` +
+            "Ela não pode ser excluída — inative para preservar o histórico.",
+          {
+            action: {
+              label: "Inativar",
+              onClick: () => toggleAccount.mutate({ code, active: false }),
+            },
+          },
+        );
+      } else if (res.deleted === 0) {
+        toast.error("Conta não encontrada.");
+      } else {
+        toast.success(`Conta excluída em ${res.deleted} empresas.`);
+        invalidate();
+      }
+      setAccountToDelete(null);
+    },
+    onError: (err: { code?: string; message?: string }) => {
+      setAccountToDelete(null);
+      onError(err);
+    },
   });
 
   const subgroupOptions = subgroupList.map((sg) => {
@@ -290,7 +338,7 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
           <CardTitle className="text-base">Contas</CardTitle>
           <p className="text-sm text-muted-foreground">
             Plano de contas compartilhado — toda alteração de grupo, subgrupo ou categoria é replicada
-            em todas as empresas.
+            em todas as empresas que o compartilham (a Use Noronha tem plano próprio, do Bling).
           </p>
 
         </div>
@@ -375,39 +423,42 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
                     .filter((sg) => sg.groupCode === g.code)
                     .map((sg) => (
                       <Fragment key={sg.id}>
-                        <TableRow>
-                          <TableCell className="pl-6 font-mono text-xs">{sg.code}</TableCell>
-                          <TableCell className="pl-6">{sg.name}</TableCell>
-                          <TableCell className="text-muted-foreground">Subgrupo</TableCell>
-                          <TableCell className="text-muted-foreground">—</TableCell>
-                          <TableCell className="text-muted-foreground">—</TableCell>
-                          <TableCell className="text-right">
-                            {canEdit && (
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() =>
-                                  setSubgroupForm({
-                                    id: sg.id,
-                                    group_id: g.id,
-                                    code: sg.code,
-                                    name: sg.name,
-                                    sort_order: String(sg.sort_order),
-                                  })
-                                }
-                              >
-                                <Pencil className="size-4" />
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
+                        {sg.name !== g.name && (
+                          <TableRow>
+                            <TableCell className="pl-6 font-mono text-xs">{sg.code}</TableCell>
+                            <TableCell className="pl-6">{sg.name}</TableCell>
+                            <TableCell className="text-muted-foreground">Subgrupo</TableCell>
+                            <TableCell className="text-muted-foreground">—</TableCell>
+                            <TableCell className="text-muted-foreground">—</TableCell>
+                            <TableCell className="text-right">
+                              {canEdit && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() =>
+                                    setSubgroupForm({
+                                      id: sg.id,
+                                      group_id: g.id,
+                                      code: sg.code,
+                                      name: sg.name,
+                                      sort_order: String(sg.sort_order),
+                                    })
+                                  }
+                                >
+                                  <Pencil className="size-4" />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        )}
+
 
                         {accountList
                           .filter((a) => a.subgroupCode === sg.code)
                           .map((a) => (
                             <TableRow key={a.id} className={a.active ? "" : "opacity-60"}>
-                              <TableCell className="pl-12 font-mono text-xs">{a.code}</TableCell>
-                              <TableCell className="pl-12">{a.name}</TableCell>
+                              <TableCell className="pl-6 font-mono text-xs">{a.code}</TableCell>
+                              <TableCell className="pl-6">{a.name}</TableCell>
                               <TableCell className="text-muted-foreground">Analítica</TableCell>
                               <TableCell className="text-muted-foreground">
                                 {a.type === "entrada" ? "Entrada" : "Saída"}
@@ -443,6 +494,18 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
                                       }
                                     >
                                       <Pencil className="size-4" />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="text-destructive hover:text-destructive"
+                                      aria-label={`Excluir conta ${a.code}`}
+                                      disabled={deleteAccount.isPending}
+                                      onClick={() =>
+                                        setAccountToDelete({ code: a.code, name: a.name })
+                                      }
+                                    >
+                                      <Trash2 className="size-4" />
                                     </Button>
                                   </div>
                                 ) : (
@@ -726,6 +789,36 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={!!accountToDelete}
+        onOpenChange={(o) => !o && setAccountToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Excluir a conta {accountToDelete?.code} em todas as empresas do plano?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {accountToDelete?.name} será removida do plano de contas de todas as empresas que o compartilham.
+              Se houver lançamentos ou simulações usando esta conta, a exclusão é bloqueada e você
+              poderá inativá-la.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteAccount.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (accountToDelete) deleteAccount.mutate(accountToDelete.code);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

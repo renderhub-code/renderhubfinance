@@ -549,24 +549,25 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
             {year})
           </CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent>
           {linesQuery.isLoading ? (
             <TableSkeleton rows={4} cols={8} />
           ) : (
-            <Table>
-              <TableHeader>
+            <div className="relative max-h-[70vh] overflow-auto rounded-md border">
+            <table className="w-full caption-bottom text-sm">
+              <TableHeader className="sticky top-0 z-20 bg-card shadow-[0_1px_0_var(--color-border)]">
                 <TableRow>
-                  <TableHead className="min-w-40">Cliente</TableHead>
-                  <TableHead className="text-right min-w-28">Valor Unitário</TableHead>
-                  <TableHead className="text-right min-w-24">Margem %</TableHead>
+                  <TableHead className="sticky left-0 z-10 bg-card w-40 min-w-40 max-w-40 z-30">Cliente</TableHead>
+                  <TableHead className="text-right sticky left-40 z-10 bg-card w-28 min-w-28 max-w-28 z-30">Valor Unitário</TableHead>
+                  <TableHead className="text-right sticky left-68 z-10 bg-card w-24 min-w-24 max-w-24 shadow-[1px_0_0_var(--color-border)] z-30">Margem %</TableHead>
                   {MONTHS.map((m) => (
-                    <TableHead key={m} className="text-right min-w-16">
+                    <TableHead key={m} className="text-right min-w-16 bg-card">
                       {m}
                     </TableHead>
                   ))}
-                  <TableHead className="text-right min-w-32">Receita prevista</TableHead>
-                  <TableHead className="text-right min-w-32">Custo previsto</TableHead>
-                  <TableHead className="w-10" />
+                  <TableHead className="text-right min-w-32 bg-card">Receita prevista</TableHead>
+                  <TableHead className="text-right min-w-32 bg-card">Custo previsto</TableHead>
+                  <TableHead className="w-10 bg-card" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -587,7 +588,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                     <Fragment key={g.accountId}>
                       <TableRow key={`h-${g.accountId}`} className="bg-muted/60">
                         <TableCell colSpan={18}>
-                          <div className="flex items-center gap-2">
+                          <div className="sticky left-2 flex w-fit items-center gap-2">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -629,7 +630,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                           const qty = view === "previsto" ? r.qtyExpected : r.qtyRealized;
                           return (
                             <TableRow key={r.groupKey}>
-                              <TableCell>
+                              <TableCell className="sticky left-0 z-10 bg-card w-40 min-w-40 max-w-40">
                                 <Input
                                   value={r.clientName}
                                   placeholder="Cliente"
@@ -638,7 +639,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                                   }
                                 />
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="sticky left-40 z-10 bg-card w-28 min-w-28 max-w-28">
                                 <Input
                                   type="number"
                                   step="0.01"
@@ -652,7 +653,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                                   }
                                 />
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="sticky left-68 z-10 bg-card w-24 min-w-24 max-w-24 shadow-[1px_0_0_var(--color-border)]">
                                 <Input
                                   type="number"
                                   step="0.1"
@@ -716,7 +717,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                       {g.rows.length > 0 && (
                         <>
                           <TableRow key={`sr-${g.accountId}`} className="bg-muted/20">
-                            <TableCell colSpan={3} className="text-sm font-medium">
+                            <TableCell colSpan={3} className="sticky left-0 z-10 bg-muted text-sm font-medium">
                               Subtotal {g.code} — receita
                             </TableCell>
                             {g.revenue.map((v, i) => (
@@ -730,7 +731,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                             <TableCell colSpan={2} />
                           </TableRow>
                           <TableRow key={`sc-${g.accountId}`} className="bg-muted/20">
-                            <TableCell colSpan={3} className="text-sm font-medium">
+                            <TableCell colSpan={3} className="sticky left-0 z-10 bg-muted text-sm font-medium">
                               Subtotal {g.code} — custo
                             </TableCell>
                             {g.cost.map((v, i) => (
@@ -752,7 +753,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                 {rows.length > 0 && (
                   <>
                     <TableRow className="bg-muted/40">
-                      <TableCell colSpan={3} className="font-medium">
+                      <TableCell colSpan={3} className="sticky left-0 z-10 bg-muted font-medium">
                         Receita prevista por mês (total)
                       </TableCell>
                       {monthTotals.revenue.map((v, i) => (
@@ -766,7 +767,7 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                       <TableCell colSpan={2} />
                     </TableRow>
                     <TableRow className="bg-muted/40">
-                      <TableCell colSpan={3} className="font-medium">
+                      <TableCell colSpan={3} className="sticky left-0 z-10 bg-muted font-medium">
                         Custo previsto por mês (total)
                       </TableCell>
                       {monthTotals.cost.map((v, i) => (
@@ -783,7 +784,8 @@ export function SimulacaoComercial({ companyId }: { companyId: string }) {
                   </>
                 )}
               </TableBody>
-            </Table>
+            </table>
+            </div>
           )}
         </CardContent>
       </Card>

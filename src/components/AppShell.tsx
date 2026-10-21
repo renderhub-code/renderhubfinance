@@ -35,7 +35,27 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { activeHubId, setHub } = useHubStore();
   const activeHub = getHub(activeHubId);
 
+  const isHubConsolidator = !!activeHub.consolidator;
+  const navItems = isHubConsolidator
+    ? NAV.filter((n) => n.to === "/dashboard" || n.to === "/fluxo-de-caixa")
+    : NAV.filter((n) => n.to !== "/financeiro" || activeHubId === "noronha");
+
+  // Keep the active company locked to the active hub (except the consolidator hub).
   useEffect(() => {
+    if (!companies || isHubConsolidator) return;
+    const c = companies.find((x) => x.slug === activeHub.companySlug);
+    if (c && c.id !== activeCompanyId) setCompany(c.id);
+  }, [companies, isHubConsolidator, activeHub.companySlug, activeCompanyId, setCompany]);
+
+  useEffect(() => {
+    if (!isHubConsolidator) return;
+    if (!navItems.some((n) => loc.pathname === n.to || loc.pathname.startsWith(n.to + "/"))) {
+      navigate({ to: "/dashboard" });
+    }
+  }, [isHubConsolidator, loc.pathname, navigate, navItems]);
+
+  useEffect(() => {
+    if (!initialized && isHubConsolidator) { markInitialized(); return; }
     if (!initialized && companies && companies.length > 0) {
       const hubCompany = companies.find((c) => c.slug === activeHub.companySlug);
       setCompany((hubCompany ?? companies[0]).id);
@@ -52,8 +72,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   function selectHub(id: HubId) {
     setHub(id);
     const hub = getHub(id);
-    const company = companies?.find((c) => c.slug === hub.companySlug);
-    if (company) setCompany(company.id);
+    if (hub.consolidator) setCompany(null);
+    else {
+      const company = companies?.find((c) => c.slug === hub.companySlug);
+      if (company) setCompany(company.id);
+    }
     navigate({ to: "/dashboard" });
   }
 
@@ -98,7 +121,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         <nav className="flex-1 p-3 space-y-0.5">
 
-          {NAV.map((n) => {
+          {navItems.map((n) => {
             const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
             return (
               <Link
@@ -127,9 +150,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="h-16 border-b bg-background px-4 md:px-6 flex items-center gap-3">
           <div className="text-sm font-semibold truncate max-w-[220px] md:hidden lg:block">{activeHub.label}</div>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-xs text-muted-foreground hidden sm:inline">Empresa</span>
+            {isHubConsolidator && <span className="text-xs text-muted-foreground hidden sm:inline">Empresa</span>}
 
-            {loadingCompanies ? (
+            {!isHubConsolidator ? null : loadingCompanies ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Select

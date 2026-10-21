@@ -1,38 +1,31 @@
 import { useMemo } from "react";
 import { useCompanyStore } from "@/lib/company-store";
-import { useTransactions } from "@/lib/queries";
 import { useFinancialStore } from "@/lib/financial-store";
+import { useAccountGroups, useAccountSubgroups, useAccounts, useTransactions } from "@/lib/queries";
+import { buildCashFlow, cashFlowByCompany } from "@/lib/cashflow-blocks";
 
-/** Agrega previsto e realizado da empresa selecionada por mês. */
-export function useForecastByMonth() {
+/** Fluxo de caixa completo do ano: previsto x realizado, por blocos e grupos (empresas sem Bling). */
+export function useCashFlow() {
   const companyId = useCompanyStore((s) => s.activeCompanyId);
   const businessUnitId = useCompanyStore((s) => s.activeBusinessUnitId);
   const year = useFinancialStore((s) => s.year);
-  const { data: txs, isLoading } = useTransactions(companyId, {
+  const { data: allTxs, isLoading } = useTransactions(companyId, {
     from: `${year}-01-01`,
     to: `${year}-12-31`,
     businessUnitId,
   });
-
-  const totals = useMemo(() => {
-    const expectedIn = Array(12).fill(0) as number[];
-    const expectedOut = Array(12).fill(0) as number[];
-    const realizedIn = Array(12).fill(0) as number[];
-    const realizedOut = Array(12).fill(0) as number[];
-    for (const t of txs ?? []) {
-      if (t.status === "cancelado") continue;
-      const m = Number(t.entry_date.slice(5, 7)) - 1;
-      if (m < 0 || m > 11) continue;
-      if (t.status === "realizado") {
-        if (t.type === "entrada") realizedIn[m] += Number(t.amount_realized ?? 0);
-        else realizedOut[m] += Number(t.amount_realized ?? 0);
-      } else if (t.status === "previsto") {
-        if (t.type === "entrada") expectedIn[m] += Number(t.amount_expected ?? 0);
-        else expectedOut[m] += Number(t.amount_expected ?? 0);
-      }
-    }
-    return { expectedIn, expectedOut, realizedIn, realizedOut };
-  }, [txs]);
-
-  return { ...totals, year, isLoading };
+  const { data: accounts, isLoading: l1 } = useAccounts(companyId);
+  const { data: groups, isLoading: l2 } = useAccountGroups(companyId);
+  const { data: subgroups, isLoading: l3 } = useAccountSubgroups(companyId);
+  // Títulos importados do Bling são valor de face, não caixa; o caixa da Use Noronha vem do snapshot próprio.
+  const txs = useMemo(() => (allTxs ?? []).filter((t) => !t.external_source?.startsWith("bling:")), [allTxs]);
+  const data = useMemo(
+    () => buildCashFlow(txs, accounts ?? [], groups ?? [], subgroups ?? []),
+    [txs, accounts, groups, subgroups],
+  );
+  const byCompany = useMemo(
+    () => (companyId === null ? cashFlowByCompany(txs, accounts ?? [], groups ?? [], subgroups ?? []) : {}),
+    [companyId, txs, accounts, groups, subgroups],
+  );
+  return { ...data, byCompany, year, isLoading: isLoading || l1 || l2 || l3 };
 }

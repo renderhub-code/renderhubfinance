@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Union Contadores Financeiro — Hub Empresarial" },
-      { name: "description", content: "Controle financeiro unificado do hub Union Contadores: fluxo de caixa realizado, previsto e DRE gerencial." },
+      { name: "description", content: "Controle financeiro unificado do hub Union Contadores: fluxo de caixa realizado e previsto." },
       { property: "og:title", content: "Union Contadores Financeiro" },
       { property: "og:description", content: "Controle financeiro unificado do hub Union Contadores." },
       { property: "og:type", content: "website" },

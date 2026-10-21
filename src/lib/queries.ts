@@ -73,6 +73,9 @@ export interface Transaction {
   source_simulation_id: string | null;
   external_source: string | null;
   external_id: string | null;
+  document_number?: string | null;
+  bank?: string | null;
+  bank_account?: string | null;
   created_at: string;
 }
 
