@@ -36,6 +36,13 @@
       "when": 1792422100000,
       "tag": "0004_plano_contas_padrao",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793309941920,
+      "tag": "0005_add_transaction_import_metadata",
+      "breakpoints": true
     }
   ]
 }
