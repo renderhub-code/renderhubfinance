@@ -680,15 +680,12 @@ export type Database = {
           amount_expected: number
           amount_realized: number
           attachment_path: string | null
-          bank: string | null
-          bank_account: string | null
           business_unit_id: string | null
           company_id: string
           cost_center_id: string | null
           created_at: string
           created_by: string | null
           description: string | null
-          document_number: string | null
           due_date: string | null
           entry_date: string
           external_id: string | null
@@ -707,15 +704,12 @@ export type Database = {
           amount_expected?: number
           amount_realized?: number
           attachment_path?: string | null
-          bank?: string | null
-          bank_account?: string | null
           business_unit_id?: string | null
           company_id: string
           cost_center_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
-          document_number?: string | null
           due_date?: string | null
           entry_date?: string
           external_id?: string | null
@@ -734,15 +728,12 @@ export type Database = {
           amount_expected?: number
           amount_realized?: number
           attachment_path?: string | null
-          bank?: string | null
-          bank_account?: string | null
           business_unit_id?: string | null
           company_id?: string
           cost_center_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
-          document_number?: string | null
           due_date?: string | null
           entry_date?: string
           external_id?: string | null
