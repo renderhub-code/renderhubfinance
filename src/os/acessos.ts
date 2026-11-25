@@ -49,6 +49,15 @@ export const RECURSOS: Recurso[] = [
   { key: "cx.followup", label: "Follow-up", modulo: "Operacional", empresas: ["render"], edita: "criar e atualizar POs" },
   { key: "cx.clientes", label: "Clientes do portal", modulo: "Operacional", empresas: ["render"], edita: "clientes e e-mails do portal" },
 
+  { key: "rh.painel", label: "Painel e indicadores", modulo: "RH", empresas: TODAS },
+  { key: "rh.colaboradores", label: "Colaboradores", modulo: "RH", empresas: TODAS, edita: "cadastrar, editar e desligar" },
+  { key: "rh.remuneracao", label: "Salários, folha e custos", modulo: "RH", empresas: TODAS, edita: "salários, benefícios, folha, custos e orçamento" },
+  { key: "rh.calendario", label: "Calendário RH", modulo: "RH", empresas: TODAS, edita: "atividades recorrentes" },
+  { key: "rh.avaliacoes", label: "Avaliações (9 Box e desempenho)", modulo: "RH", empresas: TODAS, edita: "registrar avaliações" },
+  { key: "rh.aso", label: "Saúde ocupacional / ASO", modulo: "RH", empresas: TODAS, edita: "registrar ASOs · dado sensível" },
+  { key: "rh.pj", label: "Contratos PJ", modulo: "RH", empresas: TODAS, edita: "cadastrar e renovar contratos" },
+  { key: "rh.documentos", label: "Documentos e prazos", modulo: "RH", empresas: TODAS, edita: "controles e vencimentos" },
+
   { key: "ia.visao", label: "Visão geral", modulo: "IA", empresas: ["grupo"] },
   { key: "ia.entregas", label: "Entregas", modulo: "IA", empresas: ["grupo"], edita: "entregas e diário" },
   { key: "ia.empresas", label: "Por empresa", modulo: "IA", empresas: ["grupo"] },
@@ -70,6 +79,9 @@ export const PERFIS: Perfil[] = [
   { id: "con-admin", nome: "Administrador do Contábil", desc: "Todas as abas da Union, incluindo equipe e importações.", escopos: ["union"], niveis: { "con.painel": 2, "con.atividades": 2, "con.clientes": 2, "con.equipe": 2, "con.cadastros": 2, "con.bases": 2, "con.importar": 2 } },
   { id: "cx-equipe", nome: "Equipe Comex", desc: "Atualiza POs e cadastra clientes do portal.", escopos: ["render"], niveis: { "cx.followup": 2, "cx.clientes": 2 } },
   { id: "cx-leitura", nome: "Comex (leitura)", desc: "Acompanha o follow-up sem editar.", escopos: ["render"], niveis: { "cx.followup": 1, "cx.clientes": 1 } },
+  { id: "rh-gestor", nome: "RH", desc: "Vê e edita todo o RH da empresa, incluindo salários e ASO.", escopos: TODAS, niveis: { "rh.painel": 2, "rh.colaboradores": 2, "rh.remuneracao": 2, "rh.calendario": 2, "rh.avaliacoes": 2, "rh.aso": 2, "rh.pj": 2, "rh.documentos": 2 } },
+  { id: "rh-diretoria", nome: "Diretoria (RH, leitura)", desc: "Painel, custos, avaliações e contratos, sem editar e sem dados de saúde.", escopos: TODAS, niveis: { "rh.painel": 1, "rh.colaboradores": 1, "rh.remuneracao": 1, "rh.calendario": 1, "rh.avaliacoes": 1, "rh.pj": 1, "rh.documentos": 1 } },
+  { id: "rh-gestor-area", nome: "Gestor de área", desc: "Vê a equipe e registra avaliações; sem salários nem saúde.", escopos: TODAS, niveis: { "rh.colaboradores": 1, "rh.avaliacoes": 2, "rh.calendario": 1 } },
   { id: "ia-time", nome: "Time de IA", desc: "Edita entregas, diário e treinamento.", escopos: ["grupo"], niveis: { "ia.visao": 2, "ia.entregas": 2, "ia.empresas": 2, "ia.treinamento": 2 } },
   { id: "ia-leitor", nome: "Acompanha a IA", desc: "Só acompanha o departamento de IA.", escopos: ["grupo"], niveis: { "ia.visao": 1, "ia.entregas": 1, "ia.empresas": 1, "ia.treinamento": 1 } },
 ];
@@ -105,9 +117,9 @@ export function useOs() {
     if (loading || admin) return 2;
     return (mapa.get(`${empresa}|${recurso}`) ?? 0) as Nivel;
   }
-  /** Workspace "grupo" no financeiro = vale se alguma empresa tiver a aba. */
+  /** Workspace "grupo" no financeiro e no RH = vale se alguma empresa tiver a aba. */
   function nivelNo(workspace: WorkspaceId, recurso: string): Nivel {
-    if (workspace !== "grupo" || !recurso.startsWith("fin.")) return nivel(workspace as Escopo, recurso);
+    if (workspace !== "grupo" || !(recurso.startsWith("fin.") || recurso.startsWith("rh."))) return nivel(workspace as Escopo, recurso);
     return Math.max(0, ...TODAS.map((c) => nivel(c, recurso))) as Nivel;
   }
   return {

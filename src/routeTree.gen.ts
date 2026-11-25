@@ -40,6 +40,17 @@ import { Route as AuthenticatedIaTreinamentoRouteImport } from './routes/_authen
 import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
 import { Route as AuthenticatedModuloIdRouteImport } from './routes/_authenticated/modulo.$id'
 import { Route as AuthenticatedPessoasAcessosRouteImport } from './routes/_authenticated/pessoas.acessos'
+import { Route as AuthenticatedRhIndexRouteImport } from './routes/_authenticated/rh.index'
+import { Route as AuthenticatedRhAsoRouteImport } from './routes/_authenticated/rh.aso'
+import { Route as AuthenticatedRhAvaliacoesRouteImport } from './routes/_authenticated/rh.avaliacoes'
+import { Route as AuthenticatedRhCalendarioRouteImport } from './routes/_authenticated/rh.calendario'
+import { Route as AuthenticatedRhColaboradoresRouteImport } from './routes/_authenticated/rh.colaboradores'
+import { Route as AuthenticatedRhCustosRouteImport } from './routes/_authenticated/rh.custos'
+import { Route as AuthenticatedRhDocumentosRouteImport } from './routes/_authenticated/rh.documentos'
+import { Route as AuthenticatedRhFolhaRouteImport } from './routes/_authenticated/rh.folha'
+import { Route as AuthenticatedRhIndicadoresRouteImport } from './routes/_authenticated/rh.indicadores'
+import { Route as AuthenticatedRhPjRouteImport } from './routes/_authenticated/rh.pj'
+import { Route as AuthenticatedRhRemuneracaoRouteImport } from './routes/_authenticated/rh.remuneracao'
 import { Route as AuthenticatedSimulacoesIdRouteImport } from './routes/_authenticated/simulacoes.$id'
 import { Route as ApiPublicHooksBlingDailyImportRouteImport } from './routes/api/public/hooks/bling-daily-import'
 
@@ -213,6 +224,67 @@ const AuthenticatedPessoasAcessosRoute =
     path: '/pessoas/acessos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRhIndexRoute = AuthenticatedRhIndexRouteImport.update({
+  id: '/rh/',
+  path: '/rh/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRhAsoRoute = AuthenticatedRhAsoRouteImport.update({
+  id: '/rh/aso',
+  path: '/rh/aso',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRhAvaliacoesRoute =
+  AuthenticatedRhAvaliacoesRouteImport.update({
+    id: '/rh/avaliacoes',
+    path: '/rh/avaliacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRhCalendarioRoute =
+  AuthenticatedRhCalendarioRouteImport.update({
+    id: '/rh/calendario',
+    path: '/rh/calendario',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRhColaboradoresRoute =
+  AuthenticatedRhColaboradoresRouteImport.update({
+    id: '/rh/colaboradores',
+    path: '/rh/colaboradores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRhCustosRoute = AuthenticatedRhCustosRouteImport.update({
+  id: '/rh/custos',
+  path: '/rh/custos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRhDocumentosRoute =
+  AuthenticatedRhDocumentosRouteImport.update({
+    id: '/rh/documentos',
+    path: '/rh/documentos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRhFolhaRoute = AuthenticatedRhFolhaRouteImport.update({
+  id: '/rh/folha',
+  path: '/rh/folha',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRhIndicadoresRoute =
+  AuthenticatedRhIndicadoresRouteImport.update({
+    id: '/rh/indicadores',
+    path: '/rh/indicadores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRhPjRoute = AuthenticatedRhPjRouteImport.update({
+  id: '/rh/pj',
+  path: '/rh/pj',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRhRemuneracaoRoute =
+  AuthenticatedRhRemuneracaoRouteImport.update({
+    id: '/rh/remuneracao',
+    path: '/rh/remuneracao',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSimulacoesIdRoute =
   AuthenticatedSimulacoesIdRouteImport.update({
     id: '/$id',
@@ -254,10 +326,21 @@ export interface FileRoutesByFullPath {
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
+  '/rh/aso': typeof AuthenticatedRhAsoRoute
+  '/rh/avaliacoes': typeof AuthenticatedRhAvaliacoesRoute
+  '/rh/calendario': typeof AuthenticatedRhCalendarioRoute
+  '/rh/colaboradores': typeof AuthenticatedRhColaboradoresRoute
+  '/rh/custos': typeof AuthenticatedRhCustosRoute
+  '/rh/documentos': typeof AuthenticatedRhDocumentosRoute
+  '/rh/folha': typeof AuthenticatedRhFolhaRoute
+  '/rh/indicadores': typeof AuthenticatedRhIndicadoresRoute
+  '/rh/pj': typeof AuthenticatedRhPjRoute
+  '/rh/remuneracao': typeof AuthenticatedRhRemuneracaoRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/comex/': typeof AuthenticatedComexIndexRoute
   '/contabil/': typeof AuthenticatedContabilIndexRoute
   '/ia/': typeof AuthenticatedIaIndexRoute
+  '/rh/': typeof AuthenticatedRhIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRoutesByTo {
@@ -288,10 +371,21 @@ export interface FileRoutesByTo {
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
+  '/rh/aso': typeof AuthenticatedRhAsoRoute
+  '/rh/avaliacoes': typeof AuthenticatedRhAvaliacoesRoute
+  '/rh/calendario': typeof AuthenticatedRhCalendarioRoute
+  '/rh/colaboradores': typeof AuthenticatedRhColaboradoresRoute
+  '/rh/custos': typeof AuthenticatedRhCustosRoute
+  '/rh/documentos': typeof AuthenticatedRhDocumentosRoute
+  '/rh/folha': typeof AuthenticatedRhFolhaRoute
+  '/rh/indicadores': typeof AuthenticatedRhIndicadoresRoute
+  '/rh/pj': typeof AuthenticatedRhPjRoute
+  '/rh/remuneracao': typeof AuthenticatedRhRemuneracaoRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/comex': typeof AuthenticatedComexIndexRoute
   '/contabil': typeof AuthenticatedContabilIndexRoute
   '/ia': typeof AuthenticatedIaIndexRoute
+  '/rh': typeof AuthenticatedRhIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRoutesById {
@@ -324,10 +418,21 @@ export interface FileRoutesById {
   '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/_authenticated/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/_authenticated/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
+  '/_authenticated/rh/aso': typeof AuthenticatedRhAsoRoute
+  '/_authenticated/rh/avaliacoes': typeof AuthenticatedRhAvaliacoesRoute
+  '/_authenticated/rh/calendario': typeof AuthenticatedRhCalendarioRoute
+  '/_authenticated/rh/colaboradores': typeof AuthenticatedRhColaboradoresRoute
+  '/_authenticated/rh/custos': typeof AuthenticatedRhCustosRoute
+  '/_authenticated/rh/documentos': typeof AuthenticatedRhDocumentosRoute
+  '/_authenticated/rh/folha': typeof AuthenticatedRhFolhaRoute
+  '/_authenticated/rh/indicadores': typeof AuthenticatedRhIndicadoresRoute
+  '/_authenticated/rh/pj': typeof AuthenticatedRhPjRoute
+  '/_authenticated/rh/remuneracao': typeof AuthenticatedRhRemuneracaoRoute
   '/_authenticated/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/_authenticated/comex/': typeof AuthenticatedComexIndexRoute
   '/_authenticated/contabil/': typeof AuthenticatedContabilIndexRoute
   '/_authenticated/ia/': typeof AuthenticatedIaIndexRoute
+  '/_authenticated/rh/': typeof AuthenticatedRhIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRouteTypes {
@@ -360,10 +465,21 @@ export interface FileRouteTypes {
     | '/lancamentos/importar'
     | '/modulo/$id'
     | '/pessoas/acessos'
+    | '/rh/aso'
+    | '/rh/avaliacoes'
+    | '/rh/calendario'
+    | '/rh/colaboradores'
+    | '/rh/custos'
+    | '/rh/documentos'
+    | '/rh/folha'
+    | '/rh/indicadores'
+    | '/rh/pj'
+    | '/rh/remuneracao'
     | '/simulacoes/$id'
     | '/comex/'
     | '/contabil/'
     | '/ia/'
+    | '/rh/'
     | '/api/public/hooks/bling-daily-import'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -394,10 +510,21 @@ export interface FileRouteTypes {
     | '/lancamentos/importar'
     | '/modulo/$id'
     | '/pessoas/acessos'
+    | '/rh/aso'
+    | '/rh/avaliacoes'
+    | '/rh/calendario'
+    | '/rh/colaboradores'
+    | '/rh/custos'
+    | '/rh/documentos'
+    | '/rh/folha'
+    | '/rh/indicadores'
+    | '/rh/pj'
+    | '/rh/remuneracao'
     | '/simulacoes/$id'
     | '/comex'
     | '/contabil'
     | '/ia'
+    | '/rh'
     | '/api/public/hooks/bling-daily-import'
   id:
     | '__root__'
@@ -429,10 +556,21 @@ export interface FileRouteTypes {
     | '/_authenticated/lancamentos/importar'
     | '/_authenticated/modulo/$id'
     | '/_authenticated/pessoas/acessos'
+    | '/_authenticated/rh/aso'
+    | '/_authenticated/rh/avaliacoes'
+    | '/_authenticated/rh/calendario'
+    | '/_authenticated/rh/colaboradores'
+    | '/_authenticated/rh/custos'
+    | '/_authenticated/rh/documentos'
+    | '/_authenticated/rh/folha'
+    | '/_authenticated/rh/indicadores'
+    | '/_authenticated/rh/pj'
+    | '/_authenticated/rh/remuneracao'
     | '/_authenticated/simulacoes/$id'
     | '/_authenticated/comex/'
     | '/_authenticated/contabil/'
     | '/_authenticated/ia/'
+    | '/_authenticated/rh/'
     | '/api/public/hooks/bling-daily-import'
   fileRoutesById: FileRoutesById
 }
@@ -664,6 +802,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPessoasAcessosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rh/': {
+      id: '/_authenticated/rh/'
+      path: '/rh'
+      fullPath: '/rh/'
+      preLoaderRoute: typeof AuthenticatedRhIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/aso': {
+      id: '/_authenticated/rh/aso'
+      path: '/rh/aso'
+      fullPath: '/rh/aso'
+      preLoaderRoute: typeof AuthenticatedRhAsoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/avaliacoes': {
+      id: '/_authenticated/rh/avaliacoes'
+      path: '/rh/avaliacoes'
+      fullPath: '/rh/avaliacoes'
+      preLoaderRoute: typeof AuthenticatedRhAvaliacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/calendario': {
+      id: '/_authenticated/rh/calendario'
+      path: '/rh/calendario'
+      fullPath: '/rh/calendario'
+      preLoaderRoute: typeof AuthenticatedRhCalendarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/colaboradores': {
+      id: '/_authenticated/rh/colaboradores'
+      path: '/rh/colaboradores'
+      fullPath: '/rh/colaboradores'
+      preLoaderRoute: typeof AuthenticatedRhColaboradoresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/custos': {
+      id: '/_authenticated/rh/custos'
+      path: '/rh/custos'
+      fullPath: '/rh/custos'
+      preLoaderRoute: typeof AuthenticatedRhCustosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/documentos': {
+      id: '/_authenticated/rh/documentos'
+      path: '/rh/documentos'
+      fullPath: '/rh/documentos'
+      preLoaderRoute: typeof AuthenticatedRhDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/folha': {
+      id: '/_authenticated/rh/folha'
+      path: '/rh/folha'
+      fullPath: '/rh/folha'
+      preLoaderRoute: typeof AuthenticatedRhFolhaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/indicadores': {
+      id: '/_authenticated/rh/indicadores'
+      path: '/rh/indicadores'
+      fullPath: '/rh/indicadores'
+      preLoaderRoute: typeof AuthenticatedRhIndicadoresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/pj': {
+      id: '/_authenticated/rh/pj'
+      path: '/rh/pj'
+      fullPath: '/rh/pj'
+      preLoaderRoute: typeof AuthenticatedRhPjRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rh/remuneracao': {
+      id: '/_authenticated/rh/remuneracao'
+      path: '/rh/remuneracao'
+      fullPath: '/rh/remuneracao'
+      preLoaderRoute: typeof AuthenticatedRhRemuneracaoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/simulacoes/$id': {
       id: '/_authenticated/simulacoes/$id'
       path: '/$id'
@@ -733,9 +948,20 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIaTreinamentoRoute: typeof AuthenticatedIaTreinamentoRoute
   AuthenticatedModuloIdRoute: typeof AuthenticatedModuloIdRoute
   AuthenticatedPessoasAcessosRoute: typeof AuthenticatedPessoasAcessosRoute
+  AuthenticatedRhAsoRoute: typeof AuthenticatedRhAsoRoute
+  AuthenticatedRhAvaliacoesRoute: typeof AuthenticatedRhAvaliacoesRoute
+  AuthenticatedRhCalendarioRoute: typeof AuthenticatedRhCalendarioRoute
+  AuthenticatedRhColaboradoresRoute: typeof AuthenticatedRhColaboradoresRoute
+  AuthenticatedRhCustosRoute: typeof AuthenticatedRhCustosRoute
+  AuthenticatedRhDocumentosRoute: typeof AuthenticatedRhDocumentosRoute
+  AuthenticatedRhFolhaRoute: typeof AuthenticatedRhFolhaRoute
+  AuthenticatedRhIndicadoresRoute: typeof AuthenticatedRhIndicadoresRoute
+  AuthenticatedRhPjRoute: typeof AuthenticatedRhPjRoute
+  AuthenticatedRhRemuneracaoRoute: typeof AuthenticatedRhRemuneracaoRoute
   AuthenticatedComexIndexRoute: typeof AuthenticatedComexIndexRoute
   AuthenticatedContabilIndexRoute: typeof AuthenticatedContabilIndexRoute
   AuthenticatedIaIndexRoute: typeof AuthenticatedIaIndexRoute
+  AuthenticatedRhIndexRoute: typeof AuthenticatedRhIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -761,9 +987,20 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIaTreinamentoRoute: AuthenticatedIaTreinamentoRoute,
   AuthenticatedModuloIdRoute: AuthenticatedModuloIdRoute,
   AuthenticatedPessoasAcessosRoute: AuthenticatedPessoasAcessosRoute,
+  AuthenticatedRhAsoRoute: AuthenticatedRhAsoRoute,
+  AuthenticatedRhAvaliacoesRoute: AuthenticatedRhAvaliacoesRoute,
+  AuthenticatedRhCalendarioRoute: AuthenticatedRhCalendarioRoute,
+  AuthenticatedRhColaboradoresRoute: AuthenticatedRhColaboradoresRoute,
+  AuthenticatedRhCustosRoute: AuthenticatedRhCustosRoute,
+  AuthenticatedRhDocumentosRoute: AuthenticatedRhDocumentosRoute,
+  AuthenticatedRhFolhaRoute: AuthenticatedRhFolhaRoute,
+  AuthenticatedRhIndicadoresRoute: AuthenticatedRhIndicadoresRoute,
+  AuthenticatedRhPjRoute: AuthenticatedRhPjRoute,
+  AuthenticatedRhRemuneracaoRoute: AuthenticatedRhRemuneracaoRoute,
   AuthenticatedComexIndexRoute: AuthenticatedComexIndexRoute,
   AuthenticatedContabilIndexRoute: AuthenticatedContabilIndexRoute,
   AuthenticatedIaIndexRoute: AuthenticatedIaIndexRoute,
+  AuthenticatedRhIndexRoute: AuthenticatedRhIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

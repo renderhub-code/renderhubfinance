@@ -3,6 +3,7 @@ import {
   House, Wallet, ShoppingBag, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
   Workflow, ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, Ship, ShieldCheck,
+  Gauge, Calculator, CalendarDays, PiggyBank, BadgeDollarSign, Grid3x3, HeartPulse, FileSignature, FolderClock,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
 import type { Escopo } from "./acessos";
@@ -120,11 +121,24 @@ export const MODULES: OsModule[] = [
   {
     id: "pessoas",
     label: "Pessoas",
-    description: "Quem acessa o quê: por empresa, aba e nível.",
+    description: "RH de cada empresa — colaboradores, folha, custos, avaliações, ASO, PJ e prazos — e quem acessa o quê.",
     icon: Users,
     status: "live",
-    home: "/pessoas/acessos",
-    items: [{ to: "/pessoas/acessos", label: "Acessos", icon: ShieldCheck, adminOnly: true }],
+    home: "/rh",
+    items: [
+      { to: "/rh", label: "Painel de RH", icon: LayoutDashboard, perm: "rh.painel" },
+      { to: "/rh/indicadores", label: "Indicadores", icon: Gauge, perm: "rh.painel" },
+      { to: "/rh/colaboradores", label: "Colaboradores", icon: UsersRound, perm: "rh.colaboradores" },
+      { to: "/rh/remuneracao", label: "Salários e benefícios", icon: BadgeDollarSign, perm: "rh.remuneracao" },
+      { to: "/rh/folha", label: "Folha", icon: Calculator, perm: "rh.remuneracao" },
+      { to: "/rh/custos", label: "Custos de pessoal", icon: PiggyBank, perm: "rh.remuneracao" },
+      { to: "/rh/calendario", label: "Calendário RH", icon: CalendarDays, perm: "rh.calendario" },
+      { to: "/rh/avaliacoes", label: "Avaliações", icon: Grid3x3, perm: "rh.avaliacoes" },
+      { to: "/rh/aso", label: "Saúde ocupacional", icon: HeartPulse, perm: "rh.aso" },
+      { to: "/rh/pj", label: "Contratos PJ", icon: FileSignature, perm: "rh.pj" },
+      { to: "/rh/documentos", label: "Documentos e prazos", icon: FolderClock, perm: "rh.documentos" },
+      { to: "/pessoas/acessos", label: "Acessos", icon: ShieldCheck, adminOnly: true },
+    ],
   },
 ];
 

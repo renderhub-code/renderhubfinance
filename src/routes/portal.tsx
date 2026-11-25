@@ -73,11 +73,8 @@ function Portal() {
       <header className="bg-[#0b1430] text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#1E3A8A] text-sm font-bold">RC</span>
-            <div className="leading-tight">
-              <div className="text-sm font-semibold">Render Comex</div>
-              <div className="text-[11px] text-white/60">Follow-up de importação</div>
-            </div>
+            <span className="rounded-lg bg-white px-2 py-1"><img src="/brand/render-logo-wide.png" alt="Render Comex" className="h-12 w-auto" /></span>
+            <div className="text-[11px] leading-tight text-white/60">Follow-up<br />de importação</div>
           </div>
           <div className="flex items-center gap-3 text-xs text-white/70">
             <span className="hidden sm:inline">{user.email}</span>

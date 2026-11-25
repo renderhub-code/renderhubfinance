@@ -37,6 +37,8 @@ export const GROUP_COMPANIES: GroupCompany[] = [
     description: "Importação por conta e ordem, compra por encomenda e distribuição.",
     color: "#1E3A8A",
     initials: "RC",
+    mark: "/brand/render-mark.png",
+    logo: "/brand/render-logo.png",
   },
   {
     id: "union",
@@ -46,6 +48,8 @@ export const GROUP_COMPANIES: GroupCompany[] = [
     description: "Consultoria, assessoria contábil e planejamento tributário.",
     color: "#7C2D5B",
     initials: "UC",
+    mark: "/brand/union-mark.png",
+    logo: "/brand/union-logo.png",
   },
   {
     id: "dompablyto",
@@ -55,6 +59,8 @@ export const GROUP_COMPANIES: GroupCompany[] = [
     description: "Indústria e distribuição de alimentos — varejo e food service.",
     color: "#DC2626",
     initials: "DP",
+    mark: "/brand/dompablyto-mark.png",
+    logo: "/brand/dompablyto-logo.png",
   },
   {
     id: "nortrip",
