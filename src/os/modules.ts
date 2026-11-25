@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   House, Wallet, ShoppingBag, Ship, Calculator, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
+  ListChecks, UsersRound, Tags, FileSpreadsheet,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
 
@@ -19,6 +20,8 @@ export interface ModuleItem {
   only?: WorkspaceId[];
   /** Esconde o item no workspace consolidado do grupo. */
   hideInGroup?: boolean;
+  /** Só aparece para administradores do módulo (hoje: Contábil). */
+  adminOnly?: boolean;
 }
 
 export interface OsModule {
@@ -80,11 +83,18 @@ export const MODULES: OsModule[] = [
   {
     id: "contabil",
     label: "Contábil",
-    description: "Clientes da Union, obrigações e calendário fiscal.",
+    description: "Tarefas da Union Contadores: atividades, prazos e equipe.",
     icon: Calculator,
-    status: "soon",
-    home: "/modulo/contabil",
-    items: [],
+    status: "live",
+    home: "/contabil",
+    items: [
+      { to: "/contabil", label: "Painel", icon: LayoutDashboard },
+      { to: "/contabil/atividades", label: "Atividades", icon: ListChecks },
+      { to: "/contabil/clientes", label: "Empresas clientes", icon: Building2 },
+      { to: "/contabil/equipe", label: "Equipe", icon: UsersRound, adminOnly: true },
+      { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, adminOnly: true },
+      { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, adminOnly: true },
+    ],
   },
   {
     id: "pessoas",
@@ -124,8 +134,9 @@ export function moduleForPath(pathname: string): OsModule {
   );
 }
 
-export function visibleItems(mod: OsModule, workspace: WorkspaceId): ModuleItem[] {
+export function visibleItems(mod: OsModule, workspace: WorkspaceId, isModuleAdmin = true): ModuleItem[] {
   return mod.items.filter((i) => {
+    if (i.adminOnly && !isModuleAdmin) return false;
     if (i.only && !i.only.includes(workspace)) return false;
     if (workspace === "grupo" && i.hideInGroup) return false;
     return true;

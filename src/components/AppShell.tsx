@@ -16,6 +16,8 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { RenderMark } from "@/components/brand/Logo";
+import { NovaAtividadeAlerta } from "@/components/contabil/NovaAtividadeAlerta";
+import { useContabilMe } from "@/os/contabil/hooks";
 
 const ROLE_LABEL: Record<string, string> = {
   controller: "Controller",
@@ -44,7 +46,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   const workspace = getHub(activeHubId).id as WorkspaceId;
   const isGroup = workspace === "grupo";
   const currentModule = moduleForPath(pathname);
-  const navItems = visibleItems(currentModule, workspace);
+  const contabil = useContabilMe(currentModule.id === "contabil");
+  // Enquanto o perfil do Contábil carrega, não esconde nada (evita redirecionar o admin).
+  const moduleAdmin = currentModule.id !== "contabil" || contabil.loading || contabil.isAdmin;
+  const navItems = visibleItems(currentModule, workspace, moduleAdmin);
+  /** Item ativo = o de rota mais longa que casa com a URL (ex.: /contabil vs /contabil/atividades). */
+  const activeTo = navItems
+    .filter((i) => pathname === i.to || pathname.startsWith(i.to + "/"))
+    .sort((a, b) => b.to.length - a.to.length)[0]?.to;
 
   /** Empresas do registro que já existem no banco (por slug). */
   const dbIdBySlug = useMemo(() => new Map((companies ?? []).map((c) => [c.slug, c.id])), [companies]);
@@ -128,7 +137,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             <nav className="mt-4 flex flex-col gap-0.5">
               {navItems.map((n) => {
-                const active = pathname === n.to || pathname.startsWith(n.to + "/");
+                const active = n.to === activeTo;
                 return (
                   <Link
                     key={n.to}
@@ -188,6 +197,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </main>
       </div>
+      <NovaAtividadeAlerta />
     </TooltipProvider>
   );
 }
