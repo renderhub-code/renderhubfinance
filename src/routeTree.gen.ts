@@ -28,6 +28,11 @@ import { Route as AuthenticatedContabilCadastrosRouteImport } from './routes/_au
 import { Route as AuthenticatedContabilClientesRouteImport } from './routes/_authenticated/contabil.clientes'
 import { Route as AuthenticatedContabilEquipeRouteImport } from './routes/_authenticated/contabil.equipe'
 import { Route as AuthenticatedContabilImportarRouteImport } from './routes/_authenticated/contabil.importar'
+import { Route as AuthenticatedIaIndexRouteImport } from './routes/_authenticated/ia.index'
+import { Route as AuthenticatedIaAcessoRouteImport } from './routes/_authenticated/ia.acesso'
+import { Route as AuthenticatedIaEmpresasRouteImport } from './routes/_authenticated/ia.empresas'
+import { Route as AuthenticatedIaEntregasRouteImport } from './routes/_authenticated/ia.entregas'
+import { Route as AuthenticatedIaTreinamentoRouteImport } from './routes/_authenticated/ia.treinamento'
 import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
 import { Route as AuthenticatedModuloIdRouteImport } from './routes/_authenticated/modulo.$id'
 import { Route as AuthenticatedSimulacoesIdRouteImport } from './routes/_authenticated/simulacoes.$id'
@@ -138,6 +143,32 @@ const AuthenticatedContabilImportarRoute =
     path: '/contabil/importar',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedIaIndexRoute = AuthenticatedIaIndexRouteImport.update({
+  id: '/ia/',
+  path: '/ia/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIaAcessoRoute = AuthenticatedIaAcessoRouteImport.update({
+  id: '/ia/acesso',
+  path: '/ia/acesso',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIaEmpresasRoute = AuthenticatedIaEmpresasRouteImport.update({
+  id: '/ia/empresas',
+  path: '/ia/empresas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIaEntregasRoute = AuthenticatedIaEntregasRouteImport.update({
+  id: '/ia/entregas',
+  path: '/ia/entregas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedIaTreinamentoRoute =
+  AuthenticatedIaTreinamentoRouteImport.update({
+    id: '/ia/treinamento',
+    path: '/ia/treinamento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLancamentosImportarRoute =
   AuthenticatedLancamentosImportarRouteImport.update({
     id: '/importar',
@@ -180,10 +211,15 @@ export interface FileRoutesByFullPath {
   '/contabil/clientes': typeof AuthenticatedContabilClientesRoute
   '/contabil/equipe': typeof AuthenticatedContabilEquipeRoute
   '/contabil/importar': typeof AuthenticatedContabilImportarRoute
+  '/ia/acesso': typeof AuthenticatedIaAcessoRoute
+  '/ia/empresas': typeof AuthenticatedIaEmpresasRoute
+  '/ia/entregas': typeof AuthenticatedIaEntregasRoute
+  '/ia/treinamento': typeof AuthenticatedIaTreinamentoRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/contabil/': typeof AuthenticatedContabilIndexRoute
+  '/ia/': typeof AuthenticatedIaIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRoutesByTo {
@@ -204,10 +240,15 @@ export interface FileRoutesByTo {
   '/contabil/clientes': typeof AuthenticatedContabilClientesRoute
   '/contabil/equipe': typeof AuthenticatedContabilEquipeRoute
   '/contabil/importar': typeof AuthenticatedContabilImportarRoute
+  '/ia/acesso': typeof AuthenticatedIaAcessoRoute
+  '/ia/empresas': typeof AuthenticatedIaEmpresasRoute
+  '/ia/entregas': typeof AuthenticatedIaEntregasRoute
+  '/ia/treinamento': typeof AuthenticatedIaTreinamentoRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/contabil': typeof AuthenticatedContabilIndexRoute
+  '/ia': typeof AuthenticatedIaIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRoutesById {
@@ -230,10 +271,15 @@ export interface FileRoutesById {
   '/_authenticated/contabil/clientes': typeof AuthenticatedContabilClientesRoute
   '/_authenticated/contabil/equipe': typeof AuthenticatedContabilEquipeRoute
   '/_authenticated/contabil/importar': typeof AuthenticatedContabilImportarRoute
+  '/_authenticated/ia/acesso': typeof AuthenticatedIaAcessoRoute
+  '/_authenticated/ia/empresas': typeof AuthenticatedIaEmpresasRoute
+  '/_authenticated/ia/entregas': typeof AuthenticatedIaEntregasRoute
+  '/_authenticated/ia/treinamento': typeof AuthenticatedIaTreinamentoRoute
   '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/_authenticated/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/_authenticated/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/_authenticated/contabil/': typeof AuthenticatedContabilIndexRoute
+  '/_authenticated/ia/': typeof AuthenticatedIaIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
 export interface FileRouteTypes {
@@ -256,10 +302,15 @@ export interface FileRouteTypes {
     | '/contabil/clientes'
     | '/contabil/equipe'
     | '/contabil/importar'
+    | '/ia/acesso'
+    | '/ia/empresas'
+    | '/ia/entregas'
+    | '/ia/treinamento'
     | '/lancamentos/importar'
     | '/modulo/$id'
     | '/simulacoes/$id'
     | '/contabil/'
+    | '/ia/'
     | '/api/public/hooks/bling-daily-import'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -280,10 +331,15 @@ export interface FileRouteTypes {
     | '/contabil/clientes'
     | '/contabil/equipe'
     | '/contabil/importar'
+    | '/ia/acesso'
+    | '/ia/empresas'
+    | '/ia/entregas'
+    | '/ia/treinamento'
     | '/lancamentos/importar'
     | '/modulo/$id'
     | '/simulacoes/$id'
     | '/contabil'
+    | '/ia'
     | '/api/public/hooks/bling-daily-import'
   id:
     | '__root__'
@@ -305,10 +361,15 @@ export interface FileRouteTypes {
     | '/_authenticated/contabil/clientes'
     | '/_authenticated/contabil/equipe'
     | '/_authenticated/contabil/importar'
+    | '/_authenticated/ia/acesso'
+    | '/_authenticated/ia/empresas'
+    | '/_authenticated/ia/entregas'
+    | '/_authenticated/ia/treinamento'
     | '/_authenticated/lancamentos/importar'
     | '/_authenticated/modulo/$id'
     | '/_authenticated/simulacoes/$id'
     | '/_authenticated/contabil/'
+    | '/_authenticated/ia/'
     | '/api/public/hooks/bling-daily-import'
   fileRoutesById: FileRoutesById
 }
@@ -455,6 +516,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContabilImportarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ia/': {
+      id: '/_authenticated/ia/'
+      path: '/ia'
+      fullPath: '/ia/'
+      preLoaderRoute: typeof AuthenticatedIaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ia/acesso': {
+      id: '/_authenticated/ia/acesso'
+      path: '/ia/acesso'
+      fullPath: '/ia/acesso'
+      preLoaderRoute: typeof AuthenticatedIaAcessoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ia/empresas': {
+      id: '/_authenticated/ia/empresas'
+      path: '/ia/empresas'
+      fullPath: '/ia/empresas'
+      preLoaderRoute: typeof AuthenticatedIaEmpresasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ia/entregas': {
+      id: '/_authenticated/ia/entregas'
+      path: '/ia/entregas'
+      fullPath: '/ia/entregas'
+      preLoaderRoute: typeof AuthenticatedIaEntregasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ia/treinamento': {
+      id: '/_authenticated/ia/treinamento'
+      path: '/ia/treinamento'
+      fullPath: '/ia/treinamento'
+      preLoaderRoute: typeof AuthenticatedIaTreinamentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lancamentos/importar': {
       id: '/_authenticated/lancamentos/importar'
       path: '/importar'
@@ -530,8 +626,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedContabilClientesRoute: typeof AuthenticatedContabilClientesRoute
   AuthenticatedContabilEquipeRoute: typeof AuthenticatedContabilEquipeRoute
   AuthenticatedContabilImportarRoute: typeof AuthenticatedContabilImportarRoute
+  AuthenticatedIaAcessoRoute: typeof AuthenticatedIaAcessoRoute
+  AuthenticatedIaEmpresasRoute: typeof AuthenticatedIaEmpresasRoute
+  AuthenticatedIaEntregasRoute: typeof AuthenticatedIaEntregasRoute
+  AuthenticatedIaTreinamentoRoute: typeof AuthenticatedIaTreinamentoRoute
   AuthenticatedModuloIdRoute: typeof AuthenticatedModuloIdRoute
   AuthenticatedContabilIndexRoute: typeof AuthenticatedContabilIndexRoute
+  AuthenticatedIaIndexRoute: typeof AuthenticatedIaIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -549,8 +650,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContabilClientesRoute: AuthenticatedContabilClientesRoute,
   AuthenticatedContabilEquipeRoute: AuthenticatedContabilEquipeRoute,
   AuthenticatedContabilImportarRoute: AuthenticatedContabilImportarRoute,
+  AuthenticatedIaAcessoRoute: AuthenticatedIaAcessoRoute,
+  AuthenticatedIaEmpresasRoute: AuthenticatedIaEmpresasRoute,
+  AuthenticatedIaEntregasRoute: AuthenticatedIaEntregasRoute,
+  AuthenticatedIaTreinamentoRoute: AuthenticatedIaTreinamentoRoute,
   AuthenticatedModuloIdRoute: AuthenticatedModuloIdRoute,
   AuthenticatedContabilIndexRoute: AuthenticatedContabilIndexRoute,
+  AuthenticatedIaIndexRoute: AuthenticatedIaIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

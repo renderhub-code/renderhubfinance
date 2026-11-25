@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   House, Wallet, ShoppingBag, Ship, Calculator, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
-  ListChecks, UsersRound, Tags, FileSpreadsheet, Database,
+  ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, KeyRound,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
 
@@ -95,6 +95,21 @@ export const MODULES: OsModule[] = [
       { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, adminOnly: true },
       { to: "/contabil/bases", label: "Bases da Union", icon: Database, adminOnly: true },
       { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, adminOnly: true },
+    ],
+  },
+  {
+    id: "ia",
+    label: "IA",
+    description: "O que o departamento de IA entrega: plataformas, automações, ganho e capacitação.",
+    icon: Sparkles,
+    status: "live",
+    home: "/ia",
+    items: [
+      { to: "/ia", label: "Visão geral", icon: LayoutDashboard },
+      { to: "/ia/entregas", label: "Entregas", icon: Rocket },
+      { to: "/ia/empresas", label: "Por empresa", icon: Building2 },
+      { to: "/ia/treinamento", label: "Treinamento", icon: GraduationCap },
+      { to: "/ia/acesso", label: "Acesso", icon: KeyRound, adminOnly: true },
     ],
   },
   {
