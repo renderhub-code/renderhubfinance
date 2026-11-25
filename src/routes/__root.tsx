@@ -79,14 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Union Contadores Financeiro — Hub Empresarial" },
-      { name: "description", content: "Controle financeiro unificado do hub Union Contadores: fluxo de caixa realizado e previsto." },
-      { property: "og:title", content: "Union Contadores Financeiro" },
-      { property: "og:description", content: "Controle financeiro unificado do hub Union Contadores." },
+      { title: "render.os — Grupo Render Hub" },
+      { name: "description", content: "render.os: o sistema que unifica as empresas e operações do Grupo Render Hub." },
+      { property: "og:title", content: "render.os" },
+      { property: "og:description", content: "Uma marca. Vários negócios. Um só sistema." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
@@ -104,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>

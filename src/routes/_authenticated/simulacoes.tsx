@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/simulacoes")({
 function SimulacoesPage() {
   const activeHubId = useHubStore((s) => s.activeHubId);
   const companyId = useCompanyStore((s) => s.activeCompanyId);
-  const isCommercial = activeHubId === "render" || activeHubId === "noronha";
+  const isCommercial = activeHubId === "render" || activeHubId === "nortrip";
 
   return (
     <div className="space-y-6">

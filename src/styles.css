@@ -59,6 +59,13 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-canvas: var(--canvas);
+  --color-rail: var(--rail);
+  --color-rail-foreground: var(--rail-foreground);
+  --color-rail-active: var(--rail-active);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-magenta: var(--brand-magenta);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -70,47 +77,54 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.21 0.006 285.9);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.21 0.006 285.9);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --row-group: oklch(0.978 0.005 247.896);
-  --row-subtotal: oklch(0.985 0.004 247.896);
+  --popover-foreground: oklch(0.21 0.006 285.9);
+  --primary: oklch(0.546 0.215 262.9);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.967 0.001 286.4);
+  --secondary-foreground: oklch(0.21 0.006 285.9);
+  --muted: oklch(0.967 0.001 286.4);
+  --muted-foreground: oklch(0.552 0.016 285.9);
+  --row-group: oklch(0.975 0.002 286);
+  --row-subtotal: oklch(0.985 0.001 286);
   --flow-in: oklch(0.6 0.15 160);
   --flow-out: oklch(0.63 0.17 30);
   --flow-invest: oklch(0.58 0.15 250);
   --flow-finance: oklch(0.56 0.17 300);
   --flow-transfer: oklch(0.72 0.15 75);
   --positive: oklch(0.55 0.15 155);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --accent: oklch(0.967 0.001 286.4);
+  --accent-foreground: oklch(0.21 0.006 285.9);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(0.925 0.004 286.3);
+  --input: oklch(0.925 0.004 286.3);
+  --ring: oklch(0.546 0.215 262.9 / 45%);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar: oklch(0.975 0.002 286);
+  --sidebar-foreground: oklch(0.21 0.006 285.9);
+  --sidebar-primary: oklch(0.546 0.215 262.9);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-accent: oklch(1 0 0);
+  --sidebar-accent-foreground: oklch(0.21 0.006 285.9);
+  --sidebar-border: oklch(0.925 0.004 286.3);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  /* render.os */
+  --canvas: oklch(0.94 0.003 286);
+  --rail: oklch(0.17 0.004 286);
+  --rail-foreground: oklch(0.72 0.006 286);
+  --rail-active: oklch(0.27 0.006 286);
+  --brand-blue: oklch(0.64 0.14 236);
+  --brand-magenta: oklch(0.55 0.21 7);
 }
 
 .dark {
@@ -164,5 +178,13 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
   }
+}
+
+/* Faixa com o gradiente da marca Render Hub (azul → magenta). */
+@utility brand-gradient {
+  background-image: linear-gradient(90deg, var(--brand-blue), var(--brand-magenta));
 }

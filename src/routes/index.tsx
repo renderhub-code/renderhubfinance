@@ -5,10 +5,10 @@ import { ArrowRight, BarChart3, ListTree, TrendingUp } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Union Contadores Financeiro — Controle do Hub Empresarial" },
-      { name: "description", content: "Sistema unificado de fluxo de caixa para as empresas do hub Union Contadores: Render, ERKS, Dom Pablyto, Use Noronha, A&F e Union Contadores." },
-      { property: "og:title", content: "Union Contadores Financeiro" },
-      { property: "og:description", content: "Fluxo de caixa realizado, previsto e simulação de cenários para o hub empresarial." },
+      { title: "render.os — Grupo Render Hub" },
+      { name: "description", content: "Sistema que unifica as empresas do Grupo Render Hub: Render Comex, Union Contadores, Dom Pablyto, Nortrip, ERKS e SX Paper." },
+      { property: "og:title", content: "render.os" },
+      { property: "og:description", content: "Uma marca. Vários negócios. Um só sistema." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -20,7 +20,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background">
       <header className="h-16 px-6 flex items-center border-b">
-        <div className="font-semibold tracking-tight">Union Contadores Financeiro</div>
+        <div className="font-semibold tracking-tight">render.os</div>
         <div className="ml-auto">
           <Link to="/auth">
             <Button>Entrar <ArrowRight className="h-4 w-4 ml-1" /></Button>
@@ -29,10 +29,10 @@ function Landing() {
       </header>
       <main className="max-w-5xl mx-auto px-6 py-16 md:py-24">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-          Controle financeiro <span className="text-muted-foreground">do hub empresarial.</span>
+          Um só sistema <span className="text-muted-foreground">para o Grupo Render Hub.</span>
         </h1>
         <p className="mt-6 text-lg text-muted-foreground max-w-2xl">
-          Fluxo de caixa realizado, previsto e visão gerencial mês a mês para todas as empresas do grupo — Union Contadores, Render Comex, ERKS (Moda Feminina + SX High Paper), Dom Pablyto, Use Noronha e A&F.
+          Financeiro, comercial, comex e contábil das seis empresas do grupo — Render Comex, Union Contadores, Dom Pablyto, Nortrip, ERKS e SX Paper — em um só lugar.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <Link to="/auth">

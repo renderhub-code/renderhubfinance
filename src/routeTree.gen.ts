@@ -16,11 +16,13 @@ import { Route as AuthenticatedCentrosDeCustoRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedFluxoDeCaixaRouteImport } from './routes/_authenticated/fluxo-de-caixa'
+import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedLancamentosRouteImport } from './routes/_authenticated/lancamentos'
 import { Route as AuthenticatedPlanoDeContasRouteImport } from './routes/_authenticated/plano-de-contas'
 import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
 import { Route as BlingCallbackRouteImport } from './routes/bling.callback'
 import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
+import { Route as AuthenticatedModuloIdRouteImport } from './routes/_authenticated/modulo.$id'
 import { Route as AuthenticatedSimulacoesIdRouteImport } from './routes/_authenticated/simulacoes.$id'
 import { Route as ApiPublicHooksBlingDailyImportRouteImport } from './routes/api/public/hooks/bling-daily-import'
 
@@ -60,6 +62,11 @@ const AuthenticatedFluxoDeCaixaRoute =
     path: '/fluxo-de-caixa',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLancamentosRoute =
   AuthenticatedLancamentosRouteImport.update({
     id: '/lancamentos',
@@ -88,6 +95,11 @@ const AuthenticatedLancamentosImportarRoute =
     path: '/importar',
     getParentRoute: () => AuthenticatedLancamentosRoute,
   } as any)
+const AuthenticatedModuloIdRoute = AuthenticatedModuloIdRouteImport.update({
+  id: '/modulo/$id',
+  path: '/modulo/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSimulacoesIdRoute =
   AuthenticatedSimulacoesIdRouteImport.update({
     id: '/$id',
@@ -108,11 +120,13 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
+  '/inicio': typeof AuthenticatedInicioRoute
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
   '/bling/callback': typeof BlingCallbackRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
+  '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
@@ -123,11 +137,13 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
+  '/inicio': typeof AuthenticatedInicioRoute
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
   '/bling/callback': typeof BlingCallbackRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
+  '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
@@ -140,11 +156,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/fluxo-de-caixa': typeof AuthenticatedFluxoDeCaixaRoute
+  '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/_authenticated/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
   '/bling/callback': typeof BlingCallbackRoute
   '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
+  '/_authenticated/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/_authenticated/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
 }
@@ -157,11 +175,13 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/fluxo-de-caixa'
+    | '/inicio'
     | '/lancamentos'
     | '/plano-de-contas'
     | '/simulacoes'
     | '/bling/callback'
     | '/lancamentos/importar'
+    | '/modulo/$id'
     | '/simulacoes/$id'
     | '/api/public/hooks/bling-daily-import'
   fileRoutesByTo: FileRoutesByTo
@@ -172,11 +192,13 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/fluxo-de-caixa'
+    | '/inicio'
     | '/lancamentos'
     | '/plano-de-contas'
     | '/simulacoes'
     | '/bling/callback'
     | '/lancamentos/importar'
+    | '/modulo/$id'
     | '/simulacoes/$id'
     | '/api/public/hooks/bling-daily-import'
   id:
@@ -188,11 +210,13 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
     | '/_authenticated/fluxo-de-caixa'
+    | '/_authenticated/inicio'
     | '/_authenticated/lancamentos'
     | '/_authenticated/plano-de-contas'
     | '/_authenticated/simulacoes'
     | '/bling/callback'
     | '/_authenticated/lancamentos/importar'
+    | '/_authenticated/modulo/$id'
     | '/_authenticated/simulacoes/$id'
     | '/api/public/hooks/bling-daily-import'
   fileRoutesById: FileRoutesById
@@ -256,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFluxoDeCaixaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inicio': {
+      id: '/_authenticated/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof AuthenticatedInicioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lancamentos': {
       id: '/_authenticated/lancamentos'
       path: '/lancamentos'
@@ -290,6 +321,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/lancamentos/importar'
       preLoaderRoute: typeof AuthenticatedLancamentosImportarRouteImport
       parentRoute: typeof AuthenticatedLancamentosRoute
+    }
+    '/_authenticated/modulo/$id': {
+      id: '/_authenticated/modulo/$id'
+      path: '/modulo/$id'
+      fullPath: '/modulo/$id'
+      preLoaderRoute: typeof AuthenticatedModuloIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/simulacoes/$id': {
       id: '/_authenticated/simulacoes/$id'
@@ -342,9 +380,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFluxoDeCaixaRoute: typeof AuthenticatedFluxoDeCaixaRoute
+  AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedLancamentosRoute: typeof AuthenticatedLancamentosRouteWithChildren
   AuthenticatedPlanoDeContasRoute: typeof AuthenticatedPlanoDeContasRoute
   AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRouteWithChildren
+  AuthenticatedModuloIdRoute: typeof AuthenticatedModuloIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -352,9 +392,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFluxoDeCaixaRoute: AuthenticatedFluxoDeCaixaRoute,
+  AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedLancamentosRoute: AuthenticatedLancamentosRouteWithChildren,
   AuthenticatedPlanoDeContasRoute: AuthenticatedPlanoDeContasRoute,
   AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRouteWithChildren,
+  AuthenticatedModuloIdRoute: AuthenticatedModuloIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

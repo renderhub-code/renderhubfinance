@@ -131,7 +131,7 @@ function formFromTx(tx: Transaction): TxForm {
 /** Use Noronha usa a tela integrada ao Bling; as demais empresas usam a estrutura padrão do hub. */
 function LancamentosPage() {
   const activeHubId = useHubStore((s) => s.activeHubId);
-  return activeHubId === "noronha" ? <LancamentosNoronha /> : <LancamentosPadrao />;
+  return activeHubId === "nortrip" ? <LancamentosNoronha /> : <LancamentosPadrao />;
 }
 
 function LancamentosNoronha() {

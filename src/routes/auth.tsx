@@ -13,11 +13,11 @@ import { Loader2 } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Union Contadores Financeiro" },
-      { name: "description", content: "Acesse o sistema financeiro do hub Union Contadores." },
+      { title: "Entrar — render.os" },
+      { name: "description", content: "Acesse o render.os, o sistema do Grupo Render Hub." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Entrar — Union Contadores Financeiro" },
-      { property: "og:description", content: "Acesse o sistema financeiro do hub Union Contadores." },
+      { property: "og:title", content: "Entrar — render.os" },
+      { property: "og:description", content: "Acesse o render.os, o sistema do Grupo Render Hub." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,14 +31,14 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) navigate({ to: "/inicio", replace: true });
     });
   }, [navigate]);
 
   async function afterAuth() {
     // Bootstrap first controller if there isn't one yet
     try { await supabase.rpc("bootstrap_first_controller"); } catch {}
-    navigate({ to: "/dashboard", replace: true });
+    navigate({ to: "/inicio", replace: true });
   }
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
@@ -84,7 +84,7 @@ function AuthPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Union Financeiro</CardTitle>
+          <CardTitle className="text-2xl">render.os</CardTitle>
           <CardDescription>Acesso ao controle financeiro do hub</CardDescription>
         </CardHeader>
         <CardContent>

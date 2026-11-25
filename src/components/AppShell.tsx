@@ -1,83 +1,74 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, ArrowLeftRight, ListTree, Building2, LogOut, Loader2, Wallet, FlaskConical, PlugZap } from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Check, ChevronsUpDown, CircleHelp, LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { useCompanies, useBusinessUnits, useUserRoles } from "@/lib/queries";
 import { useCompanyStore } from "@/lib/company-store";
 import { useFinancialStore } from "@/lib/financial-store";
-import { HUBS, getHub, useHubStore, type HubId } from "@/lib/hub-store";
-import { useEffect, type ReactNode } from "react";
+import { getHub, useHubStore } from "@/lib/hub-store";
+import { GROUP_COMPANIES, GROUP_WORKSPACE, getCompany, type WorkspaceId } from "@/os/companies";
+import { MODULES, SETTINGS_MODULE, moduleForPath, visibleItems, type OsModule } from "@/os/modules";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
+const ROLE_LABEL: Record<string, string> = {
+  controller: "Controller",
+  financial_manager: "Gestor financeiro",
+  ceo_viewer: "CEO",
+};
 
-const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/lancamentos", label: "Lançamentos", icon: ArrowLeftRight },
-  { to: "/fluxo-de-caixa", label: "Fluxo de Caixa", icon: Wallet },
-  { to: "/simulacoes", label: "Simulações", icon: FlaskConical },
-  { to: "/plano-de-contas", label: "Plano de Contas", icon: ListTree },
-  { to: "/centros-de-custo", label: "Centros de Custo", icon: Building2 },
-  { to: "/financeiro", label: "Financeiro (Bling)", icon: PlugZap },
-];
-
-const CONSOLIDATED = "__all__";
-
+/**
+ * Shell do render.os.
+ *  ┌──────┬──────────────┬──────────────────────────────┐
+ *  │trilho│ painel       │ conteúdo (cartão branco)     │
+ *  │módulo│ workspace +  │                              │
+ *  │      │ menu módulo  │                              │
+ *  └──────┴──────────────┴──────────────────────────────┘
+ */
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const loc = useLocation();
-  const { data: companies, isLoading: loadingCompanies } = useCompanies();
-  const { activeCompanyId, activeBusinessUnitId, initialized, setCompany, setBusinessUnit, markInitialized } = useCompanyStore();
-  const { year, setYear } = useFinancialStore();
-  const { data: units } = useBusinessUnits(activeCompanyId);
+  const { pathname } = useLocation();
+  const { user } = useAuth();
+  const { data: companies } = useCompanies();
   const { data: roles } = useUserRoles();
-
+  const { activeCompanyId, setCompany, markInitialized } = useCompanyStore();
   const { activeHubId, setHub } = useHubStore();
-  const activeHub = getHub(activeHubId);
+  const [panelOpen, setPanelOpen] = useState(true);
 
-  const isHubConsolidator = !!activeHub.consolidator;
-  const navItems = isHubConsolidator
-    ? NAV.filter((n) => n.to === "/dashboard" || n.to === "/fluxo-de-caixa")
-    : NAV.filter((n) => n.to !== "/financeiro" || activeHubId === "noronha");
+  const workspace = getHub(activeHubId).id as WorkspaceId;
+  const isGroup = workspace === "grupo";
+  const currentModule = moduleForPath(pathname);
+  const navItems = visibleItems(currentModule, workspace);
 
-  // Keep the active company locked to the active hub (except the consolidator hub).
+  /** Empresas do registro que já existem no banco (por slug). */
+  const dbIdBySlug = useMemo(() => new Map((companies ?? []).map((c) => [c.slug, c.id])), [companies]);
+
+  // Mantém a empresa ativa do financeiro presa ao workspace escolhido.
   useEffect(() => {
-    if (!companies || isHubConsolidator) return;
-    const c = companies.find((x) => x.slug === activeHub.companySlug);
-    if (c && c.id !== activeCompanyId) setCompany(c.id);
-  }, [companies, isHubConsolidator, activeHub.companySlug, activeCompanyId, setCompany]);
-
-  useEffect(() => {
-    if (!isHubConsolidator) return;
-    if (!navItems.some((n) => loc.pathname === n.to || loc.pathname.startsWith(n.to + "/"))) {
-      navigate({ to: "/dashboard" });
+    if (isGroup) {
+      if (activeCompanyId !== null) setCompany(null);
+      else markInitialized();
+      return;
     }
-  }, [isHubConsolidator, loc.pathname, navigate, navItems]);
+    const slug = getCompany(workspace)?.slug;
+    const id = slug ? dbIdBySlug.get(slug) : undefined;
+    if (id && id !== activeCompanyId) setCompany(id);
+  }, [isGroup, workspace, dbIdBySlug, activeCompanyId, setCompany, markInitialized]);
 
+  // Se o item atual não existe neste workspace, volta para a entrada do módulo.
   useEffect(() => {
-    if (!initialized && isHubConsolidator) { markInitialized(); return; }
-    if (!initialized && companies && companies.length > 0) {
-      const hubCompany = companies.find((c) => c.slug === activeHub.companySlug);
-      setCompany((hubCompany ?? companies[0]).id);
-    } else if (!initialized && companies && companies.length === 0 && !loadingCompanies) {
-      markInitialized();
-    }
-  }, [initialized, companies, loadingCompanies, setCompany, markInitialized, activeHub.companySlug]);
+    if (currentModule.status !== "live" || currentModule.items.length === 0) return;
+    const ok = navItems.some((i) => pathname === i.to || pathname.startsWith(i.to + "/"));
+    if (!ok && navItems[0]) navigate({ to: navItems[0].to });
+  }, [currentModule, navItems, pathname, navigate]);
 
-  const activeCompany = companies?.find((c) => c.id === activeCompanyId);
-  const isErks = activeCompany?.slug === "erks";
-  const primaryRole = roles?.[0]?.role ?? "";
-  const isConsolidated = activeCompanyId === null && initialized && (companies?.length ?? 0) > 0;
-
-  function selectHub(id: HubId) {
+  function selectWorkspace(id: WorkspaceId) {
     setHub(id);
-    const hub = getHub(id);
-    if (hub.consolidator) setCompany(null);
-    else {
-      const company = companies?.find((c) => c.slug === hub.companySlug);
-      if (company) setCompany(company.id);
-    }
-    navigate({ to: "/dashboard" });
   }
 
   async function signOut() {
@@ -85,141 +76,305 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   }
 
+  const displayName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "Usuário";
+  const role = ROLE_LABEL[roles?.[0]?.role ?? ""] ?? "";
+
   return (
-    <div className="flex min-h-screen bg-muted/30">
-      <aside className="hidden md:flex flex-col w-64 border-r bg-background">
-        <div className="p-5 border-b">
-          <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            Hub Financial Command
+    <TooltipProvider delayDuration={150}>
+      <div className="flex h-screen overflow-hidden bg-sidebar text-foreground">
+        {/* Trilho de módulos */}
+        <aside className="hidden md:flex w-[60px] shrink-0 flex-col items-center bg-rail py-4 text-rail-foreground">
+          <Link to="/inicio" aria-label="render.os — início" className="mb-6 grid h-9 w-9 place-items-center">
+            <RenderMark />
+          </Link>
+          <nav className="flex flex-col items-center gap-1.5">
+            {MODULES.map((m) => (
+              <RailButton key={m.id} module={m} active={m.id === currentModule.id} />
+            ))}
+          </nav>
+          <div className="mt-auto flex flex-col items-center gap-1.5">
+            <RailButton module={SETTINGS_MODULE} active={currentModule.id === SETTINGS_MODULE.id} />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="grid h-10 w-10 place-items-center rounded-lg text-rail-foreground/70">
+                  <CircleHelp className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="right">Ajuda</TooltipContent>
+            </Tooltip>
+            <div className="mt-2 grid h-9 w-9 place-items-center rounded-full bg-rail-active text-xs font-semibold text-white">
+              {initialsOf(displayName)}
+            </div>
           </div>
-          <div className="mt-3 space-y-1">
-            {HUBS.map((h) => {
-              const active = h.id === activeHubId;
-              return (
-                <button
-                  key={h.id}
-                  type="button"
-                  onClick={() => selectHub(h.id)}
-                  className={cn(
-                    "w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-2",
-                    active
-                      ? "bg-accent font-semibold text-foreground"
-                      : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
-                  )}
-                >
-                  <span
+        </aside>
+
+        {/* Painel do módulo */}
+        {panelOpen && (
+          <aside className="hidden md:flex w-[248px] shrink-0 flex-col px-3 pt-5 pb-4">
+            <div className="flex items-center justify-between px-2">
+              <h2 className="text-[15px] font-semibold tracking-tight">{currentModule.label}</h2>
+              <button
+                type="button"
+                onClick={() => setPanelOpen(false)}
+                className="rounded-md p-1 text-muted-foreground hover:bg-background hover:text-foreground"
+                aria-label="Recolher painel"
+              >
+                <PanelLeftClose className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            </div>
+
+            <WorkspaceSwitcher workspace={workspace} available={dbIdBySlug} onSelect={selectWorkspace} />
+
+            <nav className="mt-4 flex flex-col gap-0.5">
+              {navItems.map((n) => {
+                const active = pathname === n.to || pathname.startsWith(n.to + "/");
+                return (
+                  <Link
+                    key={n.to}
+                    to={n.to}
                     className={cn(
-                      "h-1.5 w-1.5 rounded-full shrink-0",
-                      active ? "bg-primary" : "bg-muted-foreground/40",
+                      "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+                      active
+                        ? "bg-background font-medium text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.04)] ring-1 ring-border"
+                        : "text-muted-foreground hover:bg-background/70 hover:text-foreground",
                     )}
-                  />
-                  <span className="truncate">{h.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <nav className="flex-1 p-3 space-y-0.5">
+                  >
+                    <n.icon className={cn("h-4 w-4", active && "text-primary")} strokeWidth={1.75} />
+                    {n.label}
+                  </Link>
+                );
+              })}
+              {currentModule.status === "soon" && (
+                <p className="px-2.5 py-2 text-sm text-muted-foreground">Módulo em construção.</p>
+              )}
+            </nav>
 
-          {navItems.map((n) => {
-            const active = loc.pathname === n.to || loc.pathname.startsWith(n.to + "/");
-            return (
-              <Link
-                key={n.to}
-                to={n.to}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                  active
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                )}
+            <div className="mt-auto flex items-center gap-2 px-2">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium">{displayName}</div>
+                <div className="truncate text-xs text-muted-foreground">{role || user?.email}</div>
+              </div>
+              <button
+                type="button"
+                onClick={signOut}
+                className="rounded-md p-1.5 text-muted-foreground hover:bg-background hover:text-foreground"
+                aria-label="Sair"
+                title="Sair"
               >
-                <n.icon className="h-4 w-4" />
-                {n.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-3 border-t">
-          <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
-            <LogOut className="h-4 w-4 mr-2" /> Sair
-          </Button>
-        </div>
-      </aside>
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b bg-background px-4 md:px-6 flex items-center gap-3">
-          <div className="text-sm font-semibold truncate max-w-[220px] md:hidden lg:block">{activeHub.label}</div>
-          <div className="flex items-center gap-2 min-w-0">
-            {isHubConsolidator && <span className="text-xs text-muted-foreground hidden sm:inline">Empresa</span>}
+                <LogOut className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            </div>
+          </aside>
+        )}
 
-            {!isHubConsolidator ? null : loadingCompanies ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Select
-                value={activeCompanyId ?? CONSOLIDATED}
-                onValueChange={(v) => setCompany(v === CONSOLIDATED ? null : v)}
+        {/* Conteúdo */}
+        <main className="flex min-w-0 flex-1 flex-col p-2 md:pl-0">
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background shadow-[0_1px_3px_rgb(0_0_0/0.04)]">
+            {!panelOpen && (
+              <button
+                type="button"
+                onClick={() => setPanelOpen(true)}
+                className="absolute left-3 top-3 z-10 hidden rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground md:block"
+                aria-label="Abrir painel"
               >
-                <SelectTrigger className="w-[240px]">
-                  <SelectValue placeholder="Selecionar empresa" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies && companies.length > 0 ? (
-                    <>
-                      <SelectItem value={CONSOLIDATED}>Consolidado (todas)</SelectItem>
-                      {companies.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </>
-                  ) : (
-                    <div className="px-2 py-1.5 text-xs text-muted-foreground">Nenhuma empresa disponível</div>
-                  )}
-                </SelectContent>
-              </Select>
+                <PanelLeftOpen className="h-4 w-4" strokeWidth={1.75} />
+              </button>
             )}
-            {isConsolidated && (
-              <span className="text-[10px] font-medium uppercase tracking-wide px-2 py-1 rounded bg-primary/10 text-primary">
-                Consolidado
-              </span>
-            )}
-            {!isConsolidated && isErks && units && units.length > 1 && (
-              <Select
-                value={activeBusinessUnitId ?? "consolidado"}
-                onValueChange={(v) => setBusinessUnit(v === "consolidado" ? null : v)}
-              >
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Unidade" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="consolidado">ERKS Consolidado</SelectItem>
-                  {units.map((u) => (
-                    <SelectItem key={u.id} value={u.id}>
-                      {u.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-            <Select value={String(year)} onValueChange={(value) => setYear(Number(value))}>
-              <SelectTrigger className="w-[96px]" aria-label="Ano financeiro">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 5 }, (_, index) => new Date().getFullYear() - 2 + index).map((item) => (
-                  <SelectItem key={item} value={String(item)}>{item}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {currentModule.id === "financeiro" && <FinanceToolbar />}
+            <div className="min-h-0 flex-1 overflow-auto px-5 py-6 md:px-10 md:py-8">{children}</div>
           </div>
-          <div className="ml-auto text-xs text-muted-foreground uppercase tracking-wide">
-            {primaryRole === "controller" && "Controller"}
-            {primaryRole === "financial_manager" && "Gestor Financeiro"}
-            {primaryRole === "ceo_viewer" && "CEO"}
-          </div>
-        </header>
-        <main className="flex-1 p-4 md:p-6 min-w-0">{children}</main>
+        </main>
       </div>
+    </TooltipProvider>
+  );
+}
+
+function RailButton({ module: m, active }: { module: OsModule; active: boolean }) {
+  const content = (
+    <span
+      className={cn(
+        "relative grid h-10 w-10 place-items-center rounded-lg transition-colors",
+        active ? "bg-rail-active text-white" : "text-rail-foreground hover:bg-rail-active/60 hover:text-white",
+      )}
+    >
+      <m.icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+      {m.status === "soon" && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-rail-foreground/40" />}
+    </span>
+  );
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {m.status === "live" ? (
+          <Link to={m.home} aria-label={m.label}>{content}</Link>
+        ) : (
+          <Link to="/modulo/$id" params={{ id: m.id }} aria-label={m.label}>{content}</Link>
+        )}
+      </TooltipTrigger>
+      <TooltipContent side="right">
+        {m.label}
+        {m.status === "soon" && <span className="opacity-70"> · em breve</span>}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function WorkspaceSwitcher({
+  workspace,
+  available,
+  onSelect,
+}: {
+  workspace: WorkspaceId;
+  available: Map<string, string>;
+  onSelect: (id: WorkspaceId) => void;
+}) {
+  const company = getCompany(workspace);
+  const label = company?.name ?? GROUP_WORKSPACE.name;
+  const sector = company?.sector ?? GROUP_WORKSPACE.sector;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="mt-4 flex w-full items-center gap-2.5 rounded-lg border bg-background px-2.5 py-2 text-left shadow-[0_1px_2px_rgb(0_0_0/0.03)] transition-colors hover:bg-muted/50"
+        >
+          <WorkspaceAvatar id={workspace} />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-medium">{label}</span>
+            <span className="block truncate text-xs text-muted-foreground">{sector}</span>
+          </span>
+          <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-[232px]">
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Grupo</DropdownMenuLabel>
+        <WorkspaceItem id="grupo" name={GROUP_WORKSPACE.name} sector="Visão consolidada" active={workspace === "grupo"} onSelect={onSelect} />
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Empresas</DropdownMenuLabel>
+        {GROUP_COMPANIES.map((c) => {
+          const ready = available.has(c.slug);
+          return (
+            <WorkspaceItem
+              key={c.id}
+              id={c.id}
+              name={c.name}
+              sector={ready ? c.sector : "Ainda não cadastrada"}
+              active={workspace === c.id}
+              disabled={!ready}
+              onSelect={onSelect}
+            />
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function WorkspaceItem({
+  id, name, sector, active, disabled, onSelect,
+}: {
+  id: WorkspaceId; name: string; sector: string; active: boolean; disabled?: boolean; onSelect: (id: WorkspaceId) => void;
+}) {
+  return (
+    <DropdownMenuItem disabled={disabled} onSelect={() => onSelect(id)} className="gap-2.5 py-1.5">
+      <WorkspaceAvatar id={id} small />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm">{name}</span>
+        <span className="block truncate text-xs text-muted-foreground">{sector}</span>
+      </span>
+      {active && <Check className="h-4 w-4 text-primary" />}
+    </DropdownMenuItem>
+  );
+}
+
+export function WorkspaceAvatar({ id, small }: { id: WorkspaceId; small?: boolean }) {
+  const company = getCompany(id);
+  const size = small ? "h-7 w-7 text-[10px]" : "h-8 w-8 text-[11px]";
+  if (!company) {
+    return (
+      <span className={cn("grid shrink-0 place-items-center rounded-md bg-rail text-white", size)}>
+        <RenderMark className="h-4 w-4" />
+      </span>
+    );
+  }
+  return (
+    <span
+      className={cn("grid shrink-0 place-items-center rounded-md font-semibold text-white", size)}
+      style={{ backgroundColor: company.color }}
+    >
+      {company.initials}
+    </span>
+  );
+}
+
+/** Filtros globais do financeiro (ano e unidade de negócio da ERKS). */
+function FinanceToolbar() {
+  const { activeCompanyId, activeBusinessUnitId, setBusinessUnit } = useCompanyStore();
+  const { year, setYear } = useFinancialStore();
+  const workspace = useHubStore((s) => s.activeHubId);
+  const { data: units } = useBusinessUnits(activeCompanyId);
+  const showUnits = workspace === "erks" && (units?.length ?? 0) > 1;
+
+  return (
+    <div className="flex items-center gap-2 border-b px-5 py-2.5 md:px-10">
+      <span className="text-xs text-muted-foreground">Período</span>
+      <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
+        <SelectTrigger className="h-8 w-[92px]" aria-label="Ano financeiro">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((y) => (
+            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {showUnits && (
+        <Select value={activeBusinessUnitId ?? "consolidado"} onValueChange={(v) => setBusinessUnit(v === "consolidado" ? null : v)}>
+          <SelectTrigger className="h-8 w-[200px]" aria-label="Unidade de negócio">
+            <SelectValue placeholder="Unidade" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="consolidado">ERKS consolidado</SelectItem>
+            {units!.map((u) => (
+              <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      {workspace === "grupo" && (
+        <span className="ml-1 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">Consolidado do grupo</span>
+      )}
     </div>
   );
+}
+
+/** Marca do render.os: anel com o gradiente azul → magenta da Render Hub. */
+export function RenderMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={cn("h-7 w-7", className)} aria-hidden="true">
+      <defs>
+        <linearGradient id="render-os-mark" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="var(--brand-blue)" />
+          <stop offset="1" stopColor="var(--brand-magenta)" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M9 23V9h8.2a5 5 0 0 1 1.4 9.8L23.5 23"
+        fill="none"
+        stroke="url(#render-os-mark)"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function initialsOf(name: string) {
+  return name
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]!.toUpperCase())
+    .join("");
 }

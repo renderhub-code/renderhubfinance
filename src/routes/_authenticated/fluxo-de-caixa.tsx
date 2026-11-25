@@ -71,7 +71,7 @@ function collectIds(nodes: CashflowNode[], acc: string[] = []): string[] {
 /** Use Noronha usa a tela integrada ao Bling; as demais empresas usam a estrutura padrão do hub. */
 function FluxoCaixaPage() {
   const activeHubId = useHubStore((s) => s.activeHubId);
-  return activeHubId === "noronha" ? <FluxoCaixaNoronha /> : <FluxoCaixaPadrao />;
+  return activeHubId === "nortrip" ? <FluxoCaixaNoronha /> : <FluxoCaixaPadrao />;
 }
 
 function FluxoCaixaNoronha() {

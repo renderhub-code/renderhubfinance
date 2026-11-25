@@ -1,0 +1,133 @@
+import type { LucideIcon } from "lucide-react";
+import {
+  House, Wallet, ShoppingBag, Ship, Calculator, Users, Settings,
+  LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
+} from "lucide-react";
+import type { WorkspaceId } from "./companies";
+
+/**
+ * render.os — registro de módulos.
+ * Cada módulo é um ícone no trilho escuro; seus `items` formam o menu do painel ao lado.
+ * Módulos com `status: "soon"` aparecem no trilho, mas abrem a página "em construção".
+ */
+
+export interface ModuleItem {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  /** Restringe o item a certos workspaces (ex.: integração Bling só na Nortrip). */
+  only?: WorkspaceId[];
+  /** Esconde o item no workspace consolidado do grupo. */
+  hideInGroup?: boolean;
+}
+
+export interface OsModule {
+  id: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+  status: "live" | "soon";
+  /** Rota de entrada do módulo. */
+  home: string;
+  items: ModuleItem[];
+}
+
+export const MODULES: OsModule[] = [
+  {
+    id: "inicio",
+    label: "Início",
+    description: "Visão do grupo e das empresas.",
+    icon: House,
+    status: "live",
+    home: "/inicio",
+    items: [{ to: "/inicio", label: "Visão geral", icon: LayoutDashboard }],
+  },
+  {
+    id: "financeiro",
+    label: "Financeiro",
+    description: "Lançamentos, fluxo de caixa, DRE e simulações.",
+    icon: Wallet,
+    status: "live",
+    home: "/dashboard",
+    items: [
+      { to: "/dashboard", label: "Dashboard", icon: LineChart },
+      { to: "/lancamentos", label: "Lançamentos", icon: ArrowLeftRight, hideInGroup: true },
+      { to: "/fluxo-de-caixa", label: "Fluxo de caixa", icon: Wallet },
+      { to: "/simulacoes", label: "Simulações", icon: FlaskConical, hideInGroup: true },
+      { to: "/plano-de-contas", label: "Plano de contas", icon: ListTree, hideInGroup: true },
+      { to: "/centros-de-custo", label: "Centros de custo", icon: Building2, hideInGroup: true },
+      { to: "/financeiro", label: "Integração Bling", icon: PlugZap, only: ["nortrip"] },
+    ],
+  },
+  {
+    id: "comercial",
+    label: "Comercial",
+    description: "Pedidos, clientes, faturamento e ritmo contra a meta.",
+    icon: ShoppingBag,
+    status: "soon",
+    home: "/modulo/comercial",
+    items: [],
+  },
+  {
+    id: "comex",
+    label: "Comex",
+    description: "Processos de importação, conta e ordem e encomenda.",
+    icon: Ship,
+    status: "soon",
+    home: "/modulo/comex",
+    items: [],
+  },
+  {
+    id: "contabil",
+    label: "Contábil",
+    description: "Clientes da Union, obrigações e calendário fiscal.",
+    icon: Calculator,
+    status: "soon",
+    home: "/modulo/contabil",
+    items: [],
+  },
+  {
+    id: "pessoas",
+    label: "Pessoas",
+    description: "Usuários, times e permissões por empresa.",
+    icon: Users,
+    status: "soon",
+    home: "/modulo/pessoas",
+    items: [],
+  },
+];
+
+export const SETTINGS_MODULE: OsModule = {
+  id: "configuracoes",
+  label: "Configurações",
+  description: "Empresas, integrações e preferências do render.os.",
+  icon: Settings,
+  status: "soon",
+  home: "/modulo/configuracoes",
+  items: [],
+};
+
+const ALL = [...MODULES, SETTINGS_MODULE];
+
+export function getModule(id: string): OsModule | undefined {
+  return ALL.find((m) => m.id === id);
+}
+
+/** Descobre o módulo dono da rota atual. */
+export function moduleForPath(pathname: string): OsModule {
+  if (pathname.startsWith("/modulo/")) {
+    return getModule(pathname.split("/")[2] ?? "") ?? MODULES[0];
+  }
+  return (
+    ALL.find((m) => m.items.some((i) => pathname === i.to || pathname.startsWith(i.to + "/"))) ??
+    MODULES[0]
+  );
+}
+
+export function visibleItems(mod: OsModule, workspace: WorkspaceId): ModuleItem[] {
+  return mod.items.filter((i) => {
+    if (i.only && !i.only.includes(workspace)) return false;
+    if (workspace === "grupo" && i.hideInGroup) return false;
+    return true;
+  });
+}

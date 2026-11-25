@@ -33,7 +33,7 @@ function amountOf(t: { status: string; amount_realized: number; amount_expected:
 /** Use Noronha usa a tela integrada ao Bling; as demais empresas usam a estrutura padrão do hub. */
 function DashboardPage() {
   const activeHubId = useHubStore((s) => s.activeHubId);
-  return activeHubId === "noronha" ? <DashboardNoronha /> : <DashboardPadrao />;
+  return activeHubId === "nortrip" ? <DashboardNoronha /> : <DashboardPadrao />;
 }
 
 function DashboardNoronha() {

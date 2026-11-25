@@ -12,3 +12,12 @@
 - Keep stock totals (closing cash balances) separate from flow totals in the cashflow totals helper: summing monthly balances misstates the end-of-period cash position.
 - Cashflow uses completed company/year snapshots of Bling cash movements plus open-balance forecasts; invoice realized amounts never substitute actual cash dates or duplicate settlements.
 - Sync cash and forecast pages in resumable phases, publishing a snapshot only after all phases finish, so partial API failures preserve the last complete cashflow.
+
+## render.os
+
+Este repositório está sendo remodelado no **render.os**, o sistema único do Grupo Render Hub.
+
+- Empresas do grupo: `src/os/companies.ts` é a fonte única (Render Comex, Union Contadores, Dom Pablyto, Nortrip, ERKS, SX Paper). Nortrip é a antiga Use Noronha e mantém o slug `use-noronha` no banco por causa do Bling. A&F foi desativada.
+- Módulos: `src/os/modules.ts` define o trilho de ícones e o menu de cada módulo. Módulo novo = entrada `status: "soon"` até ter rotas próprias.
+- Workspace ativo (grupo ou empresa): `useHubStore` em `src/lib/hub-store.ts`; o shell (`src/components/AppShell.tsx`) sincroniza a empresa do financeiro a partir dele.
+- Visual: referência de painel claro com trilho escuro, painel cinza e conteúdo em cartão branco; primitivas de página em `src/components/os/page.tsx`.
