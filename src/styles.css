@@ -198,6 +198,7 @@
 }
 
 @keyframes ros-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ros-page-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes ros-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ros-spin { to { transform: rotate(360deg); } }
 @keyframes ros-spin-rev { to { transform: rotate(-360deg); } }
@@ -277,14 +278,14 @@ html[data-intro-seen] .ros-intro { display: none; }
 .ros-reveal.is-visible { opacity: 1; transform: none; }
 
 /* Entrada de página no app */
-.ros-page-enter { animation: ros-fade-up .45s cubic-bezier(.2,.7,.2,1) both; }
-.ros-stagger > * { animation: ros-fade-up .5s cubic-bezier(.2,.7,.2,1) both; }
-.ros-stagger > *:nth-child(2) { animation-delay: .05s; }
-.ros-stagger > *:nth-child(3) { animation-delay: .1s; }
-.ros-stagger > *:nth-child(4) { animation-delay: .15s; }
-.ros-stagger > *:nth-child(5) { animation-delay: .2s; }
-.ros-stagger > *:nth-child(6) { animation-delay: .25s; }
-.ros-stagger > *:nth-child(n+7) { animation-delay: .3s; }
+/* Troca de página: rápida e discreta, para a navegação não parecer lenta. */
+.ros-page-enter { animation: ros-page-in .18s ease-out both; }
+.ros-stagger > * { animation: ros-page-in .25s ease-out both; }
+.ros-stagger > *:nth-child(2) { animation-delay: .02s; }
+.ros-stagger > *:nth-child(3) { animation-delay: .04s; }
+.ros-stagger > *:nth-child(4) { animation-delay: .06s; }
+.ros-stagger > *:nth-child(5) { animation-delay: .08s; }
+.ros-stagger > *:nth-child(n+6) { animation-delay: .1s; }
 
 @media (prefers-reduced-motion: reduce) {
   .ros-intro { display: none; }

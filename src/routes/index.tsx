@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Calculator, Cpu, ShoppingBag, Ship, Users, Wallet, Sparkles, ShieldCheck, Zap, Layers } from "lucide-react";
+import { ArrowRight, Cpu, ShoppingBag, Users, Workflow, Wallet, Sparkles, ShieldCheck, Zap, Layers } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { TechBackground } from "@/components/brand/TechBackground";
 import { HubOrbit } from "@/components/brand/HubOrbit";
@@ -25,8 +25,7 @@ export const Route = createFileRoute("/")({
 const MODULES: { icon: LucideIcon; title: string; desc: string; live?: boolean; wide?: boolean; full?: boolean }[] = [
   { icon: Wallet, title: "Financeiro", desc: "Lançamentos, fluxo de caixa realizado e previsto, DRE e simulações — por empresa ou consolidado.", live: true, wide: true },
   { icon: ShoppingBag, title: "Comercial", desc: "Pedidos, clientes e faturamento contra a meta." },
-  { icon: Ship, title: "Comex", desc: "Processos de importação, conta e ordem e encomenda." },
-  { icon: Calculator, title: "Contábil", desc: "Clientes da Union, obrigações e calendário fiscal." },
+  { icon: Workflow, title: "Operacional", desc: "O dia a dia de cada empresa: tarefas contábeis da Union hoje, processos de importação da Render Comex em seguida.", live: true, wide: true },
   { icon: Users, title: "Pessoas", desc: "Times, acessos e permissões por empresa." },
   { icon: Cpu, title: "Inteligência", desc: "IA lendo os números do grupo e apontando o que mudou.", full: true },
 ];

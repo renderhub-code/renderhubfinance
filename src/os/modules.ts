@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  House, Wallet, ShoppingBag, Ship, Calculator, Users, Settings,
+  House, Wallet, ShoppingBag, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
-  ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, KeyRound,
+  Workflow, ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, KeyRound,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
 
@@ -34,6 +34,9 @@ export interface OsModule {
   home: string;
   items: ModuleItem[];
 }
+
+/** Workspaces onde as telas da Union aparecem (a própria Union e a visão do grupo). */
+const UNION: WorkspaceId[] = ["union", "grupo"];
 
 export const MODULES: OsModule[] = [
   {
@@ -72,29 +75,23 @@ export const MODULES: OsModule[] = [
     items: [],
   },
   {
-    id: "comex",
-    label: "Comex",
-    description: "Processos de importação, conta e ordem e encomenda.",
-    icon: Ship,
-    status: "soon",
-    home: "/modulo/comex",
-    items: [],
-  },
-  {
-    id: "contabil",
-    label: "Contábil",
-    description: "Tarefas da Union Contadores: atividades, prazos e equipe.",
-    icon: Calculator,
+    // Operacional = o dia a dia de cada empresa. O conteúdo muda com a empresa
+    // selecionada: na Union são as tarefas contábeis; Render Comex (processos de
+    // importação), Nortrip e as demais entram aqui conforme forem construídas.
+    id: "operacional",
+    label: "Operacional",
+    description: "O dia a dia de cada empresa. Na Union: atividades, prazos e equipe contábil.",
+    icon: Workflow,
     status: "live",
     home: "/contabil",
     items: [
-      { to: "/contabil", label: "Painel", icon: LayoutDashboard },
-      { to: "/contabil/atividades", label: "Atividades", icon: ListChecks },
-      { to: "/contabil/clientes", label: "Empresas clientes", icon: Building2 },
-      { to: "/contabil/equipe", label: "Equipe", icon: UsersRound, adminOnly: true },
-      { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, adminOnly: true },
-      { to: "/contabil/bases", label: "Bases da Union", icon: Database, adminOnly: true },
-      { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, adminOnly: true },
+      { to: "/contabil", label: "Painel", icon: LayoutDashboard, only: UNION },
+      { to: "/contabil/atividades", label: "Atividades", icon: ListChecks, only: UNION },
+      { to: "/contabil/clientes", label: "Empresas clientes", icon: Building2, only: UNION },
+      { to: "/contabil/equipe", label: "Equipe", icon: UsersRound, adminOnly: true, only: UNION },
+      { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, adminOnly: true, only: UNION },
+      { to: "/contabil/bases", label: "Bases da Union", icon: Database, adminOnly: true, only: UNION },
+      { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, adminOnly: true, only: UNION },
     ],
   },
   {

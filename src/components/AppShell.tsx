@@ -47,11 +47,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   const workspace = getHub(activeHubId).id as WorkspaceId;
   const isGroup = workspace === "grupo";
   const currentModule = moduleForPath(pathname);
-  const contabil = useContabilMe(currentModule.id === "contabil");
+  const contabil = useContabilMe(currentModule.id === "operacional");
   const ia = useIaMe(currentModule.id === "ia");
   // Enquanto o perfil do módulo carrega, não esconde nada (evita redirecionar o admin).
   const moduleAdmin =
-    currentModule.id === "contabil" ? contabil.loading || contabil.isAdmin
+    currentModule.id === "operacional" ? contabil.loading || contabil.isAdmin
     : currentModule.id === "ia" ? ia.loading || ia.isAdmin
     : true;
   const navItems = visibleItems(currentModule, workspace, moduleAdmin);
@@ -197,13 +197,36 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
             {currentModule.id === "financeiro" && <FinanceToolbar />}
             <div className="min-h-0 flex-1 overflow-auto px-5 py-6 md:px-10 md:py-8">
-              <div key={pathname} className="ros-page-enter">{children}</div>
+              <div key={pathname} className="ros-page-enter">
+                {currentModule.status === "live" && navItems.length === 0
+                  ? <EmConstrucao module={currentModule} workspace={workspace} />
+                  : children}
+              </div>
             </div>
           </div>
         </main>
       </div>
       <NovaAtividadeAlerta />
     </TooltipProvider>
+  );
+}
+
+/** Módulo que existe no grupo, mas ainda não tem telas para a empresa escolhida. */
+function EmConstrucao({ module: m, workspace }: { module: OsModule; workspace: WorkspaceId }) {
+  const nome = workspace === "grupo" ? GROUP_WORKSPACE.name : getCompany(workspace)?.name ?? "esta empresa";
+  const Icon = m.icon;
+  return (
+    <div className="grid min-h-[55vh] place-items-center">
+      <div className="max-w-md text-center">
+        <span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl border bg-muted/40">
+          <Icon className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
+        </span>
+        <h2 className="text-base font-semibold">{m.label} da {nome} em construção</h2>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Por enquanto, o {m.label} está pronto para a Union Contadores. Troque de empresa no seletor ao lado para ver.
+        </p>
+      </div>
+    </div>
   );
 }
 
