@@ -10,14 +10,14 @@ import {
   ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 
-const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+export const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+export const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const fmt = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-const money = (v: number) => fmt.format(Math.round(v) || 0);
-const short = new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 });
-const sign = (v: number) => (v >= 0 ? "var(--positive)" : "var(--destructive)");
+export const money = (v: number) => fmt.format(Math.round(v) || 0);
+export const short = new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 });
+export const sign = (v: number) => (v >= 0 ? "var(--positive)" : "var(--destructive)");
 
-function Delta({ expected, realized, invert = false }: { expected: number; realized: number; invert?: boolean }) {
+export function Delta({ expected, realized, invert = false }: { expected: number; realized: number; invert?: boolean }) {
   const d = Math.round(deltaOf(expected, realized));
   if (d === 0) return <span className="text-xs text-muted-foreground">= previsto</span>;
   const good = invert ? d < 0 : d > 0;
@@ -28,7 +28,7 @@ function Delta({ expected, realized, invert = false }: { expected: number; reali
   );
 }
 
-function Spark({ data, color, m }: { data: number[]; color: string; m: number }) {
+export function Spark({ data, color, m }: { data: number[]; color: string; m: number }) {
   const id = "g" + color.replace(/[^a-z]/gi, "");
   return (
     <ResponsiveContainer width="100%" height={56}>
@@ -47,7 +47,7 @@ function Spark({ data, color, m }: { data: number[]; color: string; m: number })
   );
 }
 
-function Flow({ icon, label, color, r, e, series, m, invert }: { icon: ReactNode; label: string; color: string; r: number; e: number; series: number[]; m: number; invert?: boolean }) {
+export function Flow({ icon, label, color, r, e, series, m, invert }: { icon: ReactNode; label: string; color: string; r: number; e: number; series: number[]; m: number; invert?: boolean }) {
   return (
     <Card className="overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-500">
       <CardContent className="pt-5 pb-2 space-y-2">
