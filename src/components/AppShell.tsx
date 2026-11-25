@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { BrandArrow } from "@/components/brand/Logo";
 
 const ROLE_LABEL: Record<string, string> = {
   controller: "Controller",
@@ -84,8 +85,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex h-screen overflow-hidden bg-sidebar text-foreground">
         {/* Trilho de módulos */}
         <aside className="hidden md:flex w-[60px] shrink-0 flex-col items-center bg-rail py-4 text-rail-foreground">
-          <Link to="/inicio" aria-label="render.os — início" className="mb-6 grid h-9 w-9 place-items-center">
-            <RenderMark />
+          <Link to="/inicio" aria-label="render.os — início" className="group mb-6 grid h-10 w-10 place-items-center">
+            <BrandArrow className="h-7 w-auto transition-transform duration-500 group-hover:rotate-[-12deg] group-hover:scale-110" />
           </Link>
           <nav className="flex flex-col items-center gap-1.5">
             {MODULES.map((m) => (
@@ -181,7 +182,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               </button>
             )}
             {currentModule.id === "financeiro" && <FinanceToolbar />}
-            <div className="min-h-0 flex-1 overflow-auto px-5 py-6 md:px-10 md:py-8">{children}</div>
+            <div className="min-h-0 flex-1 overflow-auto px-5 py-6 md:px-10 md:py-8">
+              <div key={pathname} className="ros-page-enter">{children}</div>
+            </div>
           </div>
         </main>
       </div>
@@ -292,8 +295,8 @@ export function WorkspaceAvatar({ id, small }: { id: WorkspaceId; small?: boolea
   const size = small ? "h-7 w-7 text-[10px]" : "h-8 w-8 text-[11px]";
   if (!company) {
     return (
-      <span className={cn("grid shrink-0 place-items-center rounded-md bg-rail text-white", size)}>
-        <RenderMark className="h-4 w-4" />
+      <span className={cn("grid shrink-0 place-items-center rounded-md bg-rail", size)}>
+        <BrandArrow className="h-[60%] w-auto" />
       </span>
     );
   }
@@ -345,28 +348,6 @@ function FinanceToolbar() {
         <span className="ml-1 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">Consolidado do grupo</span>
       )}
     </div>
-  );
-}
-
-/** Marca do render.os: anel com o gradiente azul → magenta da Render Hub. */
-export function RenderMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" className={cn("h-7 w-7", className)} aria-hidden="true">
-      <defs>
-        <linearGradient id="render-os-mark" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--brand-blue)" />
-          <stop offset="1" stopColor="var(--brand-magenta)" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M9 23V9h8.2a5 5 0 0 1 1.4 9.8L23.5 23"
-        fill="none"
-        stroke="url(#render-os-mark)"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 

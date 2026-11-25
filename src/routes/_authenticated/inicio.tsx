@@ -5,7 +5,11 @@ import { useHubStore } from "@/lib/hub-store";
 import { GROUP_COMPANIES, type CompanyId } from "@/os/companies";
 import { MODULES } from "@/os/modules";
 import { WorkspaceAvatar } from "@/components/AppShell";
-import { PageHeader, Section } from "@/components/os/page";
+import { Section } from "@/components/os/page";
+import { TechBackground } from "@/components/brand/TechBackground";
+import { BrandArrow } from "@/components/brand/Logo";
+import { useAuth } from "@/hooks/use-auth";
+import { spotlight } from "@/hooks/use-reveal";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({ meta: [{ title: "Início — render.os" }] }),
@@ -18,17 +22,38 @@ function InicioPage() {
   const inDb = new Set((companies ?? []).map((c) => c.slug));
   const live = MODULES.filter((m) => m.status === "live" && m.id !== "inicio");
   const soon = MODULES.filter((m) => m.status === "soon");
+  const { user } = useAuth();
+  const name = ((user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "").split(" ")[0];
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  const today = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
 
   return (
     <div className="mx-auto max-w-6xl">
-      <PageHeader
-        eyebrow="Grupo Render Hub"
-        title="Visão geral"
-        description="Uma marca. Vários negócios. Um só sistema."
-      />
+      <div className="relative mb-10 overflow-hidden rounded-2xl bg-[#06070a] px-7 py-8 text-white md:px-10 md:py-10">
+        <TechBackground />
+        <BrandArrow className="pointer-events-none absolute -right-6 top-1/2 h-48 w-auto -translate-y-1/2 opacity-25 md:right-10 md:opacity-90" />
+        <div className="relative max-w-xl">
+          <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#4cc3ff]">{today}</div>
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">
+            {greeting}{name ? `, ${name}` : ""}.
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-white/60">
+            Seis operações do Grupo Render Hub em um só lugar. Escolha uma empresa ou siga para o consolidado.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <Link to="/dashboard" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#06070a] transition-transform hover:scale-[1.02]">
+              Abrir financeiro
+            </Link>
+            <span className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/75">
+              {inDb.size} de {GROUP_COMPANIES.length} empresas ativas
+            </span>
+          </div>
+        </div>
+      </div>
 
       <Section icon={Building2} title="Empresas do grupo">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="ros-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {GROUP_COMPANIES.map((c) => {
             const ready = inDb.has(c.slug);
             return (
@@ -37,7 +62,8 @@ function InicioPage() {
                 type="button"
                 disabled={!ready}
                 onClick={() => setHub(c.id as CompanyId)}
-                className="group flex flex-col gap-3 rounded-xl border bg-background p-4 text-left transition-colors hover:border-foreground/15 hover:bg-muted/30 disabled:cursor-not-allowed disabled:opacity-60"
+                onMouseMove={spotlight}
+                className="ros-spotlight group flex flex-col gap-3 rounded-xl border bg-background p-4 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/15 hover:shadow-[0_8px_24px_rgb(0_0_0/0.06)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <div className="flex items-center gap-3">
                   <WorkspaceAvatar id={c.id} />
@@ -59,7 +85,7 @@ function InicioPage() {
       </Section>
 
       <Section icon={Boxes} title="Módulos">
-        <div className="divide-y rounded-xl border">
+        <div className="ros-stagger divide-y rounded-xl border">
           {[...live, ...soon].map((m) => (
             <div key={m.id} className="flex items-center gap-4 px-4 py-3.5">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border bg-muted/40">

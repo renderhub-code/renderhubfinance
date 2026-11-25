@@ -1,11 +1,13 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { TechBackground } from "@/components/brand/TechBackground";
+import { HubOrbit } from "@/components/brand/HubOrbit";
+import { OsWordmark } from "@/components/brand/Logo";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -81,13 +83,31 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">render.os</CardTitle>
-          <CardDescription>Acesso ao controle financeiro do hub</CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="grid min-h-screen bg-background lg:grid-cols-[1.1fr_1fr]">
+      {/* Painel da marca */}
+      <aside className="relative hidden overflow-hidden bg-[#06070a] text-white lg:flex lg:flex-col">
+        <TechBackground />
+        <div className="relative z-10 p-10">
+          <Link to="/"><OsWordmark tone="dark" /></Link>
+        </div>
+        <div className="relative z-10 mx-auto my-auto w-full max-w-[440px] px-10">
+          <HubOrbit compact />
+        </div>
+        <div className="relative z-10 p-10">
+          <p className="font-display text-2xl font-semibold leading-snug tracking-tight">
+            Uma marca. Seis operações.<br /><span className="ros-gradient-text">Um só sistema.</span>
+          </p>
+          <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.25em] text-white/40">Grupo Render Hub · Recife — PE</p>
+        </div>
+      </aside>
+
+      {/* Formulário */}
+      <main className="flex items-center justify-center p-6">
+        <div className="w-full max-w-sm ros-page-enter">
+          <div className="mb-8 lg:hidden"><OsWordmark /></div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Bem-vindo ao render.os</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">Entre para acessar as empresas do grupo.</p>
+          <div className="mt-8">
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Entrar</TabsTrigger>
@@ -103,7 +123,7 @@ function AuthPage() {
                   <Label htmlFor="l-pass">Senha</Label>
                   <Input id="l-pass" name="password" type="password" required autoComplete="current-password" />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="h-10 w-full" disabled={loading}>
                   {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Entrar
                 </Button>
               </form>
@@ -122,7 +142,7 @@ function AuthPage() {
                   <Label htmlFor="s-pass">Senha</Label>
                   <Input id="s-pass" name="password" type="password" required minLength={8} autoComplete="new-password" />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="h-10 w-full" disabled={loading}>
                   {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />} Criar conta
                 </Button>
               </form>
@@ -130,16 +150,17 @@ function AuthPage() {
           </Tabs>
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">ou</span></div>
+            <div className="relative flex justify-center text-xs"><span className="bg-background px-2 text-muted-foreground">ou</span></div>
           </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogle} disabled={loading}>
+          <Button variant="outline" className="h-10 w-full" onClick={handleGoogle} disabled={loading}>
             Continuar com Google
           </Button>
           <p className="text-xs text-muted-foreground text-center mt-6">
             O primeiro usuário se torna Controller com acesso a todas as empresas.
           </p>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

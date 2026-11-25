@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { IntroSplash, INTRO_HEAD_SCRIPT } from "@/components/brand/IntroSplash";
 
 function NotFoundComponent() {
   return (
@@ -89,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
@@ -109,6 +110,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: INTRO_HEAD_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
@@ -124,6 +126,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <IntroSplash />
       <Outlet />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
