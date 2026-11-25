@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "asset_id": "eed3b847-7fc8-45e2-b713-602d2ff2952f",
+  "asset_id": "cf0de050-1ac6-46e2-b3f9-e7be87fa64fa",
   "project_id": "1faf5f72-2f07-42af-9da0-601403edd4ce",
-  "url": "/__l5e/assets-v1/eed3b847-7fc8-45e2-b713-602d2ff2952f/render-r-apple-touch.png",
-  "r2_key": "a/v1/1faf5f72-2f07-42af-9da0-601403edd4ce/eed3b847-7fc8-45e2-b713-602d2ff2952f/render-r-apple-touch.png",
-  "original_filename": "render-r-apple-touch.png",
-  "size": 7958,
+  "url": "/__l5e/assets-v1/cf0de050-1ac6-46e2-b3f9-e7be87fa64fa/render-r-apple-touch-transparent.png",
+  "r2_key": "a/v1/1faf5f72-2f07-42af-9da0-601403edd4ce/cf0de050-1ac6-46e2-b3f9-e7be87fa64fa/render-r-apple-touch-transparent.png",
+  "original_filename": "render-r-apple-touch-transparent.png",
+  "size": 9401,
   "content_type": "image/png",
-  "created_at": "2026-11-25T01:05:08Z"
+  "created_at": "2026-11-25T01:09:27Z"
 }
