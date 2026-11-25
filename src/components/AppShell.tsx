@@ -19,6 +19,7 @@ import { RenderMark } from "@/components/brand/Logo";
 import { NovaAtividadeAlerta } from "@/components/contabil/NovaAtividadeAlerta";
 import { useContabilMe } from "@/os/contabil/hooks";
 import { useIaMe } from "@/os/ia/data";
+import { useComexMe } from "@/os/comex/data";
 
 const ROLE_LABEL: Record<string, string> = {
   controller: "Controller",
@@ -47,11 +48,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   const workspace = getHub(activeHubId).id as WorkspaceId;
   const isGroup = workspace === "grupo";
   const currentModule = moduleForPath(pathname);
-  const contabil = useContabilMe(currentModule.id === "operacional");
+  const isComex = pathname === "/comex" || pathname.startsWith("/comex/");
+  const contabil = useContabilMe(currentModule.id === "operacional" && !isComex);
+  const comex = useComexMe(isComex);
   const ia = useIaMe(currentModule.id === "ia");
   // Enquanto o perfil do módulo carrega, não esconde nada (evita redirecionar o admin).
   const moduleAdmin =
-    currentModule.id === "operacional" ? contabil.loading || contabil.isAdmin
+    isComex ? comex.loading || comex.isAdmin
+    : currentModule.id === "operacional" ? contabil.loading || contabil.isAdmin
     : currentModule.id === "ia" ? ia.loading || ia.isAdmin
     : true;
   const navItems = visibleItems(currentModule, workspace, moduleAdmin);

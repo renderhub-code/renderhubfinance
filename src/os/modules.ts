@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   House, Wallet, ShoppingBag, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
-  Workflow, ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, KeyRound,
+  Workflow, ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, KeyRound, Ship, ShieldCheck,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
 
@@ -37,6 +37,8 @@ export interface OsModule {
 
 /** Workspaces onde as telas da Union aparecem (a própria Union e a visão do grupo). */
 const UNION: WorkspaceId[] = ["union", "grupo"];
+/** Telas do follow-up de importação da Render Comex. */
+const COMEX: WorkspaceId[] = ["render"];
 
 export const MODULES: OsModule[] = [
   {
@@ -80,7 +82,7 @@ export const MODULES: OsModule[] = [
     // importação), Nortrip e as demais entram aqui conforme forem construídas.
     id: "operacional",
     label: "Operacional",
-    description: "O dia a dia de cada empresa. Na Union: atividades, prazos e equipe contábil.",
+    description: "O dia a dia de cada empresa. Na Union: atividades e prazos contábeis. Na Render Comex: follow-up das importações.",
     icon: Workflow,
     status: "live",
     home: "/contabil",
@@ -92,6 +94,9 @@ export const MODULES: OsModule[] = [
       { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, adminOnly: true, only: UNION },
       { to: "/contabil/bases", label: "Bases da Union", icon: Database, adminOnly: true, only: UNION },
       { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, adminOnly: true, only: UNION },
+      { to: "/comex", label: "Follow-up", icon: Ship, only: COMEX },
+      { to: "/comex/clientes", label: "Clientes", icon: Building2, only: COMEX },
+      { to: "/comex/equipe", label: "Equipe", icon: UsersRound, adminOnly: true, only: COMEX },
     ],
   },
   {
@@ -112,11 +117,11 @@ export const MODULES: OsModule[] = [
   {
     id: "pessoas",
     label: "Pessoas",
-    description: "Usuários, times e permissões por empresa.",
+    description: "Usuários e acessos ao render.os.",
     icon: Users,
-    status: "soon",
-    home: "/modulo/pessoas",
-    items: [],
+    status: "live",
+    home: "/pessoas/acessos",
+    items: [{ to: "/pessoas/acessos", label: "Acessos", icon: ShieldCheck }],
   },
 ];
 

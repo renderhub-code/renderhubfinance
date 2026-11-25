@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PortalRouteImport } from './routes/portal'
 import { Route as AuthenticatedCentrosDeCustoRouteImport } from './routes/_authenticated/centros-de-custo'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
@@ -21,6 +22,9 @@ import { Route as AuthenticatedLancamentosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPlanoDeContasRouteImport } from './routes/_authenticated/plano-de-contas'
 import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
 import { Route as BlingCallbackRouteImport } from './routes/bling.callback'
+import { Route as AuthenticatedComexIndexRouteImport } from './routes/_authenticated/comex.index'
+import { Route as AuthenticatedComexClientesRouteImport } from './routes/_authenticated/comex.clientes'
+import { Route as AuthenticatedComexEquipeRouteImport } from './routes/_authenticated/comex.equipe'
 import { Route as AuthenticatedContabilIndexRouteImport } from './routes/_authenticated/contabil.index'
 import { Route as AuthenticatedContabilAtividadesRouteImport } from './routes/_authenticated/contabil.atividades'
 import { Route as AuthenticatedContabilBasesRouteImport } from './routes/_authenticated/contabil.bases'
@@ -35,6 +39,7 @@ import { Route as AuthenticatedIaEntregasRouteImport } from './routes/_authentic
 import { Route as AuthenticatedIaTreinamentoRouteImport } from './routes/_authenticated/ia.treinamento'
 import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
 import { Route as AuthenticatedModuloIdRouteImport } from './routes/_authenticated/modulo.$id'
+import { Route as AuthenticatedPessoasAcessosRouteImport } from './routes/_authenticated/pessoas.acessos'
 import { Route as AuthenticatedSimulacoesIdRouteImport } from './routes/_authenticated/simulacoes.$id'
 import { Route as ApiPublicHooksBlingDailyImportRouteImport } from './routes/api/public/hooks/bling-daily-import'
 
@@ -50,6 +55,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCentrosDeCustoRoute =
@@ -101,6 +111,23 @@ const BlingCallbackRoute = BlingCallbackRouteImport.update({
   path: '/bling/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedComexIndexRoute = AuthenticatedComexIndexRouteImport.update({
+  id: '/comex/',
+  path: '/comex/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedComexClientesRoute =
+  AuthenticatedComexClientesRouteImport.update({
+    id: '/comex/clientes',
+    path: '/comex/clientes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedComexEquipeRoute =
+  AuthenticatedComexEquipeRouteImport.update({
+    id: '/comex/equipe',
+    path: '/comex/equipe',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedContabilIndexRoute =
   AuthenticatedContabilIndexRouteImport.update({
     id: '/contabil/',
@@ -180,6 +207,12 @@ const AuthenticatedModuloIdRoute = AuthenticatedModuloIdRouteImport.update({
   path: '/modulo/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPessoasAcessosRoute =
+  AuthenticatedPessoasAcessosRouteImport.update({
+    id: '/pessoas/acessos',
+    path: '/pessoas/acessos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSimulacoesIdRoute =
   AuthenticatedSimulacoesIdRouteImport.update({
     id: '/$id',
@@ -196,6 +229,7 @@ const ApiPublicHooksBlingDailyImportRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/portal': typeof PortalRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -205,6 +239,8 @@ export interface FileRoutesByFullPath {
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
   '/bling/callback': typeof BlingCallbackRoute
+  '/comex/clientes': typeof AuthenticatedComexClientesRoute
+  '/comex/equipe': typeof AuthenticatedComexEquipeRoute
   '/contabil/atividades': typeof AuthenticatedContabilAtividadesRoute
   '/contabil/bases': typeof AuthenticatedContabilBasesRoute
   '/contabil/cadastros': typeof AuthenticatedContabilCadastrosRoute
@@ -217,7 +253,9 @@ export interface FileRoutesByFullPath {
   '/ia/treinamento': typeof AuthenticatedIaTreinamentoRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
+  '/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
+  '/comex/': typeof AuthenticatedComexIndexRoute
   '/contabil/': typeof AuthenticatedContabilIndexRoute
   '/ia/': typeof AuthenticatedIaIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
@@ -225,6 +263,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/portal': typeof PortalRoute
   '/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -234,6 +273,8 @@ export interface FileRoutesByTo {
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
   '/bling/callback': typeof BlingCallbackRoute
+  '/comex/clientes': typeof AuthenticatedComexClientesRoute
+  '/comex/equipe': typeof AuthenticatedComexEquipeRoute
   '/contabil/atividades': typeof AuthenticatedContabilAtividadesRoute
   '/contabil/bases': typeof AuthenticatedContabilBasesRoute
   '/contabil/cadastros': typeof AuthenticatedContabilCadastrosRoute
@@ -246,7 +287,9 @@ export interface FileRoutesByTo {
   '/ia/treinamento': typeof AuthenticatedIaTreinamentoRoute
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
+  '/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
   '/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
+  '/comex': typeof AuthenticatedComexIndexRoute
   '/contabil': typeof AuthenticatedContabilIndexRoute
   '/ia': typeof AuthenticatedIaIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
@@ -256,6 +299,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/portal': typeof PortalRoute
   '/_authenticated/centros-de-custo': typeof AuthenticatedCentrosDeCustoRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
@@ -265,6 +309,8 @@ export interface FileRoutesById {
   '/_authenticated/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
   '/bling/callback': typeof BlingCallbackRoute
+  '/_authenticated/comex/clientes': typeof AuthenticatedComexClientesRoute
+  '/_authenticated/comex/equipe': typeof AuthenticatedComexEquipeRoute
   '/_authenticated/contabil/atividades': typeof AuthenticatedContabilAtividadesRoute
   '/_authenticated/contabil/bases': typeof AuthenticatedContabilBasesRoute
   '/_authenticated/contabil/cadastros': typeof AuthenticatedContabilCadastrosRoute
@@ -277,7 +323,9 @@ export interface FileRoutesById {
   '/_authenticated/ia/treinamento': typeof AuthenticatedIaTreinamentoRoute
   '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/_authenticated/modulo/$id': typeof AuthenticatedModuloIdRoute
+  '/_authenticated/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
   '/_authenticated/simulacoes/$id': typeof AuthenticatedSimulacoesIdRoute
+  '/_authenticated/comex/': typeof AuthenticatedComexIndexRoute
   '/_authenticated/contabil/': typeof AuthenticatedContabilIndexRoute
   '/_authenticated/ia/': typeof AuthenticatedIaIndexRoute
   '/api/public/hooks/bling-daily-import': typeof ApiPublicHooksBlingDailyImportRoute
@@ -287,6 +335,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/portal'
     | '/centros-de-custo'
     | '/dashboard'
     | '/financeiro'
@@ -296,6 +345,8 @@ export interface FileRouteTypes {
     | '/plano-de-contas'
     | '/simulacoes'
     | '/bling/callback'
+    | '/comex/clientes'
+    | '/comex/equipe'
     | '/contabil/atividades'
     | '/contabil/bases'
     | '/contabil/cadastros'
@@ -308,7 +359,9 @@ export interface FileRouteTypes {
     | '/ia/treinamento'
     | '/lancamentos/importar'
     | '/modulo/$id'
+    | '/pessoas/acessos'
     | '/simulacoes/$id'
+    | '/comex/'
     | '/contabil/'
     | '/ia/'
     | '/api/public/hooks/bling-daily-import'
@@ -316,6 +369,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/portal'
     | '/centros-de-custo'
     | '/dashboard'
     | '/financeiro'
@@ -325,6 +379,8 @@ export interface FileRouteTypes {
     | '/plano-de-contas'
     | '/simulacoes'
     | '/bling/callback'
+    | '/comex/clientes'
+    | '/comex/equipe'
     | '/contabil/atividades'
     | '/contabil/bases'
     | '/contabil/cadastros'
@@ -337,7 +393,9 @@ export interface FileRouteTypes {
     | '/ia/treinamento'
     | '/lancamentos/importar'
     | '/modulo/$id'
+    | '/pessoas/acessos'
     | '/simulacoes/$id'
+    | '/comex'
     | '/contabil'
     | '/ia'
     | '/api/public/hooks/bling-daily-import'
@@ -346,6 +404,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/portal'
     | '/_authenticated/centros-de-custo'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
@@ -355,6 +414,8 @@ export interface FileRouteTypes {
     | '/_authenticated/plano-de-contas'
     | '/_authenticated/simulacoes'
     | '/bling/callback'
+    | '/_authenticated/comex/clientes'
+    | '/_authenticated/comex/equipe'
     | '/_authenticated/contabil/atividades'
     | '/_authenticated/contabil/bases'
     | '/_authenticated/contabil/cadastros'
@@ -367,7 +428,9 @@ export interface FileRouteTypes {
     | '/_authenticated/ia/treinamento'
     | '/_authenticated/lancamentos/importar'
     | '/_authenticated/modulo/$id'
+    | '/_authenticated/pessoas/acessos'
     | '/_authenticated/simulacoes/$id'
+    | '/_authenticated/comex/'
     | '/_authenticated/contabil/'
     | '/_authenticated/ia/'
     | '/api/public/hooks/bling-daily-import'
@@ -377,6 +440,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PortalRoute: typeof PortalRoute
   BlingCallbackRoute: typeof BlingCallbackRoute
   ApiPublicHooksBlingDailyImportRoute: typeof ApiPublicHooksBlingDailyImportRoute
 }
@@ -402,6 +466,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/centros-de-custo': {
@@ -466,6 +537,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/bling/callback'
       preLoaderRoute: typeof BlingCallbackRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/comex/': {
+      id: '/_authenticated/comex/'
+      path: '/comex'
+      fullPath: '/comex/'
+      preLoaderRoute: typeof AuthenticatedComexIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/comex/clientes': {
+      id: '/_authenticated/comex/clientes'
+      path: '/comex/clientes'
+      fullPath: '/comex/clientes'
+      preLoaderRoute: typeof AuthenticatedComexClientesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/comex/equipe': {
+      id: '/_authenticated/comex/equipe'
+      path: '/comex/equipe'
+      fullPath: '/comex/equipe'
+      preLoaderRoute: typeof AuthenticatedComexEquipeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/contabil/': {
       id: '/_authenticated/contabil/'
@@ -565,6 +657,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedModuloIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pessoas/acessos': {
+      id: '/_authenticated/pessoas/acessos'
+      path: '/pessoas/acessos'
+      fullPath: '/pessoas/acessos'
+      preLoaderRoute: typeof AuthenticatedPessoasAcessosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/simulacoes/$id': {
       id: '/_authenticated/simulacoes/$id'
       path: '/$id'
@@ -620,6 +719,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLancamentosRoute: typeof AuthenticatedLancamentosRouteWithChildren
   AuthenticatedPlanoDeContasRoute: typeof AuthenticatedPlanoDeContasRoute
   AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRouteWithChildren
+  AuthenticatedComexClientesRoute: typeof AuthenticatedComexClientesRoute
+  AuthenticatedComexEquipeRoute: typeof AuthenticatedComexEquipeRoute
   AuthenticatedContabilAtividadesRoute: typeof AuthenticatedContabilAtividadesRoute
   AuthenticatedContabilBasesRoute: typeof AuthenticatedContabilBasesRoute
   AuthenticatedContabilCadastrosRoute: typeof AuthenticatedContabilCadastrosRoute
@@ -631,6 +732,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIaEntregasRoute: typeof AuthenticatedIaEntregasRoute
   AuthenticatedIaTreinamentoRoute: typeof AuthenticatedIaTreinamentoRoute
   AuthenticatedModuloIdRoute: typeof AuthenticatedModuloIdRoute
+  AuthenticatedPessoasAcessosRoute: typeof AuthenticatedPessoasAcessosRoute
+  AuthenticatedComexIndexRoute: typeof AuthenticatedComexIndexRoute
   AuthenticatedContabilIndexRoute: typeof AuthenticatedContabilIndexRoute
   AuthenticatedIaIndexRoute: typeof AuthenticatedIaIndexRoute
 }
@@ -644,6 +747,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLancamentosRoute: AuthenticatedLancamentosRouteWithChildren,
   AuthenticatedPlanoDeContasRoute: AuthenticatedPlanoDeContasRoute,
   AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRouteWithChildren,
+  AuthenticatedComexClientesRoute: AuthenticatedComexClientesRoute,
+  AuthenticatedComexEquipeRoute: AuthenticatedComexEquipeRoute,
   AuthenticatedContabilAtividadesRoute: AuthenticatedContabilAtividadesRoute,
   AuthenticatedContabilBasesRoute: AuthenticatedContabilBasesRoute,
   AuthenticatedContabilCadastrosRoute: AuthenticatedContabilCadastrosRoute,
@@ -655,6 +760,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIaEntregasRoute: AuthenticatedIaEntregasRoute,
   AuthenticatedIaTreinamentoRoute: AuthenticatedIaTreinamentoRoute,
   AuthenticatedModuloIdRoute: AuthenticatedModuloIdRoute,
+  AuthenticatedPessoasAcessosRoute: AuthenticatedPessoasAcessosRoute,
+  AuthenticatedComexIndexRoute: AuthenticatedComexIndexRoute,
   AuthenticatedContabilIndexRoute: AuthenticatedContabilIndexRoute,
   AuthenticatedIaIndexRoute: AuthenticatedIaIndexRoute,
 }
@@ -666,6 +773,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  PortalRoute: PortalRoute,
   BlingCallbackRoute: BlingCallbackRoute,
   ApiPublicHooksBlingDailyImportRoute: ApiPublicHooksBlingDailyImportRoute,
 }
