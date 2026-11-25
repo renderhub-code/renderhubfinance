@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { BrandArrow } from "@/components/brand/Logo";
+import { RenderMark } from "@/components/brand/Logo";
 
 const ROLE_LABEL: Record<string, string> = {
   controller: "Controller",
@@ -86,7 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Trilho de módulos */}
         <aside className="hidden md:flex w-[60px] shrink-0 flex-col items-center bg-rail py-4 text-rail-foreground">
           <Link to="/inicio" aria-label="render.os — início" className="group mb-6 grid h-10 w-10 place-items-center">
-            <BrandArrow className="h-7 w-auto transition-transform duration-500 group-hover:rotate-[-12deg] group-hover:scale-110" />
+            <RenderMark className="h-8 w-8 transition-transform duration-300 group-hover:scale-110" />
           </Link>
           <nav className="flex flex-col items-center gap-1.5">
             {MODULES.map((m) => (
@@ -296,7 +296,7 @@ export function WorkspaceAvatar({ id, small }: { id: WorkspaceId; small?: boolea
   if (!company) {
     return (
       <span className={cn("grid shrink-0 place-items-center rounded-md bg-rail", size)}>
-        <BrandArrow className="h-[60%] w-auto" />
+        <RenderMark className="h-[78%] w-[78%]" />
       </span>
     );
   }

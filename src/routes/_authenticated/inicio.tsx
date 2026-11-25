@@ -7,7 +7,7 @@ import { MODULES } from "@/os/modules";
 import { WorkspaceAvatar } from "@/components/AppShell";
 import { Section } from "@/components/os/page";
 import { TechBackground } from "@/components/brand/TechBackground";
-import { BrandArrow } from "@/components/brand/Logo";
+import { RenderMark } from "@/components/brand/Logo";
 import { useAuth } from "@/hooks/use-auth";
 import { spotlight } from "@/hooks/use-reveal";
 
@@ -32,7 +32,7 @@ function InicioPage() {
     <div className="mx-auto max-w-6xl">
       <div className="relative mb-10 overflow-hidden rounded-2xl bg-[#06070a] px-7 py-8 text-white md:px-10 md:py-10">
         <TechBackground />
-        <BrandArrow className="pointer-events-none absolute -right-6 top-1/2 h-48 w-auto -translate-y-1/2 opacity-25 md:right-10 md:opacity-90" />
+        <RenderMark className="pointer-events-none absolute -right-8 top-1/2 h-56 w-56 -translate-y-1/2 opacity-25 drop-shadow-[0_0_30px_rgba(76,195,255,.35)] md:right-6 md:opacity-90" />
         <div className="relative max-w-xl">
           <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#4cc3ff]">{today}</div>
           <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight">

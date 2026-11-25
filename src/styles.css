@@ -212,35 +212,37 @@
 @keyframes ros-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes ros-bar { from { transform: scaleY(.15); } to { transform: scaleY(1); } }
 
-/* Abertura (splash) */
+/* Abertura (splash): o R se desenha e abre em "render.os" */
 @keyframes ros-intro-bg { from { opacity: 0; } to { opacity: 1; } }
-@keyframes ros-intro-logo {
-  0% { opacity: 0; transform: scale(.4) rotate(-40deg); filter: blur(14px); }
-  55% { opacity: 1; filter: blur(0); }
-  75% { transform: scale(1.06) rotate(4deg); }
-  100% { opacity: 1; transform: none; filter: blur(0); }
+@keyframes ros-r-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes ros-r-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 rgb(76 195 255 / 0)); }
+  50% { filter: drop-shadow(0 0 22px rgb(76 195 255 / .65)) drop-shadow(0 0 40px rgb(224 51 126 / .35)); }
 }
-@keyframes ros-intro-reveal { from { clip-path: inset(0 100% 0 0); opacity: .2; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
+@keyframes ros-intro-slide { from { transform: translateX(var(--shift, 0px)); } to { transform: translateX(0); } }
+@keyframes ros-intro-reveal { from { clip-path: inset(0 100% 0 0); opacity: .3; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
 @keyframes ros-intro-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes ros-intro-ring { 0% { transform: scale(.3); opacity: 0; } 40% { opacity: .9; } 100% { transform: scale(2.4); opacity: 0; } }
+@keyframes ros-intro-ring { 0% { transform: translate(-50%,-50%) scale(.3); opacity: 0; } 35% { opacity: .9; } 100% { transform: translate(-50%,-50%) scale(2.6); opacity: 0; } }
 @keyframes ros-intro-out { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.06); visibility: hidden; } }
 
+.ros-r-draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
 .ros-intro:not([data-play]) .ros-intro-stage { opacity: 0; }
-.ros-intro[data-play] { animation: ros-intro-out .7s cubic-bezier(.7,0,.3,1) 2.55s forwards; }
+.ros-intro[data-play] { animation: ros-intro-out .7s cubic-bezier(.7,0,.3,1) 3s forwards; }
 .ros-intro.is-skipping { animation: ros-intro-out .35s ease-out forwards; }
 .ros-intro[data-play] .ros-intro-bgl { animation: ros-intro-bg 1s ease-out both; }
-.ros-intro[data-play] .ros-intro-logo { animation: ros-intro-logo 1.1s cubic-bezier(.2,.9,.2,1) .15s both; }
-.ros-intro[data-play] .ros-intro-ring { animation: ros-intro-ring 1.6s cubic-bezier(.2,.7,.2,1) .55s both; }
-.ros-intro[data-play] .ros-intro-ring.delay { animation-delay: .85s; }
-.ros-intro[data-play] .ros-intro-text { animation: ros-intro-reveal .7s cubic-bezier(.7,0,.2,1) .95s both; }
-.ros-intro-line { transform-origin: left; }
-.ros-intro[data-play] .ros-intro-line { animation: ros-intro-line .8s cubic-bezier(.7,0,.2,1) 1.35s both; }
-.ros-intro[data-play] .ros-intro-tag { animation: ros-fade-up .6s ease-out 1.6s both; }
-.ros-intro-shine::after {
-  content: ""; position: absolute; inset: -20% auto -20% 0; width: 40%; transform: translateX(-130%);
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / .55), transparent); mix-blend-mode: overlay;
-}
-.ros-intro[data-play] .ros-intro-shine::after { animation: ros-shine 1s ease-in-out 1.2s both; }
+.ros-intro[data-play] .ros-r-draw { animation: ros-r-draw 1s cubic-bezier(.65,0,.35,1) .2s both; }
+.ros-intro[data-play] .ros-intro-r { animation: ros-r-glow 1.4s ease-in-out .7s both; }
+.ros-intro-ring { position: absolute; left: 50%; top: 50%; opacity: 0; }
+.ros-intro[data-play] .ros-intro-ring { animation: ros-intro-ring 1.5s cubic-bezier(.2,.7,.2,1) .95s both; }
+.ros-intro[data-play] .ros-intro-ring.delay { animation-delay: 1.2s; }
+.ros-intro-row { transform: translateX(var(--shift, 0px)); }
+.ros-intro[data-play] .ros-intro-row { animation: ros-intro-slide .9s cubic-bezier(.7,0,.2,1) 1.3s both; }
+.ros-intro-word { clip-path: inset(0 100% 0 0); }
+.ros-intro[data-play] .ros-intro-word { animation: ros-intro-reveal .9s cubic-bezier(.7,0,.2,1) 1.35s both; }
+.ros-intro-line { transform: scaleX(0); transform-origin: left; }
+.ros-intro[data-play] .ros-intro-line { animation: ros-intro-line .8s cubic-bezier(.7,0,.2,1) 1.95s both; }
+.ros-intro-tag { opacity: 0; }
+.ros-intro[data-play] .ros-intro-tag { animation: ros-fade-up .6s ease-out 2.2s both; }
 html[data-intro-seen] .ros-intro { display: none; }
 
 /* Fundo tecnológico */

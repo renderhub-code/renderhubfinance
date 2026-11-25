@@ -1,31 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { RenderMark } from "@/components/brand/Logo";
 
 const KEY = "render-os-intro-seen";
 
 /**
- * Abertura com a logo da Render Hub. Toca uma vez por sessão do navegador.
+ * Abertura do render.os. Toca uma vez por sessão do navegador:
+ *  1. o R com gradiente se desenha no centro e brilha;
+ *  2. o R desliza para a esquerda e "ender.os" se revela ao lado → "render.os";
+ *  3. linha em gradiente + "Grupo Render Hub", e a tela some.
  * Um script no <head> marca `html[data-intro-seen]` antes da pintura, então quem
  * já viu não enxerga nem um frame do overlay. Clique ou tecla pula a animação.
  */
 export function IntroSplash() {
   const [state, setState] = useState<"show" | "skip" | "gone">("show");
   const [play, setPlay] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const wordRef = useRef<HTMLSpanElement>(null);
 
-  // Só começa a animar depois da hidratação e com as imagens prontas,
-  // para a sequência não reiniciar nem rodar com a logo ainda carregando.
+  // Só começa depois da hidratação e com a fonte pronta: o deslocamento do R
+  // depende da largura real de "ender.os".
   useEffect(() => {
     if (document.documentElement.hasAttribute("data-intro-seen")) { setState("gone"); return; }
     try { sessionStorage.setItem(KEY, "1"); } catch { /* modo privado */ }
     let cancelled = false;
-    const ready = Promise.all(
-      ["/brand/rh-arrow.png", "/brand/rh-text-white.png"].map((src) => {
-        const img = new Image();
-        img.src = src;
-        return img.decode().catch(() => undefined);
-      }),
-    );
-    const timeout = new Promise((r) => window.setTimeout(r, 900));
-    Promise.race([ready, timeout]).then(() => { if (!cancelled) setPlay(true); });
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts?.ready ?? Promise.resolve();
+    const timeout = new Promise((r) => window.setTimeout(r, 1200));
+    Promise.race([fonts, timeout]).then(() => {
+      if (cancelled) return;
+      const w = wordRef.current?.getBoundingClientRect().width ?? 0;
+      rowRef.current?.style.setProperty("--shift", `${w / 2}px`);
+      setPlay(true);
+    });
     const skip = () => setState((s) => (s === "show" ? "skip" : s));
     window.addEventListener("keydown", skip, { once: true });
     return () => { cancelled = true; window.removeEventListener("keydown", skip); };
@@ -33,7 +38,7 @@ export function IntroSplash() {
 
   useEffect(() => {
     if (!play) return;
-    const t = window.setTimeout(() => setState((s) => (s === "show" ? "gone" : s)), 3300);
+    const t = window.setTimeout(() => setState((s) => (s === "show" ? "gone" : s)), 3750);
     return () => window.clearTimeout(t);
   }, [play]);
 
@@ -59,17 +64,22 @@ export function IntroSplash() {
       </div>
 
       <div className="ros-intro-stage relative flex flex-col items-center">
-        <div className="relative grid place-items-center">
-          <span className="ros-intro-ring absolute h-48 w-48 rounded-full border border-[#4cc3ff]/50" />
-          <span className="ros-intro-ring delay absolute h-48 w-48 rounded-full border border-[#e0337e]/40" />
-          <img src="/brand/rh-arrow.png" alt="" className="ros-intro-logo relative h-36 w-auto drop-shadow-[0_0_40px_rgba(76,195,255,.35)]" />
+        <div
+          ref={rowRef}
+          className="ros-intro-row whitespace-nowrap font-display text-[64px] font-semibold leading-none tracking-tight text-white sm:text-[96px]"
+        >
+          <span className="relative inline-block align-baseline">
+            <span className="ros-intro-ring h-24 w-24 rounded-full border border-[#4cc3ff]/60 sm:h-32 sm:w-32" />
+            <span className="ros-intro-ring delay h-24 w-24 rounded-full border border-[#e0337e]/50 sm:h-32 sm:w-32" />
+            <RenderMark tight draw className="ros-intro-r relative block" />
+          </span>
+          <span ref={wordRef} className="ros-intro-word inline-block align-baseline">
+            ender<span className="ros-gradient-text">.os</span>
+          </span>
         </div>
-        <div className="ros-intro-shine relative mt-6 overflow-hidden">
-          <img src="/brand/rh-text-white.png" alt="Render Hub" className="ros-intro-text h-[72px] w-auto" />
-        </div>
-        <div className="ros-intro-line mt-6 h-[3px] w-40 rounded-full bg-gradient-to-r from-[#1a9bd7] to-[#d6145f]" />
+        <div className="ros-intro-line mt-8 h-[3px] w-44 rounded-full bg-gradient-to-r from-[#1a9bd7] to-[#d6145f]" />
         <div className="ros-intro-tag mt-5 font-mono text-[11px] uppercase tracking-[0.4em] text-white/55">
-          render.os · sistema do grupo
+          Grupo Render Hub
         </div>
       </div>
     </div>
