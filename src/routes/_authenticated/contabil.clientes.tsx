@@ -11,9 +11,10 @@ import { ContabilGate, FieldLabel } from "@/components/contabil/ui";
 import { useAtividades, useClientes, useContabilMe, useInvalidateContabil } from "@/os/contabil/hooks";
 import { cdb, norm, statusEfetivo, type Cliente } from "@/os/contabil/db";
 import { cn } from "@/lib/utils";
+import { contabilHead } from "@/os/contabil/head";
 
 export const Route = createFileRoute("/_authenticated/contabil/clientes")({
-  head: () => ({ meta: [{ title: "Empresas clientes · Contábil — render.os" }] }),
+  head: () => contabilHead("Empresas clientes", "Carteira de empresas, CNPJs e regimes tributários da Union Contadores."),
   component: () => <ContabilGate><Clientes /></ContabilGate>,
 });
 

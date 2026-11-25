@@ -9,9 +9,10 @@ import { ContabilGate, PrioridadePill, StatusPill } from "@/components/contabil/
 import { useAtividades, useClientes, useContabilMe, useMembros, useSetores } from "@/os/contabil/hooks";
 import { dataBR, STATUS_DOT, STATUS_LABEL, statusEfetivo, type Status } from "@/os/contabil/db";
 import { cn } from "@/lib/utils";
+import { contabilHead } from "@/os/contabil/head";
 
 export const Route = createFileRoute("/_authenticated/contabil/")({
-  head: () => ({ meta: [{ title: "Painel · Contábil — render.os" }] }),
+  head: () => contabilHead("Painel", "Atividades, prazos e andamento dos setores da Union Contadores."),
   component: () => <ContabilGate><Painel /></ContabilGate>,
 });
 

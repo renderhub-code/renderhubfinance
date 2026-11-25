@@ -1,0 +1,15 @@
+{
+  "source": "bases_union.zip",
+  "scope": "Import existing Union accounting exports into the existing accounting module; no source application code is present.",
+  "capabilities": [
+    {"capability":"code","source":"existing render.os accounting module","outcome":"preserve","status":"present","next_action":"Extend existing import screen for Union exports."},
+    {"capability":"schema","source":"16 CSV exports","outcome":"migrate","status":"verified","next_action":null},
+    {"capability":"records","source":"sanitized CSV exports","outcome":"migrate","status":"verified","next_action":null,"evidence":"6775 archived records; 174 clients, 656 activities, 661 sciences; all 656 source statuses, priorities and creation dates match; no broken ownership or science relationships."},
+    {"capability":"auth identities","source":"13 profiles with unique emails and original IDs","outcome":"migrate","status":"imported; first login pending","next_action":"Twelve people must verify email and set their password; no passwords or sessions imported and no bulk emails sent."},
+    {"capability":"authorization","source":"3 administrators and 10 analysts","outcome":"preserve","status":"verified role counts; imported-user session test pending","next_action":"Verify an imported analyst's private access after they complete email verification; protected memberships preserve 3 admin and 10 analyst roles."},
+    {"capability":"uploaded file bytes","source":"CSV-only ZIP","outcome":"not applicable","status":"verified","next_action":null},
+    {"capability":"external providers, callbacks, webhooks, schedules, secrets, cutover","source":"record exports only; no application code or provider configuration supplied","outcome":"unchanged","status":"not in import scope","next_action":null},
+    {"capability":"verification","source":"counts, relationships, authenticated accounting UI","outcome":"verify","status":"verified for administrator data flow","next_action":null,"evidence":"ZIP uploaded through signed-in UI; dashboard, companies, all 656 activities, Nibo paging and details, contract search, and create/read/update/delete tested. Temporary record removed. No runtime errors; layout checked at 843x697 and 390x844; four import tests passed; build OK."},
+    {"capability":"imported user first login","source":"existing users' verified email ownership","outcome":"verify","status":"implemented; user verification pending","next_action":"Real imported users must complete email verification and new-password setup; activation form verified without sending bulk emails."}
+  ]
+}

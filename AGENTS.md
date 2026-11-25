@@ -22,3 +22,7 @@ Este repositório está sendo remodelado no **render.os**, o sistema único do G
 - Módulos: `src/os/modules.ts` define o trilho de ícones e o menu de cada módulo. Módulo novo = entrada `status: "soon"` até ter rotas próprias.
 - Workspace ativo (grupo ou empresa): `useHubStore` em `src/lib/hub-store.ts`; o shell (`src/components/AppShell.tsx`) sincroniza a empresa do financeiro a partir dele.
 - Visual: referência de painel claro com trilho escuro, painel cinza e conteúdo em cartão branco; primitivas de página em `src/components/os/page.tsx`.
+
+- Import Union exports through authenticated, accounting-admin-only server functions; sanitize fields and map source identities server-side to preserve ownership without copying credentials.
+- Keep source records in protected accounting archive rows and project supported entities into the existing accounting tables; idempotent inserts preserve render.os edits on retries.
+- Prepare imported email accounts unconfirmed, without bulk emails or passwords; first access requires email verification and new-password setup before using their mapped records.

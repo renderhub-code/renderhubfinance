@@ -16,3 +16,13 @@ A reconexão foi validada e a sincronização completa contém 2.069 movimentos 
 Saldo inicial depende do valor confirmado de 01/01/2026 informado pelo usuário; não há histórico comprovado. O controle manual está disponível e a tela identifica variação acumulada enquanto o saldo estiver pendente.
 
 Publicação não realizada. A rotina diária existente importa contas a pagar/receber; a nova sincronização de movimentos de caixa é retomável pelo botão Sincronizar caixa.
+
+## Bases da Union no Contábil
+
+- [x] Conferir e filtrar os arquivos enviados, preservando dados e vínculos originais.
+- [x] Importar clientes, setores, tipos, atividades e ciências no módulo existente.
+- [x] Preservar as bases adicionais e identificar cadastros de pessoas sem conta correspondente.
+- [x] Validar quantidades, relações e leitura/edição no Contábil com sessão real.
+- [ ] Validar o primeiro acesso das 12 pessoas ainda sem e-mail confirmado — depende de cada pessoa abrir seu link e definir a senha.
+
+Importados 6.775 registros nas 16 bases; 174 clientes, 656 atividades e 661 ciências disponíveis no Contábil. Treze identidades mapeadas, com três administradores e dez analistas preservados. Históricos adicionais consultáveis em Bases da Union, com busca, paginação e detalhes. Criação, leitura, edição e exclusão de atividade temporária verificadas; nenhum registro de teste restante. Formulário de ativação disponível, sem envio de e-mails em massa. Publicação não realizada.

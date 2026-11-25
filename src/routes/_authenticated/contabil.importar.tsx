@@ -9,9 +9,11 @@ import { ContabilGate, PrioridadePill } from "@/components/contabil/ui";
 import { useCategorias, useClientes, useMembros, useSetores, useInvalidateContabil } from "@/os/contabil/hooks";
 import { cdb, dataBR, norm, STATUS_LABEL, type Status } from "@/os/contabil/db";
 import { cn } from "@/lib/utils";
+import { ImportarBasesUnion } from "@/components/contabil/ImportarBasesUnion";
+import { contabilHead } from "@/os/contabil/head";
 
 export const Route = createFileRoute("/_authenticated/contabil/importar")({
-  head: () => ({ meta: [{ title: "Importar planilha · Contábil — render.os" }] }),
+  head: () => contabilHead("Importar planilha", "Importação de atividades e bases da Union Contadores para o render.os."),
   component: () => <ContabilGate adminOnly><Importar /></ContabilGate>,
 });
 
@@ -203,6 +205,8 @@ function Importar() {
         description="Suba um .xlsx com as atividades. Confira a prévia antes de importar."
         actions={<Button variant="outline" onClick={baixarModelo}><Download className="mr-1.5 h-4 w-4" /> Baixar modelo</Button>}
       />
+
+      <ImportarBasesUnion />
 
       <button
         type="button"

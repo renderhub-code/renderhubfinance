@@ -17,9 +17,10 @@ import {
 } from "@/os/contabil/hooks";
 import { cdb, dataBR, norm, PRIORIDADE_LABEL, STATUS_LABEL, statusEfetivo, type Atividade, type Status } from "@/os/contabil/db";
 import { cn } from "@/lib/utils";
+import { contabilHead } from "@/os/contabil/head";
 
 export const Route = createFileRoute("/_authenticated/contabil/atividades")({
-  head: () => ({ meta: [{ title: "Atividades · Contábil — render.os" }] }),
+  head: () => contabilHead("Atividades", "Acompanhamento das atividades, responsáveis e prazos da Union Contadores."),
   validateSearch: (s: Record<string, unknown>) =>
     z.object({ status: z.string().optional(), cliente: z.string().optional(), lote: z.string().optional() }).parse(s),
   component: () => <ContabilGate><AtividadesPage /></ContabilGate>,

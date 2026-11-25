@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { AtivarContaUnion } from "@/components/contabil/AtivarContaUnion";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -30,8 +31,13 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [ativandoUnion, setAtivandoUnion] = useState(false);
 
   useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("ativar") === "union") {
+      setAtivandoUnion(true);
+      return;
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/inicio", replace: true });
     });
@@ -108,6 +114,7 @@ function AuthPage() {
           <h1 className="font-display text-2xl font-semibold tracking-tight">Bem-vindo ao render.os</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Entre para acessar as empresas do grupo.</p>
           <div className="mt-8">
+          {ativandoUnion ? <AtivarContaUnion onDone={afterAuth} onCancel={() => { window.history.replaceState(null, "", "/auth"); setAtivandoUnion(false); }} /> : <>
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Entrar</TabsTrigger>
@@ -155,9 +162,11 @@ function AuthPage() {
           <Button variant="outline" className="h-10 w-full" onClick={handleGoogle} disabled={loading}>
             Continuar com Google
           </Button>
+          <Button variant="link" className="mt-3 w-full" onClick={() => setAtivandoUnion(true)}>Ativar conta Union</Button>
           <p className="text-xs text-muted-foreground text-center mt-6">
             O primeiro usuário se torna Controller com acesso a todas as empresas.
           </p>
+          </>}
           </div>
         </div>
       </main>

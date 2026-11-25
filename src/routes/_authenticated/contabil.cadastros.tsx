@@ -11,9 +11,10 @@ import { ContabilGate } from "@/components/contabil/ui";
 import { useSetores, useInvalidateContabil } from "@/os/contabil/hooks";
 import { cdb, type Categoria, type Setor } from "@/os/contabil/db";
 import { cn } from "@/lib/utils";
+import { contabilHead } from "@/os/contabil/head";
 
 export const Route = createFileRoute("/_authenticated/contabil/cadastros")({
-  head: () => ({ meta: [{ title: "Setores e tipos · Contábil — render.os" }] }),
+  head: () => contabilHead("Setores e tipos", "Setores e tipos de atividade da Union Contadores."),
   component: () => <ContabilGate adminOnly><Cadastros /></ContabilGate>,
 });
 

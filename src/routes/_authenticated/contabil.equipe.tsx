@@ -13,9 +13,10 @@ import { ContabilGate, FieldLabel } from "@/components/contabil/ui";
 import { useContabilMe, useMembros, useSetores, useInvalidateContabil } from "@/os/contabil/hooks";
 import { cdb, PAPEL_LABEL, type Membro, type Papel } from "@/os/contabil/db";
 import { cn } from "@/lib/utils";
+import { contabilHead } from "@/os/contabil/head";
 
 export const Route = createFileRoute("/_authenticated/contabil/equipe")({
-  head: () => ({ meta: [{ title: "Equipe · Contábil — render.os" }] }),
+  head: () => contabilHead("Equipe", "Equipe, setores e acessos da contabilidade da Union no render.os."),
   component: () => <ContabilGate adminOnly><Equipe /></ContabilGate>,
 });
 

@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   House, Wallet, ShoppingBag, Ship, Calculator, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
-  ListChecks, UsersRound, Tags, FileSpreadsheet,
+  ListChecks, UsersRound, Tags, FileSpreadsheet, Database,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
 
@@ -93,6 +93,7 @@ export const MODULES: OsModule[] = [
       { to: "/contabil/clientes", label: "Empresas clientes", icon: Building2 },
       { to: "/contabil/equipe", label: "Equipe", icon: UsersRound, adminOnly: true },
       { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, adminOnly: true },
+      { to: "/contabil/bases", label: "Bases da Union", icon: Database, adminOnly: true },
       { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, adminOnly: true },
     ],
   },

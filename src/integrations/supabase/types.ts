@@ -551,6 +551,33 @@ export type Database = {
           },
         ]
       }
+      contabil_bases_union: {
+        Row: {
+          base: string
+          busca: string | null
+          dados: Json
+          destino_id: string | null
+          importado_em: string
+          registro_id: string
+        }
+        Insert: {
+          base: string
+          busca?: string | null
+          dados: Json
+          destino_id?: string | null
+          importado_em?: string
+          registro_id: string
+        }
+        Update: {
+          base?: string
+          busca?: string | null
+          dados?: Json
+          destino_id?: string | null
+          importado_em?: string
+          registro_id?: string
+        }
+        Relationships: []
+      }
       contabil_categorias: {
         Row: {
           ativo: boolean
@@ -666,6 +693,27 @@ export type Database = {
           regime?: string | null
           segmento?: string | null
           uf?: string | null
+        }
+        Relationships: []
+      }
+      contabil_identidades_union: {
+        Row: {
+          auth_user_id: string
+          criado_em: string
+          email: string
+          original_id: string
+        }
+        Insert: {
+          auth_user_id: string
+          criado_em?: string
+          email: string
+          original_id: string
+        }
+        Update: {
+          auth_user_id?: string
+          criado_em?: string
+          email?: string
+          original_id?: string
         }
         Relationships: []
       }
@@ -1121,6 +1169,13 @@ export type Database = {
       contabil_papel_de: {
         Args: { _uid: string }
         Returns: Database["public"]["Enums"]["contabil_papel"]
+      }
+      contabil_resumo_bases_union: {
+        Args: never
+        Returns: {
+          base: string
+          quantidade: number
+        }[]
       }
       contabil_setor_de: { Args: { _uid: string }; Returns: string }
       contabil_usuarios_disponiveis: {
