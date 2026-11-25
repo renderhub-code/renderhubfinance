@@ -12,6 +12,7 @@
 - Keep stock totals (closing cash balances) separate from flow totals in the cashflow totals helper: summing monthly balances misstates the end-of-period cash position.
 - Cashflow uses completed company/year snapshots of Bling cash movements plus open-balance forecasts; invoice realized amounts never substitute actual cash dates or duplicate settlements.
 - Sync cash and forecast pages in resumable phases, publishing a snapshot only after all phases finish, so partial API failures preserve the last complete cashflow.
+- Derive install icons and favicon from the existing `RenderMark` artwork; store install images as asset pointers and keep the favicon local so browser and installed app identities stay aligned.
 
 ## render.os
 

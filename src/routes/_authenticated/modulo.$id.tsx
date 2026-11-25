@@ -8,7 +8,19 @@ export const Route = createFileRoute("/_authenticated/modulo/$id")({
     if (!mod) throw notFound();
     return { id: mod.id };
   },
-  head: ({ loaderData }) => ({ meta: [{ title: `${getModule(loaderData?.id ?? "")?.label ?? "Módulo"} — render.os` }] }),
+  head: ({ loaderData }) => {
+    const mod = getModule(loaderData?.id ?? "");
+    const title = `${mod?.label ?? "Módulo"} — render.os`;
+    const description = mod?.description ?? "Módulos do Grupo Render Hub no render.os.";
+    return { meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ] };
+  },
   component: ModuloEmBreve,
 });
 

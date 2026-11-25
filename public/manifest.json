@@ -3,14 +3,16 @@
   "name": "RenderHub Financeiro",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/__l5e/assets-v1/2461d505-c2e2-4cc1-abc6-ec89bd714905/render-r-icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/__l5e/assets-v1/60157b5e-fb43-4f35-8896-e5a7268ae6e9/render-r-icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "start_url": "/",

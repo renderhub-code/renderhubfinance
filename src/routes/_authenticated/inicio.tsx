@@ -12,7 +12,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { spotlight } from "@/hooks/use-reveal";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
-  head: () => ({ meta: [{ title: "Início — render.os" }] }),
+  head: () => ({ meta: [
+    { title: "Início — render.os" },
+    { name: "description", content: "Empresas e módulos do Grupo Render Hub no render.os." },
+    { property: "og:title", content: "Início — render.os" },
+    { property: "og:description", content: "Empresas e módulos do Grupo Render Hub no render.os." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: InicioPage,
 });
 

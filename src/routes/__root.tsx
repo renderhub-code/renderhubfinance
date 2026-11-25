@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { IntroSplash, INTRO_HEAD_SCRIPT } from "@/components/brand/IntroSplash";
+import appleTouchIcon from "@/assets/render-r-apple-touch.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -95,9 +96,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
-      { rel: "manifest", href: "/manifest.json" },
+      { rel: "icon", href: "/favicon.png?v=render-r", type: "image/png", sizes: "64x64" },
+      { rel: "apple-touch-icon", href: appleTouchIcon.url, sizes: "180x180" },
+      { rel: "manifest", href: "/manifest.json?v=render-r" },
     ],
   }),
   shellComponent: RootShell,
