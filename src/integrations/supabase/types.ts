@@ -478,6 +478,259 @@ export type Database = {
         }
         Relationships: []
       }
+      contabil_atividades: {
+        Row: {
+          atividade: string
+          atualizado_por: string | null
+          categoria_id: string | null
+          cliente_id: string | null
+          criado_em: string
+          criado_por: string | null
+          follow_up: string | null
+          id: string
+          prazo: string | null
+          prioridade: number
+          responsavel_id: string
+          setor_id: string
+          status: Database["public"]["Enums"]["contabil_status"]
+          ultima_atualizacao: string | null
+        }
+        Insert: {
+          atividade: string
+          atualizado_por?: string | null
+          categoria_id?: string | null
+          cliente_id?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          follow_up?: string | null
+          id?: string
+          prazo?: string | null
+          prioridade?: number
+          responsavel_id: string
+          setor_id: string
+          status?: Database["public"]["Enums"]["contabil_status"]
+          ultima_atualizacao?: string | null
+        }
+        Update: {
+          atividade?: string
+          atualizado_por?: string | null
+          categoria_id?: string | null
+          cliente_id?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          follow_up?: string | null
+          id?: string
+          prazo?: string | null
+          prioridade?: number
+          responsavel_id?: string
+          setor_id?: string
+          status?: Database["public"]["Enums"]["contabil_status"]
+          ultima_atualizacao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabil_atividades_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contabil_atividades_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contabil_atividades_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabil_categorias: {
+        Row: {
+          ativo: boolean
+          criado_em: string
+          criado_por: string | null
+          id: string
+          nome: string
+          ordem: number
+          setor_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          nome: string
+          ordem?: number
+          setor_id: string
+        }
+        Update: {
+          ativo?: boolean
+          criado_em?: string
+          criado_por?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+          setor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabil_categorias_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabil_ciencias: {
+        Row: {
+          atividade_id: string
+          ciente_em: string
+          user_id: string
+        }
+        Insert: {
+          atividade_id: string
+          ciente_em?: string
+          user_id: string
+        }
+        Update: {
+          atividade_id?: string
+          ciente_em?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabil_ciencias_atividade_id_fkey"
+            columns: ["atividade_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_atividades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabil_clientes: {
+        Row: {
+          apelido: string | null
+          ativo: boolean
+          atualizado_em: string
+          cidade: string | null
+          cnpj: string | null
+          cnpj_digits: string | null
+          codigo_dominio: string | null
+          criado_em: string
+          grupo_economico: string | null
+          id: string
+          nome_fantasia: string | null
+          razao_social: string
+          regime: string | null
+          segmento: string | null
+          uf: string | null
+        }
+        Insert: {
+          apelido?: string | null
+          ativo?: boolean
+          atualizado_em?: string
+          cidade?: string | null
+          cnpj?: string | null
+          cnpj_digits?: string | null
+          codigo_dominio?: string | null
+          criado_em?: string
+          grupo_economico?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          razao_social: string
+          regime?: string | null
+          segmento?: string | null
+          uf?: string | null
+        }
+        Update: {
+          apelido?: string | null
+          ativo?: boolean
+          atualizado_em?: string
+          cidade?: string | null
+          cnpj?: string | null
+          cnpj_digits?: string | null
+          codigo_dominio?: string | null
+          criado_em?: string
+          grupo_economico?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          razao_social?: string
+          regime?: string | null
+          segmento?: string | null
+          uf?: string | null
+        }
+        Relationships: []
+      }
+      contabil_membros: {
+        Row: {
+          ativo: boolean
+          atribuicao_global: boolean
+          criado_em: string
+          email: string | null
+          nome: string
+          papel: Database["public"]["Enums"]["contabil_papel"]
+          setor_id: string | null
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          atribuicao_global?: boolean
+          criado_em?: string
+          email?: string | null
+          nome?: string
+          papel?: Database["public"]["Enums"]["contabil_papel"]
+          setor_id?: string | null
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          atribuicao_global?: boolean
+          criado_em?: string
+          email?: string | null
+          nome?: string
+          papel?: Database["public"]["Enums"]["contabil_papel"]
+          setor_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabil_membros_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_setores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabil_setores: {
+        Row: {
+          criado_em: string
+          id: string
+          nome: string
+          ordem: number
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          nome: string
+          ordem?: number
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          nome?: string
+          ordem?: number
+        }
+        Relationships: []
+      }
       cost_centers: {
         Row: {
           active: boolean
@@ -861,6 +1114,23 @@ export type Database = {
     }
     Functions: {
       bootstrap_first_controller: { Args: never; Returns: boolean }
+      contabil_bootstrap_admin: { Args: never; Returns: boolean }
+      contabil_global: { Args: { _uid: string }; Returns: boolean }
+      contabil_is_admin: { Args: { _uid: string }; Returns: boolean }
+      contabil_is_membro: { Args: { _uid: string }; Returns: boolean }
+      contabil_papel_de: {
+        Args: { _uid: string }
+        Returns: Database["public"]["Enums"]["contabil_papel"]
+      }
+      contabil_setor_de: { Args: { _uid: string }; Returns: string }
+      contabil_usuarios_disponiveis: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+          nome: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -878,6 +1148,12 @@ export type Database = {
     Enums: {
       account_type: "entrada" | "saida"
       app_role: "controller" | "financial_manager" | "ceo_viewer"
+      contabil_papel: "admin" | "coordenador" | "analista"
+      contabil_status:
+        | "nao_iniciado"
+        | "em_andamento"
+        | "concluido"
+        | "atrasado"
       dre_section:
         | "receita_bruta"
         | "deducoes"
@@ -1019,6 +1295,13 @@ export const Constants = {
     Enums: {
       account_type: ["entrada", "saida"],
       app_role: ["controller", "financial_manager", "ceo_viewer"],
+      contabil_papel: ["admin", "coordenador", "analista"],
+      contabil_status: [
+        "nao_iniciado",
+        "em_andamento",
+        "concluido",
+        "atrasado",
+      ],
       dre_section: [
         "receita_bruta",
         "deducoes",
