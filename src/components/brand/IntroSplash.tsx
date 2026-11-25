@@ -2,9 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { RenderMark } from "@/components/brand/Logo";
 
 const KEY = "render-os-intro-seen";
+/** Marca de "acabou de entrar": faz a abertura tocar de novo depois do login (inclusive após o redirect do Google). */
+const LOGIN_KEY = "render-os-intro-login";
+const EVENTO = "render-os-intro-play";
+
+/** Toca a abertura de novo (chamar logo após o login). */
+export function tocarAbertura() {
+  try { sessionStorage.setItem(LOGIN_KEY, "1"); } catch { /* modo privado */ }
+  document.documentElement.removeAttribute("data-intro-seen");
+  window.dispatchEvent(new Event(EVENTO));
+}
+/** Antes de sair para um login externo (Google): a abertura toca quando voltar. */
+export function aberturaAoVoltar() {
+  try { sessionStorage.setItem(LOGIN_KEY, "1"); } catch { /* modo privado */ }
+}
 
 /**
- * Abertura do render.os. Toca uma vez por sessão do navegador:
+ * Abertura do render.os. Toca uma vez por sessão do navegador e de novo a cada login:
  *  1. o R com gradiente se desenha no centro e brilha;
  *  2. o R desliza para a esquerda e "ender.os" se revela ao lado → "render.os";
  *  3. linha em gradiente + "Grupo Render Hub", e a tela some.
@@ -17,24 +31,45 @@ export function IntroSplash() {
   const rowRef = useRef<HTMLDivElement>(null);
   const wordRef = useRef<HTMLSpanElement>(null);
 
+  // Cada "rodada" é uma execução da abertura (entrada no link ou login).
+  const [rodada, setRodada] = useState(0);
+
+  useEffect(() => {
+    const replay = () => {
+      document.documentElement.removeAttribute("data-intro-seen");
+      setPlay(false);
+      setState("show");
+      setRodada((r) => r + 1);
+    };
+    window.addEventListener(EVENTO, replay);
+    return () => window.removeEventListener(EVENTO, replay);
+  }, []);
+
   // Só começa depois da hidratação e com a fonte pronta: o deslocamento do R
   // depende da largura real de "ender.os".
   useEffect(() => {
-    if (document.documentElement.hasAttribute("data-intro-seen")) { setState("gone"); return; }
+    let login = false;
+    try { login = sessionStorage.getItem(LOGIN_KEY) === "1"; sessionStorage.removeItem(LOGIN_KEY); } catch { /* modo privado */ }
+    if (!login && rodada === 0 && document.documentElement.hasAttribute("data-intro-seen")) { setState("gone"); return; }
+    document.documentElement.removeAttribute("data-intro-seen");
     try { sessionStorage.setItem(KEY, "1"); } catch { /* modo privado */ }
     let cancelled = false;
     const fonts = (document as Document & { fonts?: FontFaceSet }).fonts?.ready ?? Promise.resolve();
     const timeout = new Promise((r) => window.setTimeout(r, 1200));
     Promise.race([fonts, timeout]).then(() => {
       if (cancelled) return;
-      const w = wordRef.current?.getBoundingClientRect().width ?? 0;
-      rowRef.current?.style.setProperty("--shift", `${w / 2}px`);
-      setPlay(true);
+      // Espera o overlay estar na tela para medir a palavra.
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        const w = wordRef.current?.getBoundingClientRect().width ?? 0;
+        rowRef.current?.style.setProperty("--shift", `${w / 2}px`);
+        setPlay(true);
+      });
     });
     const skip = () => setState((s) => (s === "show" ? "skip" : s));
     window.addEventListener("keydown", skip, { once: true });
     return () => { cancelled = true; window.removeEventListener("keydown", skip); };
-  }, []);
+  }, [rodada]);
 
   useEffect(() => {
     if (!play) return;
@@ -52,6 +87,7 @@ export function IntroSplash() {
 
   return (
     <div
+      key={rodada}
       className={`ros-intro fixed inset-0 z-[100] grid cursor-pointer place-items-center overflow-hidden bg-[#06070a] ${state === "skip" ? "is-skipping" : ""}`}
       data-play={play ? "" : undefined}
       onClick={() => setState("skip")}
@@ -86,5 +122,5 @@ export function IntroSplash() {
   );
 }
 
-/** Script que roda antes da pintura: pula a abertura se já foi vista nesta sessão. */
-export const INTRO_HEAD_SCRIPT = `try{if(sessionStorage.getItem("${KEY}"))document.documentElement.setAttribute("data-intro-seen","")}catch(e){}`;
+/** Script que roda antes da pintura: pula a abertura se já foi vista nesta sessão (a menos que a pessoa acabou de entrar). */
+export const INTRO_HEAD_SCRIPT = `try{if(sessionStorage.getItem("${KEY}")&&!sessionStorage.getItem("${LOGIN_KEY}"))document.documentElement.setAttribute("data-intro-seen","")}catch(e){}`;

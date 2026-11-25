@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { AtivarContaUnion } from "@/components/contabil/AtivarContaUnion";
+import { aberturaAoVoltar, tocarAbertura } from "@/components/brand/IntroSplash";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -46,6 +47,7 @@ function AuthPage() {
   async function afterAuth() {
     // Bootstrap first controller if there isn't one yet
     try { await supabase.rpc("bootstrap_first_controller"); } catch {}
+    tocarAbertura();
     navigate({ to: "/inicio", replace: true });
   }
 
@@ -82,6 +84,7 @@ function AuthPage() {
 
   async function handleGoogle() {
     setLoading(true);
+    aberturaAoVoltar();
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (result.error) { toast.error(String(result.error)); setLoading(false); return; }
     if (result.redirected) return;
