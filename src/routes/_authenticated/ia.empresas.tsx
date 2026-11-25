@@ -23,7 +23,7 @@ function PorEmpresa() {
           return (
             <section key={c.id} className="rounded-xl border bg-background p-5">
               <header className="mb-4 flex items-center gap-3">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-xs font-semibold text-white" style={{ background: c.color }}>{c.initials}</span>
+                {c.mark ? <img src={c.mark} alt="" className="h-10 w-10 shrink-0 rounded-lg" /> : <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-xs font-semibold text-white" style={{ background: c.color }}>{c.initials}</span>}
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold">{c.name}</div>
                   <div className="text-xs text-muted-foreground">{sols.length} entrega(s) · {prod} em produção</div>

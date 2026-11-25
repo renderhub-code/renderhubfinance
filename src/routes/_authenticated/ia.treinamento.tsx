@@ -18,7 +18,7 @@ const CELL = ["bg-muted text-muted-foreground", "bg-blue-100 text-blue-700", "bg
 const LABEL = ["Não iniciado", "Em andamento", "Concluído"];
 
 function Treinamento() {
-  const { canEdit } = useIaMe();
+  const { canEdit } = useIaMe(true, "ia.treinamento");
   const invalidate = useInvalidateIa();
   const { data: solucoes = [] } = useSolucoes();
   const { data: pessoas = [] } = usePessoas();

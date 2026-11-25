@@ -106,9 +106,12 @@ export function DashboardNortrip() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard · Nortrip</h1>
-          <p className="text-sm text-muted-foreground">Caixa de {MESES[m]} de {year}, realizado x previsto, a partir do extrato do Bling.</p>
+        <div className="flex items-center gap-3.5">
+          <img src="/brand/nortrip-logo.png" alt="Nortrip" className="h-14 w-14 shrink-0 rounded-xl" />
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Dashboard · Nortrip</h1>
+            <p className="text-sm text-muted-foreground">Caixa de {MESES[m]} de {year}, realizado x previsto, a partir do extrato do Bling.</p>
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <SyncBadge hasSnapshot={!!snapshot?.hasSnapshot} syncedAt={snapshot?.syncedAt ?? null} />

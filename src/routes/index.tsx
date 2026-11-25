@@ -131,7 +131,7 @@ function Landing() {
           <div className="flex w-max gap-4" style={{ animation: "ros-marquee 38s linear infinite" }}>
             {marquee.map((c, i) => (
               <div key={`${c.id}-${i}`} className="flex w-[300px] shrink-0 items-start gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xs font-semibold" style={{ backgroundColor: c.color }}>{c.initials}</span>
+                {c.mark ? <img src={c.mark} alt="" className="h-10 w-10 shrink-0 rounded-xl" /> : <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-xs font-semibold" style={{ backgroundColor: c.color }}>{c.initials}</span>}
                 <div className="min-w-0">
                   <div className="font-medium">{c.name}</div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#4cc3ff]/80">{c.sector}</div>

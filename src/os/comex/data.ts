@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useOs } from "@/os/acessos";
 
 /** Cliente sem tipagem gerada para as tabelas cs_* (follow-up da Render Comex). */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,22 +68,21 @@ export interface Atualizacao {
   autor: string | null; criado_em: string;
 }
 
-/** Perfil do usuário no follow-up (equipe/admin). Primeiro controller vira admin. */
-export function useComexMe(enabled = true) {
-  const { user, loading } = useAuth();
-  const q = useQuery({
-    queryKey: ["comex", "me", user?.id],
-    enabled: enabled && !!user?.id,
-    queryFn: async () => {
-      try { await xdb.rpc("cs_bootstrap_admin"); } catch { /* tabelas ainda não criadas */ }
-      const { data, error } = await xdb.from("cs_equipe").select("*").eq("user_id", user!.id).maybeSingle();
-      if (error) return { membro: null as Membro | null, erro: error.message };
-      return { membro: data as Membro | null, erro: null as string | null };
-    },
-    staleTime: 60_000,
-  });
-  const membro = q.data?.membro ?? null;
-  return { user, loading: loading || q.isLoading, membro, erro: q.data?.erro ?? null, isAdmin: membro?.papel === "admin" };
+/** Acesso ao follow-up a partir de Pessoas › Acessos (empresa Render Comex). */
+export function useComexMe(_enabled = true) {
+  const { user } = useAuth();
+  const os = useOs();
+  const followup = os.nivel("render", "cx.followup");
+  const clientes = os.nivel("render", "cx.clientes");
+  return {
+    user,
+    loading: os.loading,
+    membro: followup || clientes ? ({ user_id: user?.id ?? "" } as Pick<Membro, "user_id">) : null,
+    erro: null as string | null,
+    isAdmin: os.admin,
+    editaPOs: followup === 2,
+    editaClientes: clientes === 2,
+  };
 }
 
 export function useClientes() {

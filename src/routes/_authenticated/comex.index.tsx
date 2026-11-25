@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/os/page";
 import { Card, ComexGate, ProcessoCard, ProcessoDialog } from "@/components/comex/ui";
-import { GRUPOS, grupoDaEtapa, useAtualizacoes, useClientes, useComexAoVivo, useProcessos, type Grupo, type Processo } from "@/os/comex/data";
+import { GRUPOS, grupoDaEtapa, useAtualizacoes, useClientes, useComexAoVivo, useComexMe, useProcessos, type Grupo, type Processo } from "@/os/comex/data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/comex/")({
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/comex/")({
 
 function Painel() {
   useComexAoVivo();
+  const { editaPOs } = useComexMe();
   const { data: clientes = [] } = useClientes();
   const { data: processos = [], isLoading } = useProcessos();
   const { data: feed = [] } = useAtualizacoes(null, 15);
@@ -43,7 +44,7 @@ function Painel() {
         description="Atualize as POs aqui: o cliente vê na hora, pelo portal."
         actions={<>
           <Button variant="outline" size="sm" asChild><a href="/portal" target="_blank" rel="noreferrer"><ExternalLink className="mr-1.5 h-4 w-4" />Portal do cliente</a></Button>
-          <Button size="sm" onClick={() => setEditando({ cliente_id: cliente !== "todos" ? cliente : undefined, etapa: "pedido" })} disabled={!clientes.length}><Plus className="mr-1.5 h-4 w-4" />Nova PO</Button>
+          {editaPOs && <Button size="sm" onClick={() => setEditando({ cliente_id: cliente !== "todos" ? cliente : undefined, etapa: "pedido" })} disabled={!clientes.length}><Plus className="mr-1.5 h-4 w-4" />Nova PO</Button>}
         </>}
       />
 
@@ -74,7 +75,7 @@ function Painel() {
             <span className="text-xs text-muted-foreground">{grupo === "ativos" ? "Em andamento" : GRUPOS.find((g) => g.key === grupo)?.label} · {lista.length}</span>
           </div>
           {isLoading ? null : lista.length ? (
-            lista.map((p) => <ProcessoCard key={p.id} p={p} clienteNome={cliente === "todos" ? nome.get(p.cliente_id) : undefined} onEdit={() => setEditando(p)} />)
+            lista.map((p) => <ProcessoCard key={p.id} p={p} clienteNome={cliente === "todos" ? nome.get(p.cliente_id) : undefined} onEdit={editaPOs ? () => setEditando(p) : undefined} />)
           ) : (
             <div className="rounded-xl border border-dashed bg-background py-12 text-center text-sm text-muted-foreground">
               {clientes.length ? "Nenhuma PO neste filtro." : "Cadastre um cliente em Operacional › Clientes para começar."}
@@ -89,7 +90,7 @@ function Painel() {
                 {pendencias.map((p) => (
                   <li key={p.id} className="flex gap-2 text-sm">
                     <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                    <button type="button" className="text-left" onClick={() => setEditando(p)}>
+                    <button type="button" className="text-left" disabled={!editaPOs} onClick={() => setEditando(p)}>
                       <span className="font-mono text-xs text-brand-blue">PO #{p.po}</span>
                       <span className="text-xs text-muted-foreground"> · {nome.get(p.cliente_id)}</span>
                       <span className="block">{p.pendencia}</span>

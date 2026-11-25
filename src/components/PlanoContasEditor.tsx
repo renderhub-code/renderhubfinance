@@ -1,3 +1,4 @@
+import { useFinEdit } from "@/os/acessos";
 import { Fragment, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -54,7 +55,6 @@ import {
   useAccountGroups,
   useAccountSubgroups,
   useAccounts,
-  useUserRoles,
 } from "@/lib/queries";
 
 const DRE_SECTIONS = [
@@ -121,16 +121,12 @@ export function PlanoContasEditor({ companyId }: { companyId: string | null }) {
   const { data: groups, isLoading: lg } = useAccountGroups(companyId);
   const { data: subgroups, isLoading: ls } = useAccountSubgroups(companyId);
   const { data: accounts, isLoading: la } = useAccounts(companyId);
-  const { data: roles } = useUserRoles();
 
   const [groupForm, setGroupForm] = useState<GroupForm | null>(null);
   const [subgroupForm, setSubgroupForm] = useState<SubgroupForm | null>(null);
   const [accountForm, setAccountForm] = useState<AccountForm | null>(null);
 
-  const canEdit = useMemo(() => {
-    const list = roles?.map((r) => r.role) ?? [];
-    return list.includes("controller") || list.includes("financial_manager");
-  }, [roles]);
+  const canEdit = useFinEdit("fin.plano");
 
   const rawGroups = groups ?? [];
   const rawSubgroups = subgroups ?? [];

@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { GROUP_COMPANIES } from "@/os/companies";
+import { useOs } from "@/os/acessos";
 
 /** Cliente sem tipagem gerada para as tabelas ia_* (ainda fora de types.ts). */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -101,29 +102,25 @@ export const nf = (n: number, d = 0) => new Intl.NumberFormat("pt-BR", { maximum
 // ---------- Hooks ----------
 
 /** Meu acesso ao módulo de IA. Faz o bootstrap do primeiro administrador. */
-export function useIaMe(enabled = true) {
-  const { user, loading } = useAuth();
-  const q = useQuery({
-    queryKey: ["ia", "me", user?.id],
-    enabled: enabled && !!user?.id,
-    queryFn: async () => {
-      try { await idb.rpc("ia_bootstrap_admin"); } catch { /* tabelas ainda não criadas */ }
-      const { data, error } = await idb.from("ia_acesso").select("*").eq("user_id", user!.id).maybeSingle();
-      if (error) return { acesso: null as Acesso | null, erro: error.message };
-      return { acesso: data as Acesso | null, erro: null as string | null };
-    },
-    staleTime: 60_000,
-  });
-  const acesso = q.data?.acesso ?? null;
+/**
+ * Acesso da pessoa logada ao módulo de IA, a partir de Pessoas › Acessos (escopo "grupo").
+ * `recurso` define o que conta como "editar" na tela atual (ex.: "ia.entregas").
+ */
+export function useIaMe(_enabled = true, recurso?: string) {
+  const { user } = useAuth();
+  const os = useOs();
+  const ver = IA_RECURSOS.some((r) => os.nivel("grupo", r) >= 1);
+  const canEdit = recurso ? os.nivel("grupo", recurso) === 2 : IA_RECURSOS.some((r) => os.nivel("grupo", r) === 2);
   return {
     user,
-    loading: loading || q.isLoading,
-    acesso,
-    erro: q.data?.erro ?? null,
-    canEdit: acesso?.papel === "admin" || acesso?.papel === "colaborador",
-    isAdmin: acesso?.papel === "admin",
+    loading: os.loading,
+    acesso: ver ? { papel: (canEdit ? "colaborador" : "leitor") as Papel } : null,
+    erro: null as string | null,
+    canEdit,
+    isAdmin: os.admin,
   };
 }
+const IA_RECURSOS = ["ia.visao", "ia.entregas", "ia.empresas", "ia.treinamento"];
 
 function lista<T>(key: string, table: string, order: [string, boolean][], map?: (r: T) => T) {
   return {

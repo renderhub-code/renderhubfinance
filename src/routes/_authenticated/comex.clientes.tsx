@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/comex/clientes")({
 });
 
 function Clientes() {
-  const { isAdmin } = useComexMe();
+  const { editaClientes } = useComexMe();
   const invalidate = useInvalidateComex();
   const { data: clientes = [] } = useClientes();
   const { data: processos = [] } = useProcessos();
@@ -34,7 +34,7 @@ function Clientes() {
         eyebrow="Render Comex · Operacional"
         title="Clientes do follow-up"
         description="Quem acompanha as importações pelo portal e com quais e-mails."
-        actions={<Button size="sm" onClick={() => setEditando({ empresa: "render" })}><Plus className="mr-1.5 h-4 w-4" />Novo cliente</Button>}
+        actions={editaClientes && <Button size="sm" onClick={() => setEditando({ empresa: "render" })}><Plus className="mr-1.5 h-4 w-4" />Novo cliente</Button>}
       />
       <div className="overflow-hidden rounded-xl border bg-background">
         <table className="w-full text-sm">
@@ -66,8 +66,8 @@ function Clientes() {
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">{ativos.length}{porto ? <span className="block text-xs text-muted-foreground">{porto} no porto</span> : null}</td>
                   <td className="px-4 py-3 text-right">
-                    <button type="button" className="p-1 text-muted-foreground hover:text-foreground" aria-label="Editar" onClick={() => setEditando(c)}><Pencil className="h-4 w-4" /></button>
-                    {isAdmin && <button type="button" className="p-1 text-muted-foreground hover:text-destructive" aria-label="Excluir" onClick={() => void excluir(c)}><Trash2 className="h-4 w-4" /></button>}
+                    {editaClientes && <button type="button" className="p-1 text-muted-foreground hover:text-foreground" aria-label="Editar" onClick={() => setEditando(c)}><Pencil className="h-4 w-4" /></button>}
+                    {editaClientes && <button type="button" className="p-1 text-muted-foreground hover:text-destructive" aria-label="Excluir" onClick={() => void excluir(c)}><Trash2 className="h-4 w-4" /></button>}
                   </td>
                 </tr>
               );

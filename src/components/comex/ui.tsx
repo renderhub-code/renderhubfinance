@@ -25,7 +25,7 @@ export function ComexGate({ children, adminOnly }: { children: ReactNode; adminO
       </Notice>
     );
   }
-  if (!membro) return <Notice icon={Lock} title="Você ainda não faz parte da equipe do follow-up">Peça a um administrador para liberar você em <b>Operacional › Equipe</b>.</Notice>;
+  if (!membro) return <Notice icon={Lock} title="Você ainda não tem acesso ao follow-up">Peça a um administrador do render.os para liberar em <b>Pessoas › Acessos</b> (empresa Render Comex).</Notice>;
   if (adminOnly && !isAdmin) return <Notice icon={Lock} title="Área de administradores">Somente administradores do follow-up acessam esta tela.</Notice>;
   return <>{children}</>;
 }

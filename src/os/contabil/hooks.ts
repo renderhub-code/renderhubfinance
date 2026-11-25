@@ -1,11 +1,16 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useOs } from "@/os/acessos";
 import { useAuth } from "@/hooks/use-auth";
 import { cdb, type Atividade, type Categoria, type Cliente, type Membro, type Setor } from "./db";
 
 /** Quem sou eu no Contábil. Faz o bootstrap do primeiro administrador. */
+/** Abas administrativas: quem edita qualquer uma delas é administrador do Contábil. */
+const CON_ADMIN = ["con.equipe", "con.cadastros", "con.bases", "con.importar"];
+
 export function useContabilMe(enabled = true) {
   const { user, loading } = useAuth();
+  const os = useOs();
   const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["contabil", "me", user?.id],
@@ -28,7 +33,8 @@ export function useContabilMe(enabled = true) {
     loading: loading || q.isLoading,
     membro,
     erro: q.data?.erro ?? null,
-    isAdmin: membro?.papel === "admin",
+    // Administrador do Contábil: papel admin na equipe ou "Editar" em Equipe (Pessoas › Acessos).
+    isAdmin: !!membro && (membro.papel === "admin" || CON_ADMIN.some((r) => os.nivel("union", r) === 2)),
     isCoordenador: membro?.papel === "coordenador",
   };
 }

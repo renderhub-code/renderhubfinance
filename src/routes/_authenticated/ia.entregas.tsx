@@ -27,7 +27,7 @@ const BLANK: Draft = { titulo: "", tipo: "Automação", status: "Ideia", ganho: 
 type SortK = "titulo" | "ganho" | "custo" | "horas" | "roi" | "atualizado_em";
 
 function Entregas() {
-  const { canEdit } = useIaMe();
+  const { canEdit } = useIaMe(true, "ia.entregas");
   const { data: solucoes = [], isLoading } = useSolucoes();
   const { data: atualizacoes = [] } = useAtualizacoes();
   const [q, setQ] = useState("");

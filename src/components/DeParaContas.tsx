@@ -1,3 +1,4 @@
+import { useFinEdit } from "@/os/acessos";
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
@@ -26,7 +27,6 @@ import { ImportarPlanoContas } from "@/components/ImportarPlanoContas";
 import {
   useAccountMappings,
   useAccounts,
-  useUserRoles,
   type AccountMapping,
 } from "@/lib/queries";
 
@@ -48,16 +48,12 @@ export function DeParaContas({ companyId }: DeParaContasProps) {
   const queryClient = useQueryClient();
   const { data: accounts, isLoading: loadingAccounts } = useAccounts(companyId);
   const { data: mappings, isLoading: loadingMappings } = useAccountMappings(companyId);
-  const { data: roles } = useUserRoles();
 
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftRow>(EMPTY_DRAFT);
 
-  const canEdit = useMemo(() => {
-    const list = roles?.map((r) => r.role) ?? [];
-    return list.includes("controller") || list.includes("financial_manager");
-  }, [roles]);
+  const canEdit = useFinEdit("fin.plano");
 
   const activeAccounts = useMemo(
     () => (accounts ?? []).filter((a) => a.active),

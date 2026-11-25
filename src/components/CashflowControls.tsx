@@ -8,14 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DeParaContas } from "./DeParaContas";
 import { useCompanyStore } from "@/lib/company-store";
-import { useUserRoles } from "@/lib/queries";
+import { useFinEdit } from "@/os/acessos";
 import { supabase } from "@/integrations/supabase/client";
 import { beginBlingCashSync, syncBlingCashPage } from "@/lib/bling.functions";
 
 export function CashflowControls({ year, opening }: { year: number; opening: number | null }) {
   const companyId = useCompanyStore(s => s.activeCompanyId);
-  const { data: roles } = useUserRoles();
-  const canEdit = roles?.some(r => ["controller", "financial_manager"].includes(r.role));
+  const canEdit = useFinEdit("fin.fluxo");
   const queryClient = useQueryClient();
   const begin = useServerFn(beginBlingCashSync);
   const pageFn = useServerFn(syncBlingCashPage);

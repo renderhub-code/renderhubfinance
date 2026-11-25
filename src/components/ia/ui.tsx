@@ -20,9 +20,11 @@ export function EmpresaChips({ ids, max = 6 }: { ids: string[]; max?: number }) 
   return (
     <div className="flex -space-x-1">
       {cs.slice(0, max).map((c) => (
-        <span key={c!.id} title={c!.name} className="grid h-6 w-6 place-items-center rounded-full text-[9px] font-semibold text-white ring-2 ring-background" style={{ background: c!.color }}>
-          {c!.initials}
-        </span>
+        c!.mark ? <img key={c!.id} title={c!.name} src={c!.mark} alt={c!.name} className="h-6 w-6 rounded-full ring-2 ring-background" /> : (
+          <span key={c!.id} title={c!.name} className="grid h-6 w-6 place-items-center rounded-full text-[9px] font-semibold text-white ring-2 ring-background" style={{ background: c!.color }}>
+            {c!.initials}
+          </span>
+        )
       ))}
     </div>
   );
@@ -45,7 +47,7 @@ export function IaGate({ children, adminOnly }: { children: ReactNode; adminOnly
     );
   }
   if (!acesso) {
-    return <Notice icon={Lock} title="Você ainda não tem acesso ao módulo de IA">Peça a um administrador para liberar você em <b>IA › Acesso</b>.</Notice>;
+    return <Notice icon={Lock} title="Você ainda não tem acesso ao módulo de IA">Peça a um administrador do render.os para liberar em <b>Pessoas › Acessos</b> (área “Grupo”).</Notice>;
   }
   if (adminOnly && !isAdmin) return <Notice icon={Lock} title="Área de administradores">Somente administradores do módulo de IA acessam esta tela.</Notice>;
   return (

@@ -22,6 +22,10 @@ export interface GroupCompany {
   initials: string;
   /** Financeiro integrado ao Bling (telas próprias). */
   bling?: boolean;
+  /** Símbolo quadrado da marca (avatar no seletor de empresa). */
+  mark?: string;
+  /** Logo completo (cabeçalhos). */
+  logo?: string;
 }
 
 export const GROUP_COMPANIES: GroupCompany[] = [
@@ -58,9 +62,11 @@ export const GROUP_COMPANIES: GroupCompany[] = [
     slug: "use-noronha",
     sector: "Turismo",
     description: "Turismo e viagens corporativas.",
-    color: "#0EA5E9",
+    color: "#1C2340",
     initials: "NT",
     bling: true,
+    mark: "/brand/nortrip-mark.png",
+    logo: "/brand/nortrip-logo.png",
   },
   {
     id: "erks",

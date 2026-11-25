@@ -8,7 +8,8 @@ import { useCompanyStore } from "@/lib/company-store";
 import { useFinancialStore } from "@/lib/financial-store";
 import { getHub, useHubStore } from "@/lib/hub-store";
 import { GROUP_COMPANIES, GROUP_WORKSPACE, getCompany, type WorkspaceId } from "@/os/companies";
-import { MODULES, SETTINGS_MODULE, moduleForPath, visibleItems, type OsModule } from "@/os/modules";
+import { MODULES, SETTINGS_MODULE, moduleForPath, moduleHasAccess, visibleItems, type OsModule } from "@/os/modules";
+import { useOs } from "@/os/acessos";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -17,9 +18,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils";
 import { RenderMark } from "@/components/brand/Logo";
 import { NovaAtividadeAlerta } from "@/components/contabil/NovaAtividadeAlerta";
-import { useContabilMe } from "@/os/contabil/hooks";
-import { useIaMe } from "@/os/ia/data";
-import { useComexMe } from "@/os/comex/data";
 
 const ROLE_LABEL: Record<string, string> = {
   controller: "Controller",
@@ -48,17 +46,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const workspace = getHub(activeHubId).id as WorkspaceId;
   const isGroup = workspace === "grupo";
   const currentModule = moduleForPath(pathname);
-  const isComex = pathname === "/comex" || pathname.startsWith("/comex/");
-  const contabil = useContabilMe(currentModule.id === "operacional" && !isComex);
-  const comex = useComexMe(isComex);
-  const ia = useIaMe(currentModule.id === "ia");
-  // Enquanto o perfil do módulo carrega, não esconde nada (evita redirecionar o admin).
-  const moduleAdmin =
-    isComex ? comex.loading || comex.isAdmin
-    : currentModule.id === "operacional" ? contabil.loading || contabil.isAdmin
-    : currentModule.id === "ia" ? ia.loading || ia.isAdmin
-    : true;
-  const navItems = visibleItems(currentModule, workspace, moduleAdmin);
+  // Permissões por empresa × aba. Enquanto carregam, nada é escondido.
+  const os = useOs();
+  const navItems = visibleItems(currentModule, workspace, os.nivelNo, os.loading || os.admin);
+  /** O módulo tem telas nesta empresa, mas a pessoa não tem acesso a nenhuma. */
+  const semAcessoAqui = navItems.length === 0 && visibleItems(currentModule, workspace, () => 2, true).length > 0;
+  const railModules = MODULES.filter((m) => moduleHasAccess(m, os.nivelNo, os.loading || os.admin));
   /** Item ativo = o de rota mais longa que casa com a URL (ex.: /contabil vs /contabil/atividades). */
   const activeTo = navItems
     .filter((i) => pathname === i.to || pathname.startsWith(i.to + "/"))
@@ -96,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   const displayName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email?.split("@")[0] ?? "Usuário";
-  const role = ROLE_LABEL[roles?.[0]?.role ?? ""] ?? "";
+  const role = os.admin && !os.loading ? "Administrador do render.os" : ROLE_LABEL[roles?.[0]?.role ?? ""] ?? "";
 
   return (
     <TooltipProvider delayDuration={150}>
@@ -107,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <RenderMark className="h-8 w-8 transition-transform duration-300 group-hover:scale-110" />
           </Link>
           <nav className="flex flex-col items-center gap-1.5">
-            {MODULES.map((m) => (
+            {railModules.map((m) => (
               <RailButton key={m.id} module={m} active={m.id === currentModule.id} />
             ))}
           </nav>
@@ -203,7 +196,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="min-h-0 flex-1 overflow-auto px-5 py-6 md:px-10 md:py-8">
               <div key={pathname} className="ros-page-enter">
                 {currentModule.status === "live" && navItems.length === 0
-                  ? <EmConstrucao module={currentModule} workspace={workspace} />
+                  ? <EmConstrucao module={currentModule} workspace={workspace} semAcesso={semAcessoAqui} />
                   : children}
               </div>
             </div>
@@ -216,9 +209,22 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 /** Módulo que existe no grupo, mas ainda não tem telas para a empresa escolhida. */
-function EmConstrucao({ module: m, workspace }: { module: OsModule; workspace: WorkspaceId }) {
+function EmConstrucao({ module: m, workspace, semAcesso }: { module: OsModule; workspace: WorkspaceId; semAcesso?: boolean }) {
   const nome = workspace === "grupo" ? GROUP_WORKSPACE.name : getCompany(workspace)?.name ?? "esta empresa";
   const Icon = m.icon;
+  if (semAcesso) {
+    return (
+      <div className="grid min-h-[55vh] place-items-center">
+        <div className="max-w-md text-center">
+          <span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl border bg-muted/40">
+            <Icon className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
+          </span>
+          <h2 className="text-base font-semibold">Sem acesso ao {m.label} da {nome}</h2>
+          <p className="mt-1.5 text-sm text-muted-foreground">Peça a um administrador do render.os para liberar em <b>Pessoas › Acessos</b>, ou troque de empresa no seletor ao lado.</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="grid min-h-[55vh] place-items-center">
       <div className="max-w-md text-center">
@@ -227,11 +233,19 @@ function EmConstrucao({ module: m, workspace }: { module: OsModule; workspace: W
         </span>
         <h2 className="text-base font-semibold">{m.label} da {nome} em construção</h2>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Por enquanto, o {m.label} está pronto para a Union Contadores. Troque de empresa no seletor ao lado para ver.
+          Por enquanto, o {m.label} está pronto para {prontas(m)}. Troque de empresa no seletor ao lado para ver.
         </p>
       </div>
     </div>
   );
+}
+
+/** Empresas em que o módulo já tem telas, por extenso. */
+function prontas(m: OsModule): string {
+  const ids = new Set(m.items.flatMap((i) => i.only ?? []).filter((w) => w !== "grupo"));
+  const nomes = [...ids].map((id) => getCompany(id)?.name).filter(Boolean) as string[];
+  if (!nomes.length) return "o grupo";
+  return nomes.length === 1 ? `a ${nomes[0]}` : `${nomes.slice(0, -1).map((n) => `a ${n}`).join(", ")} e a ${nomes.at(-1)}`;
 }
 
 function RailButton({ module: m, active }: { module: OsModule; active: boolean }) {
@@ -341,6 +355,9 @@ export function WorkspaceAvatar({ id, small }: { id: WorkspaceId; small?: boolea
         <RenderMark className="h-[78%] w-[78%]" />
       </span>
     );
+  }
+  if (company.mark) {
+    return <img src={company.mark} alt="" className={cn("shrink-0 rounded-md object-cover", size)} />;
   }
   return (
     <span

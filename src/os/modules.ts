@@ -2,9 +2,10 @@ import type { LucideIcon } from "lucide-react";
 import {
   House, Wallet, ShoppingBag, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
-  Workflow, ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, KeyRound, Ship, ShieldCheck,
+  Workflow, ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, Ship, ShieldCheck,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
+import type { Escopo } from "./acessos";
 
 /**
  * render.os — registro de módulos.
@@ -20,8 +21,12 @@ export interface ModuleItem {
   only?: WorkspaceId[];
   /** Esconde o item no workspace consolidado do grupo. */
   hideInGroup?: boolean;
-  /** Só aparece para administradores do módulo (hoje: Contábil). */
+  /** Só aparece para administradores do render.os. */
   adminOnly?: boolean;
+  /** Chave da aba em Pessoas › Acessos (ver src/os/acessos.ts). */
+  perm?: string;
+  /** Empresa fixa da permissão (ex.: Contábil = union). Sem isso, vale a empresa selecionada. */
+  escopo?: Escopo;
 }
 
 export interface OsModule {
@@ -58,13 +63,13 @@ export const MODULES: OsModule[] = [
     status: "live",
     home: "/dashboard",
     items: [
-      { to: "/dashboard", label: "Dashboard", icon: LineChart },
-      { to: "/lancamentos", label: "Lançamentos", icon: ArrowLeftRight, hideInGroup: true },
-      { to: "/fluxo-de-caixa", label: "Fluxo de caixa", icon: Wallet },
-      { to: "/simulacoes", label: "Simulações", icon: FlaskConical, hideInGroup: true },
-      { to: "/plano-de-contas", label: "Plano de contas", icon: ListTree, hideInGroup: true },
-      { to: "/centros-de-custo", label: "Centros de custo", icon: Building2, hideInGroup: true },
-      { to: "/financeiro", label: "Integração Bling", icon: PlugZap, only: ["nortrip"] },
+      { to: "/dashboard", label: "Dashboard", icon: LineChart, perm: "fin.dashboard" },
+      { to: "/lancamentos", label: "Lançamentos", icon: ArrowLeftRight, hideInGroup: true, perm: "fin.lancamentos" },
+      { to: "/fluxo-de-caixa", label: "Fluxo de caixa", icon: Wallet, perm: "fin.fluxo" },
+      { to: "/simulacoes", label: "Simulações", icon: FlaskConical, hideInGroup: true, perm: "fin.simulacoes" },
+      { to: "/plano-de-contas", label: "Plano de contas", icon: ListTree, hideInGroup: true, perm: "fin.plano" },
+      { to: "/centros-de-custo", label: "Centros de custo", icon: Building2, hideInGroup: true, perm: "fin.centros" },
+      { to: "/financeiro", label: "Integração Bling", icon: PlugZap, only: ["nortrip"], perm: "fin.bling" },
     ],
   },
   {
@@ -87,16 +92,15 @@ export const MODULES: OsModule[] = [
     status: "live",
     home: "/contabil",
     items: [
-      { to: "/contabil", label: "Painel", icon: LayoutDashboard, only: UNION },
-      { to: "/contabil/atividades", label: "Atividades", icon: ListChecks, only: UNION },
-      { to: "/contabil/clientes", label: "Empresas clientes", icon: Building2, only: UNION },
-      { to: "/contabil/equipe", label: "Equipe", icon: UsersRound, adminOnly: true, only: UNION },
-      { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, adminOnly: true, only: UNION },
-      { to: "/contabil/bases", label: "Bases da Union", icon: Database, adminOnly: true, only: UNION },
-      { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, adminOnly: true, only: UNION },
-      { to: "/comex", label: "Follow-up", icon: Ship, only: COMEX },
-      { to: "/comex/clientes", label: "Clientes", icon: Building2, only: COMEX },
-      { to: "/comex/equipe", label: "Equipe", icon: UsersRound, adminOnly: true, only: COMEX },
+      { to: "/contabil", label: "Painel", icon: LayoutDashboard, only: UNION, perm: "con.painel", escopo: "union" },
+      { to: "/contabil/atividades", label: "Atividades", icon: ListChecks, only: UNION, perm: "con.atividades", escopo: "union" },
+      { to: "/contabil/clientes", label: "Empresas clientes", icon: Building2, only: UNION, perm: "con.clientes", escopo: "union" },
+      { to: "/contabil/equipe", label: "Equipe", icon: UsersRound, only: UNION, perm: "con.equipe", escopo: "union" },
+      { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, only: UNION, perm: "con.cadastros", escopo: "union" },
+      { to: "/contabil/bases", label: "Bases da Union", icon: Database, only: UNION, perm: "con.bases", escopo: "union" },
+      { to: "/contabil/importar", label: "Importar planilha", icon: FileSpreadsheet, only: UNION, perm: "con.importar", escopo: "union" },
+      { to: "/comex", label: "Follow-up", icon: Ship, only: COMEX, perm: "cx.followup", escopo: "render" },
+      { to: "/comex/clientes", label: "Clientes", icon: Building2, only: COMEX, perm: "cx.clientes", escopo: "render" },
     ],
   },
   {
@@ -107,21 +111,20 @@ export const MODULES: OsModule[] = [
     status: "live",
     home: "/ia",
     items: [
-      { to: "/ia", label: "Visão geral", icon: LayoutDashboard },
-      { to: "/ia/entregas", label: "Entregas", icon: Rocket },
-      { to: "/ia/empresas", label: "Por empresa", icon: Building2 },
-      { to: "/ia/treinamento", label: "Treinamento", icon: GraduationCap },
-      { to: "/ia/acesso", label: "Acesso", icon: KeyRound, adminOnly: true },
+      { to: "/ia", label: "Visão geral", icon: LayoutDashboard, perm: "ia.visao", escopo: "grupo" },
+      { to: "/ia/entregas", label: "Entregas", icon: Rocket, perm: "ia.entregas", escopo: "grupo" },
+      { to: "/ia/empresas", label: "Por empresa", icon: Building2, perm: "ia.empresas", escopo: "grupo" },
+      { to: "/ia/treinamento", label: "Treinamento", icon: GraduationCap, perm: "ia.treinamento", escopo: "grupo" },
     ],
   },
   {
     id: "pessoas",
     label: "Pessoas",
-    description: "Usuários e acessos ao render.os.",
+    description: "Quem acessa o quê: por empresa, aba e nível.",
     icon: Users,
     status: "live",
     home: "/pessoas/acessos",
-    items: [{ to: "/pessoas/acessos", label: "Acessos", icon: ShieldCheck }],
+    items: [{ to: "/pessoas/acessos", label: "Acessos", icon: ShieldCheck, adminOnly: true }],
   },
 ];
 
@@ -152,11 +155,26 @@ export function moduleForPath(pathname: string): OsModule {
   );
 }
 
-export function visibleItems(mod: OsModule, workspace: WorkspaceId, isModuleAdmin = true): ModuleItem[] {
+/** Resposta de permissão: nível da pessoa numa aba (0 sem acesso, 1 ver, 2 editar). */
+export type NivelFn = (workspace: WorkspaceId, recurso: string) => number;
+
+export function visibleItems(mod: OsModule, workspace: WorkspaceId, nivelNo: NivelFn, isAdmin: boolean): ModuleItem[] {
   return mod.items.filter((i) => {
-    if (i.adminOnly && !isModuleAdmin) return false;
+    if (i.adminOnly && !isAdmin) return false;
     if (i.only && !i.only.includes(workspace)) return false;
     if (workspace === "grupo" && i.hideInGroup) return false;
+    if (i.perm && nivelNo(i.escopo ?? workspace, i.perm) < 1) return false;
     return true;
+  });
+}
+
+/** O módulo tem alguma aba liberada em algum lugar? (para esconder ícones do trilho) */
+export function moduleHasAccess(mod: OsModule, nivelNo: NivelFn, isAdmin: boolean): boolean {
+  if (mod.status !== "live" || mod.id === "inicio") return true;
+  return mod.items.some((i) => {
+    if (i.adminOnly) return isAdmin;
+    if (!i.perm) return true;
+    const lugares: WorkspaceId[] = i.escopo ? [i.escopo] : (i.only ?? ["render", "union", "dompablyto", "nortrip", "erks", "sxpaper"]);
+    return lugares.some((w) => nivelNo(w, i.perm!) >= 1);
   });
 }

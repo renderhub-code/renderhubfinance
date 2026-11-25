@@ -49,9 +49,11 @@ export function HubOrbit({ className, compact }: { className?: string; compact?:
                 "flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_8px_30px_rgba(0,0,0,.35)] backdrop-blur-md",
                 compact ? "px-1.5 py-1.5" : "px-2.5 py-2",
               )}>
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-[10px] font-semibold text-white" style={{ backgroundColor: c.color }}>
-                  {c.initials}
-                </span>
+                {c.mark ? <img src={c.mark} alt="" className="h-7 w-7 shrink-0 rounded-lg" /> : (
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-[10px] font-semibold text-white" style={{ backgroundColor: c.color }}>
+                    {c.initials}
+                  </span>
+                )}
                 {!compact && (
                   <span className="pr-1 leading-tight">
                     <span className="block whitespace-nowrap text-[12px] font-medium text-white">{c.name}</span>

@@ -1,3 +1,4 @@
+import { useFinEdit } from "@/os/acessos";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useHubStore } from "@/lib/hub-store";
@@ -42,7 +43,6 @@ import {
   useAccounts,
   useBusinessUnits,
   useTransactions,
-  useUserRoles,
   type Transaction,
 } from "@/lib/queries";
 import { useCompanyStore } from "@/lib/company-store";
@@ -161,12 +161,8 @@ function LancamentosNoronha() {
   });
   const { data: accounts } = useAccounts(companyId);
   const { data: units = [] } = useBusinessUnits(companyId);
-  const { data: roles } = useUserRoles();
 
-  const canEdit = useMemo(() => {
-    const list = roles?.map((r) => r.role) ?? [];
-    return list.includes("controller") || list.includes("financial_manager");
-  }, [roles]);
+  const canEdit = useFinEdit("fin.lancamentos");
 
   const accountMap = useMemo(
     () => new Map((accounts ?? []).map((a) => [a.id, `${a.code} · ${a.name}`])),

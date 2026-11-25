@@ -90,7 +90,7 @@ function Visao() {
             {rows.map(({ c, v }) => (
               <li key={c.id} className="grid grid-cols-[minmax(0,170px)_1fr_auto] items-center gap-3 text-sm">
                 <span className="flex items-center gap-2 truncate">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[9px] font-semibold text-white" style={{ background: c.color }}>{c.initials}</span>
+                  {c.mark ? <img src={c.mark} alt="" className="h-6 w-6 shrink-0 rounded-full" /> : <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[9px] font-semibold text-white" style={{ background: c.color }}>{c.initials}</span>}
                   {c.name}
                 </span>
                 <span className="h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full rounded-full" style={{ width: `${(v / mx) * 100}%`, background: c.color }} /></span>

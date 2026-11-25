@@ -61,9 +61,18 @@ const RESOURCES = {
 export type BlingResource = keyof typeof RESOURCES;
 
 async function requireCashEditor(context: { supabase: import("@supabase/supabase-js").SupabaseClient; userId: string }) {
-  const { data: allowed } = await context.supabase.rpc("user_has_company", { _user_id: context.userId, _company_id: "0c3d7a6e-24bc-4ea1-9009-2112a2f31f6a" });
-  const { data: roles } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
-  if (!allowed || !roles?.some((r: { role: string }) => ["controller", "financial_manager"].includes(r.role))) throw new Error("Sem permissão para sincronizar o caixa.");
+  // Pessoas › Acessos: "Fluxo de caixa: Editar" na Nortrip.
+  const { data: allowed, error } = await context.supabase.rpc("os_pode_company" as never, {
+    _company: "0c3d7a6e-24bc-4ea1-9009-2112a2f31f6a", _recurso: "fin.fluxo", _min: 2,
+  } as never);
+  if (error) {
+    // SQL de acessos ainda não aplicado: mantém a regra antiga.
+    const { data: ok } = await context.supabase.rpc("user_has_company", { _user_id: context.userId, _company_id: "0c3d7a6e-24bc-4ea1-9009-2112a2f31f6a" });
+    const { data: roles } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+    if (!ok || !roles?.some((r: { role: string }) => ["controller", "financial_manager"].includes(r.role))) throw new Error("Sem permissão para sincronizar o caixa.");
+    return;
+  }
+  if (!allowed) throw new Error("Sem permissão para sincronizar o caixa.");
 }
 
 export const beginBlingCashSync = createServerFn({ method: "POST" })

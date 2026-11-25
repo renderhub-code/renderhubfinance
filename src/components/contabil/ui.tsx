@@ -39,8 +39,8 @@ export function ContabilGate({ children, adminOnly }: { children: ReactNode; adm
   }
   if (!membro) {
     return (
-      <Notice icon={Lock} title="Você ainda não faz parte da equipe do Contábil">
-        Peça a um administrador do Contábil para incluir você em <b>Contábil › Equipe</b>, com setor e papel.
+      <Notice icon={Lock} title="Você ainda não tem acesso ao Operacional da Union">
+        Peça a um administrador do render.os para liberar em <b>Pessoas › Acessos</b> (empresa Union Contadores). O setor e o papel se ajustam depois em <b>Equipe</b>.
       </Notice>
     );
   }
