@@ -29,6 +29,7 @@ Importados 6.775 registros nas 16 bases; 174 clientes, 656 atividades e 661 ciê
 
 ## Agenda de reuniões no Contábil
 
+- [x] Disponibilizar Online/Presencial para o cliente e intervalo de 30 minutos entre reuniões, com oito testes e reserva pública presencial verificada; reserva temporária removida.
 - [x] Agenda do Caio Oliveira com calendário, abertura de horários (um ou vários), edição, remoção e cancelamento.
 - [x] Link público para o cliente escolher um horário; horário escolhido fica esgotado.
 - [ ] Caio informar o link da videochamada e o endereço do escritório em Configurar — depende dele.

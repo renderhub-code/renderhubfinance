@@ -30,5 +30,6 @@ Este repositório está sendo remodelado no **render.os**, o sistema único do G
 - Public booking pages reach the Contábil agenda only through the two anon-executable SQL functions (list slots, reserve), called from server functions with the publishable key; tables stay closed to visitors so client contact data never leaks.
 - One confirmed reservation per slot is enforced by a partial unique index, not by app code, so simultaneous bookings cannot double-book.
 - Agenda times are Recife wall-clock (fixed UTC-3) converted in `src/os/contabil/agenda.ts`; never format them with the viewer's timezone.
+- Generate agenda slots through the shared interval helper and enforce spacing in database triggers with an agenda-level transaction lock, so manual edits and simultaneous bookings obey the same rule.
 - The brand/module picker in Pessoas › Usuários is a shortcut over `os_acessos` (via `acessosDaSelecao` in `src/os/usuarios.ts`), never a second permission store, so Usuários and Acessos cannot disagree.
 - Keep the permission catalog in `src/os/recursos.ts` free of React and database imports; `src/os/acessos.ts` re-exports it, so server functions and tests can read the same catalog.

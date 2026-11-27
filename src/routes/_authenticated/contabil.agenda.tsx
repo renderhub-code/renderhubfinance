@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useContabilMe, useMembros } from "@/os/contabil/hooks";
 import { useAgendas, useHorarios, useReservas } from "@/os/contabil/agenda-hooks";
 import {
-  DIAS_SEMANA, dataExtensa, diaRecife, duracaoMin, faixaHoras, gerarHorarios, hojeRecife, horaRecife, instanteRecife,
+  DIAS_SEMANA, INTERVALO_REUNIOES_MIN, conflitaComIntervalo, dataExtensa, diaRecife, duracaoMin, faixaHoras, gerarHorarios, hojeRecife, horaRecife, instanteRecife,
   reservaDoHorario, somaDias, type Agenda, type Horario, type Reserva,
 } from "@/os/contabil/agenda";
 import { dataBR } from "@/os/contabil/db";
@@ -192,8 +192,8 @@ function AgendaReunioes() {
         )}
       </section>
 
-      {abrindo && <AbrirHorarios agenda={agenda} dia={dia < hoje ? hoje : dia} onClose={() => setAbrindo(false)} onSaved={recarregar} />}
-      {editando && <EditarHorario horario={editando} onClose={() => setEditando(null)} onSaved={recarregar} />}
+      {abrindo && <AbrirHorarios agenda={agenda} horarios={horarios} dia={dia < hoje ? hoje : dia} onClose={() => setAbrindo(false)} onSaved={recarregar} />}
+      {editando && <EditarHorario horario={editando} horarios={horarios} onClose={() => setEditando(null)} onSaved={recarregar} />}
       {configurando && <Configurar agenda={agenda} onClose={() => setConfigurando(false)} onSaved={recarregar} />}
       {vendo && <VerReuniao {...vendo} podeEditar={podeEditar} onClose={() => setVendo(null)} onSaved={recarregar} />}
     </div>
@@ -204,7 +204,7 @@ function Campo({ id, label, children }: { id: string; label: string; children: R
   return <div className="min-w-0"><Label htmlFor={id} className="mb-1.5 block text-xs text-muted-foreground">{label}</Label>{children}</div>;
 }
 
-function AbrirHorarios({ agenda, dia, onClose, onSaved }: { agenda: Agenda; dia: string; onClose: () => void; onSaved: () => void }) {
+function AbrirHorarios({ agenda, horarios, dia, onClose, onSaved }: { agenda: Agenda; horarios: Horario[]; dia: string; onClose: () => void; onSaved: () => void }) {
   const [modo, setModo] = useState("um");
   const [data, setData] = useState(dia);
   const [hora, setHora] = useState("09:00");
@@ -224,6 +224,7 @@ function AbrirHorarios({ agenda, dia, onClose, onSaved }: { agenda: Agenda; dia:
       : gerarHorarios({ de: data, ate, dias, das, as, duracao: d });
     const agora = new Date().toISOString();
     lote = lote.filter((h) => h.inicio > agora);
+    if (lote.some((h) => horarios.some((existente) => conflitaComIntervalo(h, existente)))) erro = "Mantenha 30 minutos de intervalo dos horários já abertos.";
     if (!lote.length) erro = "Nenhum horário futuro nesse período.";
   } catch (e) { erro = e instanceof Error ? e.message : "Confira os campos."; }
 
@@ -281,8 +282,9 @@ function AbrirHorarios({ agenda, dia, onClose, onSaved }: { agenda: Agenda; dia:
             </div>
           </TabsContent>
         </Tabs>
+        <p className="text-xs text-muted-foreground">Intervalo entre reuniões: {INTERVALO_REUNIOES_MIN} min</p>
         <p className={cn("text-xs", erro ? "text-destructive" : "text-muted-foreground")} role="status">
-          {erro ?? (lote.length === 1 ? `1 horário: ${dataBR(diaRecife(lote[0]!.inicio))}, ${faixaHoras(lote[0]!)}.` : `${lote.length} horários serão abertos.`)}
+          {erro ?? (lote.length === 1 && lote[0] ? `1 horário: ${dataBR(diaRecife(lote[0].inicio))}, ${faixaHoras(lote[0])}.` : `${lote.length} horários serão abertos.`)}
         </p>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
@@ -299,7 +301,7 @@ function somaHora(hora: string, min: number): string {
   return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
 }
 
-function EditarHorario({ horario, onClose, onSaved }: { horario: Horario; onClose: () => void; onSaved: () => void }) {
+function EditarHorario({ horario, horarios, onClose, onSaved }: { horario: Horario; horarios: Horario[]; onClose: () => void; onSaved: () => void }) {
   const [data, setData] = useState(diaRecife(horario.inicio));
   const [hora, setHora] = useState(horaRecife(horario.inicio));
   const [duracao, setDuracao] = useState(String(duracaoMin(horario)));
@@ -311,6 +313,9 @@ function EditarHorario({ horario, onClose, onSaved }: { horario: Horario; onClos
     let inicio: string;
     try { inicio = instanteRecife(data, hora); } catch { toast.error("Confira o dia e a hora."); return; }
     const fim = new Date(new Date(inicio).getTime() + d * 60000).toISOString();
+    if (horarios.some((h) => h.id !== horario.id && conflitaComIntervalo({ inicio, fim }, h))) {
+      toast.error("Mantenha 30 minutos de intervalo dos outros horários."); return;
+    }
     setSalvando(true);
     const { error } = await supabase.from("contabil_agenda_horarios").update({ inicio, fim }).eq("id", horario.id);
     setSalvando(false);
@@ -366,7 +371,7 @@ function Configurar({ agenda, onClose, onSaved }: { agenda: Agenda; onClose: () 
         <div className="space-y-3">
           <Campo id="c-link" label="Link da videochamada (reuniões online)"><Input id="c-link" placeholder="https://meet.google.com/…" value={link} onChange={(e) => setLink(e.target.value)} /></Campo>
           <Campo id="c-end" label="Endereço do escritório (reuniões presenciais)"><Textarea id="c-end" rows={3} value={endereco} onChange={(e) => setEndereco(e.target.value)} /></Campo>
-          <p className="text-xs text-muted-foreground">Sem endereço, o link oferece apenas reunião online.</p>
+          <p className="text-xs text-muted-foreground">Formato da reunião: Online ou Presencial, à escolha do cliente.</p>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancelar</Button>

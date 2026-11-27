@@ -71,6 +71,13 @@
       "when": 1795794569645,
       "tag": "0009_contabil_agenda_reunioes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795813317527,
+      "tag": "0010_agenda_intervalo_reunioes",
+      "breakpoints": true
     }
   ]
 }

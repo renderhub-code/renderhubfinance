@@ -134,7 +134,7 @@ function Agendar() {
   async function confirmar(e: React.FormEvent) {
     e.preventDefault();
     if (!horario) return;
-    const dados = reservaSchema.safeParse({ codigo, horario: horario.id, ...form, modalidade: agenda?.presencial ? modalidade : "online" });
+    const dados = reservaSchema.safeParse({ codigo, horario: horario.id, ...form, modalidade });
     if (!dados.success) { setErro(dados.error.issues[0]?.message ?? "Confira os campos."); return; }
     setErro(null);
     setEnviando(true);
@@ -208,19 +208,17 @@ function Agendar() {
               <div><Label htmlFor="r-tel" className="mb-1.5 block">Telefone</Label><Input id="r-tel" type="tel" maxLength={40} autoComplete="tel" {...campo("telefone")} /></div>
               <div className="sm:col-span-2"><Label htmlFor="r-assunto" className="mb-1.5 block">Assunto da reunião</Label><Textarea id="r-assunto" rows={3} maxLength={1000} {...campo("assunto")} /></div>
             </div>
-            {agenda.presencial && (
               <fieldset className="mt-4">
                 <legend className="mb-1.5 text-sm font-medium">Como prefere a reunião?</legend>
                 <div className="grid grid-cols-2 gap-2 sm:max-w-sm">
                   {([["online", "Online", Video], ["presencial", "Presencial", MapPin]] as const).map(([valor, nome, Icone]) => (
                     <label key={valor} className={cn("flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm", modalidade === valor && "border-primary bg-primary/5 ring-1 ring-primary")}>
-                      <input type="radio" name="modalidade" className="sr-only" checked={modalidade === valor} onChange={() => setModalidade(valor)} />
+                      <input type="radio" name="modalidade" aria-label={nome} className="sr-only" checked={modalidade === valor} onChange={() => setModalidade(valor)} />
                       <Icone className="h-4 w-4" /> {nome}
                     </label>
                   ))}
                 </div>
               </fieldset>
-            )}
             {erro && <p role="alert" className="mt-4 text-sm text-destructive">{erro}</p>}
             <Button type="submit" className="mt-6 w-full sm:w-auto" disabled={enviando}>{enviando ? "Confirmando…" : "Confirmar reunião"}</Button>
           </form>

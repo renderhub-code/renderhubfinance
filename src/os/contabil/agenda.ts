@@ -76,6 +76,13 @@ const minutos = (hora: string) => {
 const horaDe = (min: number) => `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
 
 export const LIMITE_HORARIOS = 400;
+export const INTERVALO_REUNIOES_MIN = 30;
+
+export function conflitaComIntervalo(a: { inicio: string; fim: string }, b: { inicio: string; fim: string }): boolean {
+  const intervalo = INTERVALO_REUNIOES_MIN * 60000;
+  return new Date(a.inicio).getTime() < new Date(b.fim).getTime() + intervalo
+    && new Date(b.inicio).getTime() < new Date(a.fim).getTime() + intervalo;
+}
 
 export interface LoteHorarios {
   /** Primeiro e último dia (inclusive), AAAA-MM-DD. */
@@ -88,7 +95,7 @@ export interface LoteHorarios {
   duracao: number;
 }
 
-/** Abre vários horários de uma vez: um a cada `duracao` minutos dentro da janela, nos dias escolhidos. */
+/** Abre horários com intervalo de descanso entre reuniões, nos dias escolhidos. */
 export function gerarHorarios(p: LoteHorarios): { inicio: string; fim: string }[] {
   if (!Number.isInteger(p.duracao) || p.duracao < 10 || p.duracao > 480) throw new Error("A duração deve ficar entre 10 minutos e 8 horas.");
   if (p.ate < p.de) throw new Error("A data final vem antes da inicial.");
@@ -97,7 +104,7 @@ export function gerarHorarios(p: LoteHorarios): { inicio: string; fim: string }[
   const out: { inicio: string; fim: string }[] = [];
   for (let dia = p.de; dia <= p.ate; dia = somaDias(dia, 1)) {
     if (!p.dias.includes(diaDaSemana(dia))) continue;
-    for (let t = ini; t + p.duracao <= fim; t += p.duracao) {
+    for (let t = ini; t + p.duracao <= fim; t += p.duracao + INTERVALO_REUNIOES_MIN) {
       out.push({ inicio: instanteRecife(dia, horaDe(t)), fim: instanteRecife(dia, horaDe(t + p.duracao)) });
       if (out.length > LIMITE_HORARIOS) throw new Error(`São mais de ${LIMITE_HORARIOS} horários de uma vez. Reduza o período.`);
     }
