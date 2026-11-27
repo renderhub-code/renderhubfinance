@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { RenderMark } from "@/components/brand/Logo";
 import { CalendarioMes } from "@/components/contabil/CalendarioMes";
 import { getAgendaPublica, reservarHorario } from "@/os/contabil/agenda.functions";
 import {
@@ -57,9 +56,7 @@ function Moldura({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-8 sm:py-14">
       <div className="mx-auto max-w-[880px]">
-        <div className="mb-6 flex items-center gap-2 text-sm font-semibold">
-          <RenderMark className="h-7 w-7" /> Union Contadores
-        </div>
+        <div className="mb-6 text-sm font-semibold tracking-tight">Union Contadores</div>
         {children}
       </div>
     </main>

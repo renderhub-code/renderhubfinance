@@ -7,6 +7,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useLocation,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -124,10 +125,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const publico = useLocation({ select: (l) => l.pathname.startsWith("/agendar/") });
 
   return (
     <QueryClientProvider client={queryClient}>
-      <IntroSplash />
+      {/* A abertura do render.os é da equipe; o cliente que abre o link de agendamento não a vê. */}
+      {!publico && <IntroSplash />}
       <Outlet />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
