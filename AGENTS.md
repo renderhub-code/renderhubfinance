@@ -26,6 +26,7 @@ Este repositório está sendo remodelado no **render.os**, o sistema único do G
 - Import Union exports through authenticated, accounting-admin-only server functions; sanitize fields and map source identities server-side to preserve ownership without copying credentials.
 - Keep source records in protected accounting archive rows and project supported entities into the existing accounting tables; idempotent inserts preserve render.os edits on retries.
 - Prepare imported email accounts unconfirmed, without bulk emails or passwords; first access requires email verification and new-password setup before using their mapped records.
+- Admin-set provisional passwords go through controller-only server functions that confirm the account and flag it in `app_metadata`; the authenticated layout blocks the app until the person replaces it, so shared passwords never stay in use.
 - Public booking pages reach the Contábil agenda only through the two anon-executable SQL functions (list slots, reserve), called from server functions with the publishable key; tables stay closed to visitors so client contact data never leaks.
 - One confirmed reservation per slot is enforced by a partial unique index, not by app code, so simultaneous bookings cannot double-book.
 - Agenda times are Recife wall-clock (fixed UTC-3) converted in `src/os/contabil/agenda.ts`; never format them with the viewer's timezone.

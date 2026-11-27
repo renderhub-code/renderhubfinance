@@ -5,6 +5,7 @@ import { Clock, Loader2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
+import { TrocarSenhaProvisoria } from "@/components/TrocarSenhaProvisoria";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -53,6 +54,9 @@ function Layout() {
       cancelled = true;
     };
   }, [qc]);
+
+  // Senha definida por um administrador: a pessoa cria a própria antes de usar o sistema.
+  if (user.app_metadata?.["senha_provisoria"] === true) return <TrocarSenhaProvisoria />;
 
   if (perfil.isLoading) {
     return <div className="grid h-screen place-items-center bg-sidebar text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>;

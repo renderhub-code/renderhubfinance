@@ -42,6 +42,7 @@ import { Route as AuthenticatedIaTreinamentoRouteImport } from './routes/_authen
 import { Route as AuthenticatedLancamentosImportarRouteImport } from './routes/_authenticated/lancamentos.importar'
 import { Route as AuthenticatedModuloIdRouteImport } from './routes/_authenticated/modulo.$id'
 import { Route as AuthenticatedPessoasAcessosRouteImport } from './routes/_authenticated/pessoas.acessos'
+import { Route as AuthenticatedPessoasUsuariosRouteImport } from './routes/_authenticated/pessoas.usuarios'
 import { Route as AuthenticatedRhIndexRouteImport } from './routes/_authenticated/rh.index'
 import { Route as AuthenticatedRhAsoRouteImport } from './routes/_authenticated/rh.aso'
 import { Route as AuthenticatedRhAvaliacoesRouteImport } from './routes/_authenticated/rh.avaliacoes'
@@ -237,6 +238,12 @@ const AuthenticatedPessoasAcessosRoute =
     path: '/pessoas/acessos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPessoasUsuariosRoute =
+  AuthenticatedPessoasUsuariosRouteImport.update({
+    id: '/pessoas/usuarios',
+    path: '/pessoas/usuarios',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRhIndexRoute = AuthenticatedRhIndexRouteImport.update({
   id: '/rh/',
   path: '/rh/',
@@ -341,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
+  '/pessoas/usuarios': typeof AuthenticatedPessoasUsuariosRoute
   '/rh/aso': typeof AuthenticatedRhAsoRoute
   '/rh/avaliacoes': typeof AuthenticatedRhAvaliacoesRoute
   '/rh/calendario': typeof AuthenticatedRhCalendarioRoute
@@ -388,6 +396,7 @@ export interface FileRoutesByTo {
   '/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
+  '/pessoas/usuarios': typeof AuthenticatedPessoasUsuariosRoute
   '/rh/aso': typeof AuthenticatedRhAsoRoute
   '/rh/avaliacoes': typeof AuthenticatedRhAvaliacoesRoute
   '/rh/calendario': typeof AuthenticatedRhCalendarioRoute
@@ -437,6 +446,7 @@ export interface FileRoutesById {
   '/_authenticated/lancamentos/importar': typeof AuthenticatedLancamentosImportarRoute
   '/_authenticated/modulo/$id': typeof AuthenticatedModuloIdRoute
   '/_authenticated/pessoas/acessos': typeof AuthenticatedPessoasAcessosRoute
+  '/_authenticated/pessoas/usuarios': typeof AuthenticatedPessoasUsuariosRoute
   '/_authenticated/rh/aso': typeof AuthenticatedRhAsoRoute
   '/_authenticated/rh/avaliacoes': typeof AuthenticatedRhAvaliacoesRoute
   '/_authenticated/rh/calendario': typeof AuthenticatedRhCalendarioRoute
@@ -486,6 +496,7 @@ export interface FileRouteTypes {
     | '/lancamentos/importar'
     | '/modulo/$id'
     | '/pessoas/acessos'
+    | '/pessoas/usuarios'
     | '/rh/aso'
     | '/rh/avaliacoes'
     | '/rh/calendario'
@@ -533,6 +544,7 @@ export interface FileRouteTypes {
     | '/lancamentos/importar'
     | '/modulo/$id'
     | '/pessoas/acessos'
+    | '/pessoas/usuarios'
     | '/rh/aso'
     | '/rh/avaliacoes'
     | '/rh/calendario'
@@ -581,6 +593,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lancamentos/importar'
     | '/_authenticated/modulo/$id'
     | '/_authenticated/pessoas/acessos'
+    | '/_authenticated/pessoas/usuarios'
     | '/_authenticated/rh/aso'
     | '/_authenticated/rh/avaliacoes'
     | '/_authenticated/rh/calendario'
@@ -842,6 +855,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPessoasAcessosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pessoas/usuarios': {
+      id: '/_authenticated/pessoas/usuarios'
+      path: '/pessoas/usuarios'
+      fullPath: '/pessoas/usuarios'
+      preLoaderRoute: typeof AuthenticatedPessoasUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rh/': {
       id: '/_authenticated/rh/'
       path: '/rh'
@@ -989,6 +1009,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIaTreinamentoRoute: typeof AuthenticatedIaTreinamentoRoute
   AuthenticatedModuloIdRoute: typeof AuthenticatedModuloIdRoute
   AuthenticatedPessoasAcessosRoute: typeof AuthenticatedPessoasAcessosRoute
+  AuthenticatedPessoasUsuariosRoute: typeof AuthenticatedPessoasUsuariosRoute
   AuthenticatedRhAsoRoute: typeof AuthenticatedRhAsoRoute
   AuthenticatedRhAvaliacoesRoute: typeof AuthenticatedRhAvaliacoesRoute
   AuthenticatedRhCalendarioRoute: typeof AuthenticatedRhCalendarioRoute
@@ -1029,6 +1050,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIaTreinamentoRoute: AuthenticatedIaTreinamentoRoute,
   AuthenticatedModuloIdRoute: AuthenticatedModuloIdRoute,
   AuthenticatedPessoasAcessosRoute: AuthenticatedPessoasAcessosRoute,
+  AuthenticatedPessoasUsuariosRoute: AuthenticatedPessoasUsuariosRoute,
   AuthenticatedRhAsoRoute: AuthenticatedRhAsoRoute,
   AuthenticatedRhAvaliacoesRoute: AuthenticatedRhAvaliacoesRoute,
   AuthenticatedRhCalendarioRoute: AuthenticatedRhCalendarioRoute,

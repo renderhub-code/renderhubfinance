@@ -3,7 +3,7 @@ import {
   House, Wallet, ShoppingBag, Users, Settings,
   LayoutDashboard, ArrowLeftRight, FlaskConical, ListTree, Building2, PlugZap, LineChart,
   Workflow, ListChecks, UsersRound, Tags, FileSpreadsheet, Database, Sparkles, Rocket, GraduationCap, Ship, ShieldCheck,
-  Gauge, Calculator, CalendarDays, PiggyBank, BadgeDollarSign, Grid3x3, HeartPulse, FileSignature, FolderClock,
+  Gauge, Calculator, CalendarDays, PiggyBank, BadgeDollarSign, Grid3x3, HeartPulse, FileSignature, FolderClock, UserCog,
 } from "lucide-react";
 import type { WorkspaceId } from "./companies";
 import type { Escopo } from "./acessos";
@@ -138,6 +138,7 @@ export const MODULES: OsModule[] = [
       { to: "/rh/aso", label: "Saúde ocupacional", icon: HeartPulse, perm: "rh.aso" },
       { to: "/rh/pj", label: "Contratos PJ", icon: FileSignature, perm: "rh.pj" },
       { to: "/rh/documentos", label: "Documentos e prazos", icon: FolderClock, perm: "rh.documentos" },
+      { to: "/pessoas/usuarios", label: "Usuários", icon: UserCog, adminOnly: true },
       { to: "/pessoas/acessos", label: "Acessos", icon: ShieldCheck, adminOnly: true },
     ],
   },
