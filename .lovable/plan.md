@@ -1,24 +1,47 @@
-# Trazer do hub-finance-master a estrutura das outras empresas
+# Separar 4 operações e 6 marcas
 
-Objetivo: copiar do repositório `hub-finance-master` como funcionam as empresas que não são a Use Noronha (Union Contadores, Render Comex, Dom Pablyto, ERKS, A&F): dashboard, simulações, plano de contas e De/Para. A Use Noronha fica exatamente como está hoje.
+Objetivo: o sistema passa a mostrar o grupo como **4 operações**, cada uma com as suas **marcas**. As 6 marcas continuam as que já existem; nenhum dado é movido ou apagado.
 
-## Bloqueio atual
+## Como fica
 
-O link do GitHub é privado, e por isso não consegui abrir o código. Antes de começar, preciso de uma destas opções:
-- deixar o repositório público por alguns minutos, ou
-- anexar o ZIP do código aqui (no GitHub: Code → Download ZIP).
+```text
+Grupo Render Hub
+├── Union ................................ Union Contadores
+├── Render ............................... Render Comex, Dom Pablyto
+├── ERKS Indústria e Distribuidora ....... ERKS, SX Paper
+└── Use Noronha .......................... Nortrip
+```
 
-## Etapas (depois do acesso)
+## O que muda nas telas
 
-1. **Comparar**: levantar o que o repositório tem por empresa (telas, plano de contas, De/Para, simulações, indicadores do dashboard) e o que muda em relação a este projeto.
-2. **Plano de contas e De/Para**: cadastrar o plano e as regras de cada empresa que não seja a Use Noronha. Contas que já existem serão desativadas, sem apagar nada.
-3. **Dashboard**: aplicar os indicadores e cartões de cada empresa que existirem no repositório.
-4. **Simulações**: trazer os modelos de simulação de cada empresa. A simulação comercial hoje só aparece para Render Comex e Use Noronha; isso será liberado conforme o repositório.
-5. **Outras telas**: aplicar as diferenças encontradas em Lançamentos, Centros de Custo e Fluxo de Caixa, sem mexer na sincronização com o Bling nem na conciliação da Use Noronha.
-6. **Validar**: entrar como Controller, alternar entre os hubs e confirmar que cada empresa abre a sua própria estrutura sem erros.
+1. **Seletor do topo**: as marcas aparecem agrupadas por operação, com o nome da operação como título de cada grupo. Continua sendo possível escolher o grupo inteiro ou uma marca.
+2. **Início e página de entrada**: os textos e contadores passam a dizer "4 operações e 6 marcas", e os cartões das marcas ficam organizados por operação.
+3. **Acessos de pessoas**: a lista de onde cada pessoa tem acesso fica agrupada por operação, e o texto troca "empresas" por "marcas". As permissões atuais de cada pessoa ficam iguais.
+4. **Demais telas** (Financeiro, Pessoas, IA, Contábil): onde hoje está escrito "empresa" para se referir a uma das 6, passa a ser "marca"; onde fizer sentido, o nome da operação aparece junto.
+
+## O que não muda
+
+- Lançamentos, fluxo de caixa, plano de contas, De/Para e simulações de cada marca.
+- A integração com o Bling e a importação diária das 17h da Nortrip.
+- As bases da Union no Contábil.
+- Os acessos já concedidos.
+
+## Validação
+
+- Abrir o seletor e conferir as 4 operações com as 6 marcas nos grupos certos.
+- Trocar para cada marca e confirmar que os dados continuam os mesmos de antes (em especial o Fluxo de Caixa da Nortrip).
+- Conferir Início e Acessos em tela grande e no celular.
+
+## Ideias opcionais (não incluídas)
+
+- Poder escolher uma **operação** no seletor e ver o financeiro somado das suas marcas (ex.: Render = Render Comex + Dom Pablyto).
+- Dar acesso a uma pessoa por operação inteira, em vez de marca por marca.
 
 ## Detalhes técnicos
 
-- Somente o código e o schema vêm do repositório. Os lançamentos reais de outras empresas não vêm junto; se existirem, precisam ser enviados em CSV.
-- Regras exclusivas da Use Noronha (o Bling, as fotos do caixa, o saldo inicial) continuam presas à empresa `use-noronha`.
-- O que for diferente para cada empresa vai seguir o slug da empresa (já existe em `hub-store.ts`), sem duplicar telas.
+- `src/os/companies.ts` segue como fonte única: adicionar `OperationId`, a lista `GROUP_OPERATIONS` (id, nome, marcas) e o campo `operation` em cada item de `GROUP_COMPANIES`, mais helpers `getOperation` / `companiesByOperation`. Ids (`CompanyId`) e slugs das marcas ficam inalterados, inclusive `use-noronha`.
+- Sem mudança no banco: `public.companies` (6 ativas + A&F inativa) e `public.business_units` ficam como estão; as tabelas de RH, IA, acessos e financeiro continuam referenciando os mesmos ids.
+- `useHubStore` / `HUBS` mantêm os mesmos ids de workspace; só a apresentação é agrupada.
+- Telas a ajustar: `src/components/AppShell.tsx` (seletor), `src/routes/_authenticated/inicio.tsx`, `src/routes/index.tsx`, `src/components/brand/HubOrbit.tsx`, `src/routes/_authenticated/pessoas.acessos.tsx`, `src/routes/_authenticated/ia.empresas.tsx` e rótulos em `src/os/modules.ts`.
+- Teste pequeno em `src/os/` garantindo: 4 operações, 6 marcas, cada marca em exatamente uma operação, com o mapeamento acima.
+- Atualizar a regra de empresas no `AGENTS.md` e salvar o mapeamento operação → marcas na memória do projeto.
