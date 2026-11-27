@@ -26,3 +26,10 @@ Publicação não realizada. A rotina diária existente importa contas a pagar/r
 - [ ] Validar o primeiro acesso das 12 pessoas ainda sem e-mail confirmado — depende de cada pessoa abrir seu link e definir a senha.
 
 Importados 6.775 registros nas 16 bases; 174 clientes, 656 atividades e 661 ciências disponíveis no Contábil. Treze identidades mapeadas, com três administradores e dez analistas preservados. Históricos adicionais consultáveis em Bases da Union, com busca, paginação e detalhes. Criação, leitura, edição e exclusão de atividade temporária verificadas; nenhum registro de teste restante. Formulário de ativação disponível, sem envio de e-mails em massa. Publicação não realizada.
+
+## Agenda de reuniões no Contábil
+
+- [x] Agenda do Caio Oliveira com calendário, abertura de horários (um ou vários), edição, remoção e cancelamento.
+- [x] Link público para o cliente escolher um horário; horário escolhido fica esgotado.
+- [ ] Caio informar o link da videochamada e o endereço do escritório em Configurar — depende dele.
+- [ ] Ligação com o Google Agenda — adiada a pedido do usuário.

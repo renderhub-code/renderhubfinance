@@ -95,6 +95,7 @@ export const MODULES: OsModule[] = [
     items: [
       { to: "/contabil", label: "Painel", icon: LayoutDashboard, only: UNION, perm: "con.painel", escopo: "union" },
       { to: "/contabil/atividades", label: "Atividades", icon: ListChecks, only: UNION, perm: "con.atividades", escopo: "union" },
+      { to: "/contabil/agenda", label: "Agenda de reuniões", icon: CalendarDays, only: UNION, perm: "con.agenda", escopo: "union" },
       { to: "/contabil/clientes", label: "Empresas clientes", icon: Building2, only: UNION, perm: "con.clientes", escopo: "union" },
       { to: "/contabil/equipe", label: "Equipe", icon: UsersRound, only: UNION, perm: "con.equipe", escopo: "union" },
       { to: "/contabil/cadastros", label: "Setores e tipos", icon: Tags, only: UNION, perm: "con.cadastros", escopo: "union" },

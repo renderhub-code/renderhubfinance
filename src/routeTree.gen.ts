@@ -21,11 +21,13 @@ import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedLancamentosRouteImport } from './routes/_authenticated/lancamentos'
 import { Route as AuthenticatedPlanoDeContasRouteImport } from './routes/_authenticated/plano-de-contas'
 import { Route as AuthenticatedSimulacoesRouteImport } from './routes/_authenticated/simulacoes'
+import { Route as AgendarCodigoRouteImport } from './routes/agendar.$codigo'
 import { Route as BlingCallbackRouteImport } from './routes/bling.callback'
 import { Route as AuthenticatedComexIndexRouteImport } from './routes/_authenticated/comex.index'
 import { Route as AuthenticatedComexClientesRouteImport } from './routes/_authenticated/comex.clientes'
 import { Route as AuthenticatedComexEquipeRouteImport } from './routes/_authenticated/comex.equipe'
 import { Route as AuthenticatedContabilIndexRouteImport } from './routes/_authenticated/contabil.index'
+import { Route as AuthenticatedContabilAgendaRouteImport } from './routes/_authenticated/contabil.agenda'
 import { Route as AuthenticatedContabilAtividadesRouteImport } from './routes/_authenticated/contabil.atividades'
 import { Route as AuthenticatedContabilBasesRouteImport } from './routes/_authenticated/contabil.bases'
 import { Route as AuthenticatedContabilCadastrosRouteImport } from './routes/_authenticated/contabil.cadastros'
@@ -117,6 +119,11 @@ const AuthenticatedSimulacoesRoute = AuthenticatedSimulacoesRouteImport.update({
   path: '/simulacoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AgendarCodigoRoute = AgendarCodigoRouteImport.update({
+  id: '/agendar/$codigo',
+  path: '/agendar/$codigo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlingCallbackRoute = BlingCallbackRouteImport.update({
   id: '/bling/callback',
   path: '/bling/callback',
@@ -143,6 +150,12 @@ const AuthenticatedContabilIndexRoute =
   AuthenticatedContabilIndexRouteImport.update({
     id: '/contabil/',
     path: '/contabil/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedContabilAgendaRoute =
+  AuthenticatedContabilAgendaRouteImport.update({
+    id: '/contabil/agenda',
+    path: '/contabil/agenda',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedContabilAtividadesRoute =
@@ -310,9 +323,11 @@ export interface FileRoutesByFullPath {
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/agendar/$codigo': typeof AgendarCodigoRoute
   '/bling/callback': typeof BlingCallbackRoute
   '/comex/clientes': typeof AuthenticatedComexClientesRoute
   '/comex/equipe': typeof AuthenticatedComexEquipeRoute
+  '/contabil/agenda': typeof AuthenticatedContabilAgendaRoute
   '/contabil/atividades': typeof AuthenticatedContabilAtividadesRoute
   '/contabil/bases': typeof AuthenticatedContabilBasesRoute
   '/contabil/cadastros': typeof AuthenticatedContabilCadastrosRoute
@@ -355,9 +370,11 @@ export interface FileRoutesByTo {
   '/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/agendar/$codigo': typeof AgendarCodigoRoute
   '/bling/callback': typeof BlingCallbackRoute
   '/comex/clientes': typeof AuthenticatedComexClientesRoute
   '/comex/equipe': typeof AuthenticatedComexEquipeRoute
+  '/contabil/agenda': typeof AuthenticatedContabilAgendaRoute
   '/contabil/atividades': typeof AuthenticatedContabilAtividadesRoute
   '/contabil/bases': typeof AuthenticatedContabilBasesRoute
   '/contabil/cadastros': typeof AuthenticatedContabilCadastrosRoute
@@ -402,9 +419,11 @@ export interface FileRoutesById {
   '/_authenticated/lancamentos': typeof AuthenticatedLancamentosRouteWithChildren
   '/_authenticated/plano-de-contas': typeof AuthenticatedPlanoDeContasRoute
   '/_authenticated/simulacoes': typeof AuthenticatedSimulacoesRouteWithChildren
+  '/agendar/$codigo': typeof AgendarCodigoRoute
   '/bling/callback': typeof BlingCallbackRoute
   '/_authenticated/comex/clientes': typeof AuthenticatedComexClientesRoute
   '/_authenticated/comex/equipe': typeof AuthenticatedComexEquipeRoute
+  '/_authenticated/contabil/agenda': typeof AuthenticatedContabilAgendaRoute
   '/_authenticated/contabil/atividades': typeof AuthenticatedContabilAtividadesRoute
   '/_authenticated/contabil/bases': typeof AuthenticatedContabilBasesRoute
   '/_authenticated/contabil/cadastros': typeof AuthenticatedContabilCadastrosRoute
@@ -449,9 +468,11 @@ export interface FileRouteTypes {
     | '/lancamentos'
     | '/plano-de-contas'
     | '/simulacoes'
+    | '/agendar/$codigo'
     | '/bling/callback'
     | '/comex/clientes'
     | '/comex/equipe'
+    | '/contabil/agenda'
     | '/contabil/atividades'
     | '/contabil/bases'
     | '/contabil/cadastros'
@@ -494,9 +515,11 @@ export interface FileRouteTypes {
     | '/lancamentos'
     | '/plano-de-contas'
     | '/simulacoes'
+    | '/agendar/$codigo'
     | '/bling/callback'
     | '/comex/clientes'
     | '/comex/equipe'
+    | '/contabil/agenda'
     | '/contabil/atividades'
     | '/contabil/bases'
     | '/contabil/cadastros'
@@ -540,9 +563,11 @@ export interface FileRouteTypes {
     | '/_authenticated/lancamentos'
     | '/_authenticated/plano-de-contas'
     | '/_authenticated/simulacoes'
+    | '/agendar/$codigo'
     | '/bling/callback'
     | '/_authenticated/comex/clientes'
     | '/_authenticated/comex/equipe'
+    | '/_authenticated/contabil/agenda'
     | '/_authenticated/contabil/atividades'
     | '/_authenticated/contabil/bases'
     | '/_authenticated/contabil/cadastros'
@@ -579,6 +604,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   PortalRoute: typeof PortalRoute
+  AgendarCodigoRoute: typeof AgendarCodigoRoute
   BlingCallbackRoute: typeof BlingCallbackRoute
   ApiPublicHooksBlingDailyImportRoute: typeof ApiPublicHooksBlingDailyImportRoute
 }
@@ -669,6 +695,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSimulacoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/agendar/$codigo': {
+      id: '/agendar/$codigo'
+      path: '/agendar/$codigo'
+      fullPath: '/agendar/$codigo'
+      preLoaderRoute: typeof AgendarCodigoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bling/callback': {
       id: '/bling/callback'
       path: '/bling/callback'
@@ -702,6 +735,13 @@ declare module '@tanstack/react-router' {
       path: '/contabil'
       fullPath: '/contabil/'
       preLoaderRoute: typeof AuthenticatedContabilIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/contabil/agenda': {
+      id: '/_authenticated/contabil/agenda'
+      path: '/contabil/agenda'
+      fullPath: '/contabil/agenda'
+      preLoaderRoute: typeof AuthenticatedContabilAgendaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/contabil/atividades': {
@@ -936,6 +976,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSimulacoesRoute: typeof AuthenticatedSimulacoesRouteWithChildren
   AuthenticatedComexClientesRoute: typeof AuthenticatedComexClientesRoute
   AuthenticatedComexEquipeRoute: typeof AuthenticatedComexEquipeRoute
+  AuthenticatedContabilAgendaRoute: typeof AuthenticatedContabilAgendaRoute
   AuthenticatedContabilAtividadesRoute: typeof AuthenticatedContabilAtividadesRoute
   AuthenticatedContabilBasesRoute: typeof AuthenticatedContabilBasesRoute
   AuthenticatedContabilCadastrosRoute: typeof AuthenticatedContabilCadastrosRoute
@@ -975,6 +1016,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSimulacoesRoute: AuthenticatedSimulacoesRouteWithChildren,
   AuthenticatedComexClientesRoute: AuthenticatedComexClientesRoute,
   AuthenticatedComexEquipeRoute: AuthenticatedComexEquipeRoute,
+  AuthenticatedContabilAgendaRoute: AuthenticatedContabilAgendaRoute,
   AuthenticatedContabilAtividadesRoute: AuthenticatedContabilAtividadesRoute,
   AuthenticatedContabilBasesRoute: AuthenticatedContabilBasesRoute,
   AuthenticatedContabilCadastrosRoute: AuthenticatedContabilCadastrosRoute,
@@ -1011,6 +1053,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   PortalRoute: PortalRoute,
+  AgendarCodigoRoute: AgendarCodigoRoute,
   BlingCallbackRoute: BlingCallbackRoute,
   ApiPublicHooksBlingDailyImportRoute: ApiPublicHooksBlingDailyImportRoute,
 }

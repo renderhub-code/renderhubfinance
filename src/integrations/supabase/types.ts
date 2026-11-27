@@ -478,6 +478,121 @@ export type Database = {
         }
         Relationships: []
       }
+      contabil_agenda_horarios: {
+        Row: {
+          agenda_id: string
+          criado_em: string
+          fim: string
+          id: string
+          inicio: string
+        }
+        Insert: {
+          agenda_id: string
+          criado_em?: string
+          fim: string
+          id?: string
+          inicio: string
+        }
+        Update: {
+          agenda_id?: string
+          criado_em?: string
+          fim?: string
+          id?: string
+          inicio?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabil_agenda_horarios_agenda_id_fkey"
+            columns: ["agenda_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_agendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabil_agenda_reservas: {
+        Row: {
+          assunto: string | null
+          cancelado_em: string | null
+          criado_em: string
+          email: string
+          empresa: string | null
+          horario_id: string
+          id: string
+          modalidade: string
+          nome: string
+          situacao: string
+          telefone: string | null
+        }
+        Insert: {
+          assunto?: string | null
+          cancelado_em?: string | null
+          criado_em?: string
+          email: string
+          empresa?: string | null
+          horario_id: string
+          id?: string
+          modalidade: string
+          nome: string
+          situacao?: string
+          telefone?: string | null
+        }
+        Update: {
+          assunto?: string | null
+          cancelado_em?: string | null
+          criado_em?: string
+          email?: string
+          empresa?: string | null
+          horario_id?: string
+          id?: string
+          modalidade?: string
+          nome?: string
+          situacao?: string
+          telefone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contabil_agenda_reservas_horario_id_fkey"
+            columns: ["horario_id"]
+            isOneToOne: false
+            referencedRelation: "contabil_agenda_horarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contabil_agendas: {
+        Row: {
+          ativa: boolean
+          atualizado_em: string
+          codigo: string
+          criado_em: string
+          dono_id: string
+          endereco: string | null
+          id: string
+          link_video: string | null
+        }
+        Insert: {
+          ativa?: boolean
+          atualizado_em?: string
+          codigo: string
+          criado_em?: string
+          dono_id: string
+          endereco?: string | null
+          id?: string
+          link_video?: string | null
+        }
+        Update: {
+          ativa?: boolean
+          atualizado_em?: string
+          codigo?: string
+          criado_em?: string
+          dono_id?: string
+          endereco?: string | null
+          id?: string
+          link_video?: string | null
+        }
+        Relationships: []
+      }
       contabil_atividades: {
         Row: {
           atividade: string
@@ -2014,6 +2129,24 @@ export type Database = {
         }[]
       }
       bootstrap_first_controller: { Args: never; Returns: boolean }
+      contabil_agenda_pode_editar: {
+        Args: { _agenda: string }
+        Returns: boolean
+      }
+      contabil_agenda_publica: { Args: { _codigo: string }; Returns: Json }
+      contabil_agenda_reservar: {
+        Args: {
+          _assunto: string
+          _codigo: string
+          _email: string
+          _empresa: string
+          _horario: string
+          _modalidade: string
+          _nome: string
+          _telefone: string
+        }
+        Returns: Json
+      }
       contabil_bootstrap_admin: { Args: never; Returns: boolean }
       contabil_global: { Args: { _uid: string }; Returns: boolean }
       contabil_is_admin: { Args: { _uid: string }; Returns: boolean }

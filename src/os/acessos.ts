@@ -40,6 +40,7 @@ export const RECURSOS: Recurso[] = [
 
   { key: "con.painel", label: "Painel", modulo: "Operacional", empresas: ["union"] },
   { key: "con.atividades", label: "Atividades", modulo: "Operacional", empresas: ["union"], edita: "abrir e atualizar atividades" },
+  { key: "con.agenda", label: "Agenda de reuniões", modulo: "Operacional", empresas: ["union"] },
   { key: "con.clientes", label: "Empresas clientes", modulo: "Operacional", empresas: ["union"], edita: "cadastrar e editar" },
   { key: "con.equipe", label: "Equipe", modulo: "Operacional", empresas: ["union"], edita: "setores e papéis · torna administrador do Contábil" },
   { key: "con.cadastros", label: "Setores e tipos", modulo: "Operacional", empresas: ["union"], edita: "criar e editar · torna administrador do Contábil" },
@@ -75,8 +76,8 @@ export const PERFIS: Perfil[] = [
   { id: "fin-gestor", nome: "Financeiro", desc: "Vê e edita todo o financeiro da empresa.", escopos: TODAS, niveis: fin(2) },
   { id: "fin-ceo", nome: "Diretoria (leitura)", desc: "Acompanha o financeiro sem editar.", escopos: TODAS, niveis: fin(1) },
   { id: "fin-lanca", nome: "Lançador", desc: "Lança movimentos; o resto só vê.", escopos: TODAS, niveis: fin(1, { "fin.lancamentos": 2, "fin.plano": 1 }) },
-  { id: "con-analista", nome: "Analista contábil", desc: "Painel e atividades; vê as empresas clientes.", escopos: ["union"], niveis: { "con.painel": 2, "con.atividades": 2, "con.clientes": 1 } },
-  { id: "con-admin", nome: "Administrador do Contábil", desc: "Todas as abas da Union, incluindo equipe e importações.", escopos: ["union"], niveis: { "con.painel": 2, "con.atividades": 2, "con.clientes": 2, "con.equipe": 2, "con.cadastros": 2, "con.bases": 2, "con.importar": 2 } },
+  { id: "con-analista", nome: "Analista contábil", desc: "Painel e atividades; vê as empresas clientes.", escopos: ["union"], niveis: { "con.painel": 2, "con.atividades": 2, "con.agenda": 1, "con.clientes": 1 } },
+  { id: "con-admin", nome: "Administrador do Contábil", desc: "Todas as abas da Union, incluindo equipe e importações.", escopos: ["union"], niveis: { "con.painel": 2, "con.atividades": 2, "con.agenda": 2, "con.clientes": 2, "con.equipe": 2, "con.cadastros": 2, "con.bases": 2, "con.importar": 2 } },
   { id: "cx-equipe", nome: "Equipe Comex", desc: "Atualiza POs e cadastra clientes do portal.", escopos: ["render"], niveis: { "cx.followup": 2, "cx.clientes": 2 } },
   { id: "cx-leitura", nome: "Comex (leitura)", desc: "Acompanha o follow-up sem editar.", escopos: ["render"], niveis: { "cx.followup": 1, "cx.clientes": 1 } },
   { id: "rh-gestor", nome: "RH", desc: "Vê e edita todo o RH da empresa, incluindo salários e ASO.", escopos: TODAS, niveis: { "rh.painel": 2, "rh.colaboradores": 2, "rh.remuneracao": 2, "rh.calendario": 2, "rh.avaliacoes": 2, "rh.aso": 2, "rh.pj": 2, "rh.documentos": 2 } },

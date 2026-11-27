@@ -64,6 +64,13 @@
       "when": 1795571351887,
       "tag": "0008_contabil_union_import_least_privilege",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795794569645,
+      "tag": "0009_contabil_agenda_reunioes",
+      "breakpoints": true
     }
   ]
 }
