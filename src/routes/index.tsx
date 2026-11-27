@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { TechBackground } from "@/components/brand/TechBackground";
 import { HubOrbit } from "@/components/brand/HubOrbit";
 import { OsWordmark } from "@/components/brand/Logo";
-import { GROUP_COMPANIES } from "@/os/companies";
+import { GROUP_COMPANIES, getOperation } from "@/os/companies";
 import { useReveal, spotlight } from "@/hooks/use-reveal";
 import { cn } from "@/lib/utils";
 
@@ -12,9 +12,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "render.os — Grupo Render Hub" },
-      { name: "description", content: "Sistema que unifica as empresas do Grupo Render Hub: Render Comex, Union Contadores, Dom Pablyto, Nortrip, ERKS e SX Paper." },
+      { name: "description", content: "Sistema que unifica as 4 operações e 6 marcas do Grupo Render Hub: Render Comex, Union Contadores, Dom Pablyto, Nortrip, ERKS e SX Paper." },
       { property: "og:title", content: "render.os" },
-      { property: "og:description", content: "Uma marca. Seis operações. Um só sistema." },
+      { property: "og:description", content: "Quatro operações. Seis marcas. Um só sistema." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -23,10 +23,10 @@ export const Route = createFileRoute("/")({
 });
 
 const MODULES: { icon: LucideIcon; title: string; desc: string; live?: boolean; wide?: boolean; full?: boolean }[] = [
-  { icon: Wallet, title: "Financeiro", desc: "Lançamentos, fluxo de caixa realizado e previsto, DRE e simulações — por empresa ou consolidado.", live: true, wide: true },
+  { icon: Wallet, title: "Financeiro", desc: "Lançamentos, fluxo de caixa realizado e previsto, DRE e simulações — por marca ou consolidado.", live: true, wide: true },
   { icon: ShoppingBag, title: "Comercial", desc: "Pedidos, clientes e faturamento contra a meta." },
-  { icon: Workflow, title: "Operacional", desc: "O dia a dia de cada empresa: tarefas contábeis da Union hoje, processos de importação da Render Comex em seguida.", live: true, wide: true },
-  { icon: Users, title: "Pessoas", desc: "Times, acessos e permissões por empresa." },
+  { icon: Workflow, title: "Operacional", desc: "O dia a dia de cada operação: tarefas contábeis da Union hoje, processos de importação da Render Comex em seguida.", live: true, wide: true },
+  { icon: Users, title: "Pessoas", desc: "Times, acessos e permissões por marca." },
   { icon: Cpu, title: "Inteligência", desc: "IA lendo os números do grupo e apontando o que mudou.", full: true },
 ];
 
@@ -44,7 +44,7 @@ function Landing() {
           <OsWordmark tone="dark" />
           <nav className="ml-10 hidden gap-7 text-sm text-white/55 md:flex">
             <a href="#plataforma" className="transition-colors hover:text-white">Plataforma</a>
-            <a href="#empresas" className="transition-colors hover:text-white">Empresas</a>
+            <a href="#empresas" className="transition-colors hover:text-white">Marcas</a>
             <a href="#modulos" className="transition-colors hover:text-white">Módulos</a>
           </nav>
           <Link
@@ -66,13 +66,13 @@ function Landing() {
             </div>
 
             <h1 className="mt-7 font-display text-[44px] font-semibold leading-[1.04] tracking-[-0.02em] sm:text-6xl lg:text-[68px]" style={{ animation: "ros-fade-up .8s cubic-bezier(.2,.7,.2,1) .2s both" }}>
-              Uma marca.<br />
-              Seis operações.<br />
+              Quatro operações.<br />
+              Seis marcas.<br />
               <span className="ros-gradient-text">Um só sistema.</span>
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/60" style={{ animation: "ros-fade-up .8s ease-out .35s both" }}>
-              O render.os conecta finanças, comercial, comex e contabilidade das empresas do grupo
+              O render.os conecta finanças, comercial, comex e contabilidade das operações do grupo
               em uma única plataforma — com dados em tempo real e inteligência sobre cada número.
             </p>
 
@@ -106,8 +106,8 @@ function Landing() {
       <section id="plataforma" className="relative z-10 border-y border-white/[0.06] bg-white/[0.015]">
         <div className="mx-auto grid max-w-7xl grid-cols-2 divide-white/[0.06] px-6 md:grid-cols-4 md:divide-x">
           {[
-            ["6", "empresas conectadas"],
-            ["6", "setores de atuação"],
+            ["4", "operações"],
+            ["6", "marcas conectadas"],
             ["1", "plataforma compartilhada"],
             ["1", "login para tudo"],
           ].map(([n, l], i) => (
@@ -124,7 +124,7 @@ function Landing() {
         <div className="ros-reveal mx-auto max-w-7xl px-6">
           <Eyebrow>O ecossistema</Eyebrow>
           <h2 className="mt-3 max-w-2xl font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-            Cada empresa com a sua marca. Todas no mesmo sistema.
+            Quatro operações, seis marcas. Todas no mesmo sistema.
           </h2>
         </div>
         <div className="relative mt-12 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
@@ -135,6 +135,7 @@ function Landing() {
                 <div className="min-w-0">
                   <div className="font-medium">{c.name}</div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#4cc3ff]/80">{c.sector}</div>
+                  <div className="mt-1 text-[11px] text-white/40">Operação {getOperation(c.operation)?.name}</div>
                   <p className="mt-2 text-[13px] leading-relaxed text-white/50">{c.description}</p>
                 </div>
               </div>
@@ -187,9 +188,9 @@ function Landing() {
       <section className="relative z-10 mx-auto max-w-7xl px-6 pb-28">
         <div className="grid gap-8 md:grid-cols-3">
           {[
-            { icon: Layers, t: "Um só lugar", d: "Seis operações, um login, um padrão. Sem planilhas soltas entre empresas." },
+            { icon: Layers, t: "Um só lugar", d: "Quatro operações, seis marcas, um login, um padrão. Sem planilhas soltas entre elas." },
             { icon: Zap, t: "Tempo real", d: "Integração com o Bling e sincronização automática do caixa e das contas." },
-            { icon: ShieldCheck, t: "Acesso por empresa", d: "Cada pessoa vê o que precisa: por empresa, unidade ou consolidado." },
+            { icon: ShieldCheck, t: "Acesso por marca", d: "Cada pessoa vê o que precisa: por marca, unidade ou consolidado." },
           ].map((p, i) => (
             <div key={p.t} className="ros-reveal border-t border-white/10 pt-6" style={{ transitionDelay: `${i * 90}ms` }}>
               <p.icon className="h-5 w-5 text-[#4cc3ff]" strokeWidth={1.75} />
@@ -207,7 +208,7 @@ function Landing() {
           <div className="relative">
             <Sparkles className="mx-auto h-6 w-6 text-[#4cc3ff]" strokeWidth={1.75} />
             <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-              Um só interlocutor. <span className="ros-gradient-text">Seis operações por trás.</span>
+              Um só interlocutor. <span className="ros-gradient-text">Quatro operações por trás.</span>
             </h2>
             <Link
               to="/auth"

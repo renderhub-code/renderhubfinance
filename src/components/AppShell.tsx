@@ -7,7 +7,7 @@ import { useCompanies, useBusinessUnits, useUserRoles } from "@/lib/queries";
 import { useCompanyStore } from "@/lib/company-store";
 import { useFinancialStore } from "@/lib/financial-store";
 import { getHub, useHubStore } from "@/lib/hub-store";
-import { GROUP_COMPANIES, GROUP_WORKSPACE, getCompany, type WorkspaceId } from "@/os/companies";
+import { GROUP_OPERATIONS, GROUP_WORKSPACE, companiesByOperation, getCompany, type WorkspaceId } from "@/os/companies";
 import { MODULES, SETTINGS_MODULE, moduleForPath, moduleHasAccess, visibleItems, type OsModule } from "@/os/modules";
 import { useOs } from "@/os/acessos";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -210,7 +210,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 /** Módulo que existe no grupo, mas ainda não tem telas para a empresa escolhida. */
 function EmConstrucao({ module: m, workspace, semAcesso }: { module: OsModule; workspace: WorkspaceId; semAcesso?: boolean }) {
-  const nome = workspace === "grupo" ? GROUP_WORKSPACE.name : getCompany(workspace)?.name ?? "esta empresa";
+  const nome = workspace === "grupo" ? GROUP_WORKSPACE.name : getCompany(workspace)?.name ?? "esta marca";
   const Icon = m.icon;
   if (semAcesso) {
     return (
@@ -220,7 +220,7 @@ function EmConstrucao({ module: m, workspace, semAcesso }: { module: OsModule; w
             <Icon className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
           </span>
           <h2 className="text-base font-semibold">Sem acesso ao {m.label} da {nome}</h2>
-          <p className="mt-1.5 text-sm text-muted-foreground">Peça a um administrador do render.os para liberar em <b>Pessoas › Acessos</b>, ou troque de empresa no seletor ao lado.</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">Peça a um administrador do render.os para liberar em <b>Pessoas › Acessos</b>, ou troque de marca no seletor ao lado.</p>
         </div>
       </div>
     );
@@ -233,7 +233,7 @@ function EmConstrucao({ module: m, workspace, semAcesso }: { module: OsModule; w
         </span>
         <h2 className="text-base font-semibold">{m.label} da {nome} em construção</h2>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Por enquanto, o {m.label} está pronto para {prontas(m)}. Troque de empresa no seletor ao lado para ver.
+          Por enquanto, o {m.label} está pronto para {prontas(m)}. Troque de marca no seletor ao lado para ver.
         </p>
       </div>
     </div>
@@ -309,21 +309,25 @@ function WorkspaceSwitcher({
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Grupo</DropdownMenuLabel>
         <WorkspaceItem id="grupo" name={GROUP_WORKSPACE.name} sector="Visão consolidada" active={workspace === "grupo"} onSelect={onSelect} />
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Empresas</DropdownMenuLabel>
-        {GROUP_COMPANIES.map((c) => {
-          const ready = available.has(c.slug);
-          return (
-            <WorkspaceItem
-              key={c.id}
-              id={c.id}
-              name={c.name}
-              sector={ready ? c.sector : "Ainda não cadastrada"}
-              active={workspace === c.id}
-              disabled={!ready}
-              onSelect={onSelect}
-            />
-          );
-        })}
+        {GROUP_OPERATIONS.map((op) => (
+          <div key={op.id} role="group" aria-label={op.name}>
+            <DropdownMenuLabel className="pt-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{op.name}</DropdownMenuLabel>
+            {companiesByOperation(op.id).map((c) => {
+              const ready = available.has(c.slug);
+              return (
+                <WorkspaceItem
+                  key={c.id}
+                  id={c.id}
+                  name={c.name}
+                  sector={ready ? c.sector : "Ainda não cadastrada"}
+                  active={workspace === c.id}
+                  disabled={!ready}
+                  onSelect={onSelect}
+                />
+              );
+            })}
+          </div>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

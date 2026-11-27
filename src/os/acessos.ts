@@ -60,7 +60,7 @@ export const RECURSOS: Recurso[] = [
 
   { key: "ia.visao", label: "Visão geral", modulo: "IA", empresas: ["grupo"] },
   { key: "ia.entregas", label: "Entregas", modulo: "IA", empresas: ["grupo"], edita: "entregas e diário" },
-  { key: "ia.empresas", label: "Por empresa", modulo: "IA", empresas: ["grupo"] },
+  { key: "ia.empresas", label: "Por marca", modulo: "IA", empresas: ["grupo"] },
   { key: "ia.treinamento", label: "Treinamento", modulo: "IA", empresas: ["grupo"], edita: "trilha e progresso" },
 ];
 

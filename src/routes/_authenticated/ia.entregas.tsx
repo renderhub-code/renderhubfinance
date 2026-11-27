@@ -53,7 +53,7 @@ function Entregas() {
     });
 
   function csv() {
-    const head = ["Entrega", "Tipo", "Status", "Empresas", "Ganho/mês", "Custo/mês", "Horas/mês", "Responsável", "Previsão", "Link"];
+    const head = ["Entrega", "Tipo", "Status", "Marcas", "Ganho/mês", "Custo/mês", "Horas/mês", "Responsável", "Previsão", "Link"];
     const rows = list.map((s) => [s.titulo, s.tipo, s.status, s.empresas.map((id) => GROUP_COMPANIES.find((c) => c.id === id)?.name ?? id).join("; "), s.ganho, s.custo, s.horas, s.responsavel ?? "", s.previsao ?? "", s.link ?? ""]);
     const txt = [head, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
     navigator.clipboard.writeText(txt).then(() => toast.success("CSV copiado"));
@@ -91,7 +91,7 @@ function Entregas() {
           <Input className="h-9 pl-8" placeholder="Buscar entrega, responsável…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Filtro label="Tipo" value={tipo} onChange={setTipo} options={TIPOS.map((t) => [t, t])} />
-        <Filtro label="Empresa" value={empresa} onChange={setEmpresa} options={GROUP_COMPANIES.map((c) => [c.id, c.name])} />
+        <Filtro label="Marca" value={empresa} onChange={setEmpresa} options={GROUP_COMPANIES.map((c) => [c.id, c.name])} />
       </div>
 
       <div className="overflow-hidden rounded-xl border">
@@ -101,7 +101,7 @@ function Entregas() {
               <tr>
                 <Th k="titulo">Entrega</Th>
                 <th className="px-3 py-2.5 font-medium">Status</th>
-                <th className="px-3 py-2.5 font-medium">Empresas</th>
+                <th className="px-3 py-2.5 font-medium">Marcas</th>
                 <Th k="ganho" r>Ganho/mês</Th>
                 <Th k="custo" r>Custo/mês</Th>
                 <Th k="horas" r>Horas/mês</Th>
@@ -225,7 +225,7 @@ function Editor({ draft, setDraft, canEdit, onClose }: { draft: Draft; setDraft:
         </div>
         <div>
           <div className="flex items-center justify-between">
-            <FieldLabel>Empresas atendidas</FieldLabel>
+            <FieldLabel>Marcas atendidas</FieldLabel>
             {!ro && (
               <button type="button" className="mb-1.5 text-[11px] font-medium text-primary hover:underline"
                 onClick={() => set({ empresas: draft.empresas.length === GROUP_COMPANIES.length ? [] : GROUP_COMPANIES.map((c) => c.id) })}>

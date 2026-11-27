@@ -85,7 +85,7 @@ function Visao() {
           </ul>
         </Card>
 
-        <Card className="lg:col-span-7" title="Ganho mensal por empresa" sub="Entregas em produção · rateio igual entre as empresas atendidas">
+        <Card className="lg:col-span-7" title="Ganho mensal por marca" sub="Entregas em produção · rateio igual entre as marcas atendidas">
           <ul className="grid gap-3">
             {rows.map(({ c, v }) => (
               <li key={c.id} className="grid grid-cols-[minmax(0,170px)_1fr_auto] items-center gap-3 text-sm">

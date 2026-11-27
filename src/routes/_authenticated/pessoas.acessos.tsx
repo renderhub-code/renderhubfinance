@@ -15,7 +15,7 @@ import { Notice } from "@/components/comex/ui";
 import { WorkspaceAvatar } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { GROUP_COMPANIES, getCompany } from "@/os/companies";
+import { GROUP_OPERATIONS, companiesByOperation, getCompany } from "@/os/companies";
 import { adb, NIVEL_LABEL, PERFIS, recursosDe, useOs, type Escopo, type Nivel } from "@/os/acessos";
 import { cn } from "@/lib/utils";
 
@@ -30,9 +30,10 @@ interface Usuario {
 }
 type Mapa = Record<string, Nivel>; // "empresa|recurso" -> nivel
 
-const ESCOPOS: { id: Escopo; nome: string }[] = [
-  ...GROUP_COMPANIES.map((c) => ({ id: c.id as Escopo, nome: c.name })),
-  { id: "grupo", nome: "Grupo · IA" },
+/** Marcas agrupadas por operação, mais o escopo do grupo. */
+const GRUPOS_ESCOPO: { nome: string; escopos: { id: Escopo; nome: string }[] }[] = [
+  ...GROUP_OPERATIONS.map((op) => ({ nome: op.name, escopos: companiesByOperation(op.id).map((c) => ({ id: c.id as Escopo, nome: c.name })) })),
+  { nome: "Grupo", escopos: [{ id: "grupo", nome: "Grupo · IA" }] },
 ];
 const chave = (e: string, r: string) => `${e}|${r}`;
 const mapaDe = (u: Usuario): Mapa => Object.fromEntries(u.acessos.map((a) => [chave(a.empresa, a.recurso), a.nivel]));
@@ -71,7 +72,7 @@ function Lista() {
 
   return (
     <div className="mx-auto max-w-[1200px]">
-      <PageHeader eyebrow="Pessoas" title="Acessos" description="O que cada pessoa vê e edita, por empresa e por aba. Conta nova entra sem acesso." />
+      <PageHeader eyebrow="Pessoas" title="Acessos" description="O que cada pessoa vê e edita, por operação, marca e aba. Conta nova entra sem acesso." />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="relative w-72">
@@ -235,7 +236,7 @@ function Editor({ u, souEu, todos, onClose, onSaved }: {
           <label className="flex items-start justify-between gap-4 rounded-xl border p-4">
             <span>
               <span className="flex items-center gap-1.5 text-sm font-semibold"><Crown className="h-4 w-4 text-blue-600" />Administrador do render.os</span>
-              <span className="mt-0.5 block text-xs text-muted-foreground">Vê e edita tudo, em todas as empresas, e gerencia os acessos das pessoas.</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">Vê e edita tudo, em todas as operações e marcas, e gerencia os acessos das pessoas.</span>
             </span>
             <Switch checked={admin} onCheckedChange={setAdmin} disabled={souEu && u.admin} />
           </label>
@@ -245,7 +246,7 @@ function Editor({ u, souEu, todos, onClose, onSaved }: {
           ) : (
             <>
               <div className="mt-5 flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold">Por empresa</h3>
+                <h3 className="text-sm font-semibold">Por operação e marca</h3>
                 <Select onValueChange={copiarDe}>
                   <SelectTrigger className="h-8 w-56 text-xs"><Copy className="mr-1.5 h-3.5 w-3.5" /><SelectValue placeholder="Copiar acessos de…" /></SelectTrigger>
                   <SelectContent>
@@ -254,8 +255,12 @@ function Editor({ u, souEu, todos, onClose, onSaved }: {
                 </Select>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {ESCOPOS.map((e) => {
+              <div className="mt-3 grid gap-x-5 gap-y-3 sm:grid-cols-2">
+                {GRUPOS_ESCOPO.map((g) => (
+                <div key={g.nome}>
+                <div className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{g.nome}</div>
+                <div className="flex flex-wrap gap-1.5">
+                {g.escopos.map((e) => {
                   const n = contagem(e.id);
                   return (
                     <button key={e.id} type="button" onClick={() => setEscopo(e.id)}
@@ -267,6 +272,9 @@ function Editor({ u, souEu, todos, onClose, onSaved }: {
                     </button>
                   );
                 })}
+                </div>
+                </div>
+                ))}
               </div>
 
               {perfis.length > 0 && (
@@ -311,7 +319,7 @@ function Editor({ u, souEu, todos, onClose, onSaved }: {
                 ))}
               </div>
               <p className="mt-3 text-[11px] text-muted-foreground">
-                Na visão “Grupo Render Hub” do financeiro, a pessoa vê o consolidado só das empresas em que tem a aba.
+                Na visão “Grupo Render Hub” do financeiro, a pessoa vê o consolidado só das marcas em que tem a aba.
                 {escopo === "union" && " No Operacional da Union, setor e papel (quem vê quais atividades) continuam em Operacional › Equipe."}
               </p>
             </>
@@ -320,7 +328,7 @@ function Editor({ u, souEu, todos, onClose, onSaved }: {
 
         <div className="flex items-center justify-between gap-3 border-t px-6 py-3">
           <span className="text-xs text-muted-foreground">
-            {admin ? "Acesso total" : `${Object.keys(mapa).length} aba(s) em ${new Set(Object.keys(mapa).map((k) => k.split("|")[0])).size} empresa(s)`}
+            {admin ? "Acesso total" : `${Object.keys(mapa).length} aba(s) em ${new Set(Object.keys(mapa).map((k) => k.split("|")[0])).size} marca(s)`}
           </span>
           <div className="flex gap-2">
             <Button variant="ghost" onClick={onClose}>Cancelar</Button>

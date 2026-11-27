@@ -50,7 +50,7 @@ export const MODULES: OsModule[] = [
   {
     id: "inicio",
     label: "Início",
-    description: "Visão do grupo e das empresas.",
+    description: "Visão do grupo, das operações e das marcas.",
     icon: House,
     status: "live",
     home: "/inicio",
@@ -88,7 +88,7 @@ export const MODULES: OsModule[] = [
     // importação), Nortrip e as demais entram aqui conforme forem construídas.
     id: "operacional",
     label: "Operacional",
-    description: "O dia a dia de cada empresa. Na Union: atividades e prazos contábeis. Na Render Comex: follow-up das importações.",
+    description: "O dia a dia de cada operação. Na Union: atividades e prazos contábeis. Na Render Comex: follow-up das importações.",
     icon: Workflow,
     status: "live",
     home: "/contabil",
@@ -114,14 +114,14 @@ export const MODULES: OsModule[] = [
     items: [
       { to: "/ia", label: "Visão geral", icon: LayoutDashboard, perm: "ia.visao", escopo: "grupo" },
       { to: "/ia/entregas", label: "Entregas", icon: Rocket, perm: "ia.entregas", escopo: "grupo" },
-      { to: "/ia/empresas", label: "Por empresa", icon: Building2, perm: "ia.empresas", escopo: "grupo" },
+      { to: "/ia/empresas", label: "Por marca", icon: Building2, perm: "ia.empresas", escopo: "grupo" },
       { to: "/ia/treinamento", label: "Treinamento", icon: GraduationCap, perm: "ia.treinamento", escopo: "grupo" },
     ],
   },
   {
     id: "pessoas",
     label: "Pessoas",
-    description: "RH de cada empresa — colaboradores, folha, custos, avaliações, ASO, PJ e prazos — e quem acessa o quê.",
+    description: "RH de cada marca — colaboradores, folha, custos, avaliações, ASO, PJ e prazos — e quem acessa o quê.",
     icon: Users,
     status: "live",
     home: "/rh",
@@ -145,7 +145,7 @@ export const MODULES: OsModule[] = [
 export const SETTINGS_MODULE: OsModule = {
   id: "configuracoes",
   label: "Configurações",
-  description: "Empresas, integrações e preferências do render.os.",
+  description: "Operações, marcas, integrações e preferências do render.os.",
   icon: Settings,
   status: "soon",
   home: "/modulo/configuracoes",

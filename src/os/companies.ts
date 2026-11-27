@@ -1,18 +1,22 @@
 /**
- * render.os — registro único das empresas do Grupo Render Hub.
+ * render.os — registro único das operações e marcas do Grupo Render Hub.
  *
- * Toda tela que precisa saber "quais empresas existem" lê daqui.
+ * O grupo tem 4 operações; cada uma reúne uma ou mais das 6 marcas (GROUP_COMPANIES).
+ * Toda tela que precisa saber "quais operações/marcas existem" lê daqui.
  * `slug` é a chave no banco (tabela public.companies). Use Noronha virou Nortrip,
  * mas o slug `use-noronha` foi mantido porque a integração Bling e o plano de contas
  * próprio dependem dele — trocar o slug exige migrar esses pontos juntos.
  */
 
 export type CompanyId = "union" | "render" | "nortrip" | "dompablyto" | "erks" | "sxpaper";
+export type OperationId = "union" | "render" | "erks" | "use-noronha";
 export type WorkspaceId = "grupo" | CompanyId;
 
 export interface GroupCompany {
   id: CompanyId;
   name: string;
+  /** Operação do grupo a que a marca pertence. */
+  operation: OperationId;
   /** Slug em public.companies */
   slug: string;
   sector: string;
@@ -31,6 +35,7 @@ export interface GroupCompany {
 export const GROUP_COMPANIES: GroupCompany[] = [
   {
     id: "render",
+    operation: "render",
     name: "Render Comex",
     slug: "render-comex",
     sector: "Comércio exterior",
@@ -42,6 +47,7 @@ export const GROUP_COMPANIES: GroupCompany[] = [
   },
   {
     id: "union",
+    operation: "union",
     name: "Union Contadores",
     slug: "union-contadores",
     sector: "Contabilidade",
@@ -53,6 +59,7 @@ export const GROUP_COMPANIES: GroupCompany[] = [
   },
   {
     id: "dompablyto",
+    operation: "render",
     name: "Dom Pablyto",
     slug: "dom-pablyto",
     sector: "Alimentos",
@@ -64,6 +71,7 @@ export const GROUP_COMPANIES: GroupCompany[] = [
   },
   {
     id: "nortrip",
+    operation: "use-noronha",
     name: "Nortrip",
     slug: "use-noronha",
     sector: "Turismo",
@@ -76,6 +84,7 @@ export const GROUP_COMPANIES: GroupCompany[] = [
   },
   {
     id: "erks",
+    operation: "erks",
     name: "ERKS",
     slug: "erks",
     sector: "Produtos em geral",
@@ -85,6 +94,7 @@ export const GROUP_COMPANIES: GroupCompany[] = [
   },
   {
     id: "sxpaper",
+    operation: "erks",
     name: "SX Paper",
     slug: "sx-paper",
     sector: "Papel",
@@ -93,6 +103,28 @@ export const GROUP_COMPANIES: GroupCompany[] = [
     initials: "SX",
   },
 ];
+
+export interface GroupOperation {
+  id: OperationId;
+  name: string;
+}
+
+/** As 4 operações do grupo, na ordem em que aparecem nas telas. */
+export const GROUP_OPERATIONS: GroupOperation[] = [
+  { id: "union", name: "Union" },
+  { id: "render", name: "Render" },
+  { id: "erks", name: "ERKS Indústria e Distribuidora" },
+  { id: "use-noronha", name: "Use Noronha" },
+];
+
+export function getOperation(id: OperationId | string | null | undefined): GroupOperation | undefined {
+  return GROUP_OPERATIONS.find((o) => o.id === id);
+}
+
+/** Marcas de uma operação. */
+export function companiesByOperation(id: OperationId): GroupCompany[] {
+  return GROUP_COMPANIES.filter((c) => c.operation === id);
+}
 
 export const GROUP_WORKSPACE = {
   id: "grupo" as const,

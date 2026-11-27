@@ -2,7 +2,7 @@ import { GROUP_COMPANIES } from "@/os/companies";
 import { cn } from "@/lib/utils";
 
 /**
- * "Um hub, seis operações": a seta da Render Hub no centro e as seis empresas
+ * "Um hub, seis marcas": a seta da Render Hub no centro e as seis marcas
  * orbitando, ligadas ao núcleo por linhas com pulsos de dados.
  */
 export function HubOrbit({ className, compact }: { className?: string; compact?: boolean }) {

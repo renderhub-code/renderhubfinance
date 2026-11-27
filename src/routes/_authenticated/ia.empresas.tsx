@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/os/page";
 import { IaGate, StatusPill } from "@/components/ia/ui";
 import { brl, ganhoPorEmpresa, useSolucoes } from "@/os/ia/data";
-import { GROUP_COMPANIES } from "@/os/companies";
+import { GROUP_COMPANIES, getOperation } from "@/os/companies";
 
 export const Route = createFileRoute("/_authenticated/ia/empresas")({
-  head: () => ({ meta: [{ title: "Por empresa · IA — render.os" }] }),
+  head: () => ({ meta: [{ title: "Por marca · IA — render.os" }] }),
   component: () => <IaGate><PorEmpresa /></IaGate>,
 });
 
@@ -15,7 +15,7 @@ function PorEmpresa() {
 
   return (
     <div className="mx-auto max-w-[1400px]">
-      <PageHeader eyebrow="Departamento de IA" title="Por empresa" description="O que a IA entrega para cada empresa do grupo e quanto rende por mês." />
+      <PageHeader eyebrow="Departamento de IA" title="Por marca" description="O que a IA entrega para cada marca do grupo e quanto rende por mês." />
       <div className="ros-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {GROUP_COMPANIES.map((c) => {
           const sols = solucoes.filter((s) => s.empresas.includes(c.id));
@@ -26,7 +26,7 @@ function PorEmpresa() {
                 {c.mark ? <img src={c.mark} alt="" className="h-10 w-10 shrink-0 rounded-lg" /> : <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-xs font-semibold text-white" style={{ background: c.color }}>{c.initials}</span>}
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold">{c.name}</div>
-                  <div className="text-xs text-muted-foreground">{sols.length} entrega(s) · {prod} em produção</div>
+                  <div className="text-xs text-muted-foreground">{getOperation(c.operation)?.name} · {sols.length} entrega(s) · {prod} em produção</div>
                 </div>
                 <div className="text-right">
                   <div className="font-display font-semibold tabular-nums">{brl(por[c.id] ?? 0)}</div>

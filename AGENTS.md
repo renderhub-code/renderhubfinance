@@ -18,7 +18,7 @@
 
 Este repositório está sendo remodelado no **render.os**, o sistema único do Grupo Render Hub.
 
-- Empresas do grupo: `src/os/companies.ts` é a fonte única (Render Comex, Union Contadores, Dom Pablyto, Nortrip, ERKS, SX Paper). Nortrip é a antiga Use Noronha e mantém o slug `use-noronha` no banco por causa do Bling. A&F foi desativada.
+- Operações e marcas: `src/os/companies.ts` é a fonte única. `GROUP_OPERATIONS` lista as operações e cada marca em `GROUP_COMPANIES` aponta a sua em `operation`; telas agrupam marcas por operação a partir daí, sem listas próprias, para o agrupamento nunca divergir. Ids e slugs das marcas são as chaves dos dados e não mudam. Nortrip é a antiga Use Noronha e mantém o slug `use-noronha` no banco por causa do Bling. A&F foi desativada.
 - Módulos: `src/os/modules.ts` define o trilho de ícones e o menu de cada módulo. Módulo novo = entrada `status: "soon"` até ter rotas próprias.
 - Workspace ativo (grupo ou empresa): `useHubStore` em `src/lib/hub-store.ts`; o shell (`src/components/AppShell.tsx`) sincroniza a empresa do financeiro a partir dele.
 - Visual: referência de painel claro com trilho escuro, painel cinza e conteúdo em cartão branco; primitivas de página em `src/components/os/page.tsx`.

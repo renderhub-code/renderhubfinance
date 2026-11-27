@@ -52,7 +52,7 @@ import { formatBRL, formatDate } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/lancamentos")({
   head: () => ({ meta: [
     { title: "Lançamentos — Hub Financial Command" },
-    { name: "description", content: "Lançamentos financeiros previstos e realizados por empresa." },
+    { name: "description", content: "Lançamentos financeiros previstos e realizados por marca." },
     { property: "og:title", content: "Lançamentos — Hub Financial Command" },
     { property: "og:description", content: "Documentos financeiros importados e lançados no hub." },
     { property: "og:type", content: "website" },

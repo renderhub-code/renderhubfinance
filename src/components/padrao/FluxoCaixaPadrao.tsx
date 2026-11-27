@@ -35,7 +35,7 @@ function ChartTip({ active, payload, label }: any) {
       </div>
       {!!d.empresas?.length && (
         <div className="border-t pt-1.5 mt-1.5 space-y-1">
-          <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Por empresa</div>
+          <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Por marca</div>
           {d.empresas.map((c) => (
             <div key={c.nome} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3">
               <span className="font-medium truncate max-w-32">{c.nome}</span>

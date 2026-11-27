@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowUpRight, Building2, Boxes } from "lucide-react";
 import { useCompanies } from "@/lib/queries";
 import { useHubStore } from "@/lib/hub-store";
-import { GROUP_COMPANIES, type CompanyId } from "@/os/companies";
+import { GROUP_COMPANIES, GROUP_OPERATIONS, companiesByOperation, type CompanyId } from "@/os/companies";
 import { MODULES } from "@/os/modules";
 import { WorkspaceAvatar } from "@/components/AppShell";
 import { Section } from "@/components/os/page";
@@ -14,9 +14,9 @@ import { spotlight } from "@/hooks/use-reveal";
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({ meta: [
     { title: "Início — render.os" },
-    { name: "description", content: "Empresas e módulos do Grupo Render Hub no render.os." },
+    { name: "description", content: "Operações, marcas e módulos do Grupo Render Hub no render.os." },
     { property: "og:title", content: "Início — render.os" },
-    { property: "og:description", content: "Empresas e módulos do Grupo Render Hub no render.os." },
+    { property: "og:description", content: "Operações, marcas e módulos do Grupo Render Hub no render.os." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),
@@ -46,22 +46,26 @@ function InicioPage() {
             {greeting}{name ? `, ${name}` : ""}.
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-white/60">
-            Seis operações do Grupo Render Hub em um só lugar. Escolha uma empresa ou siga para o consolidado.
+            {GROUP_OPERATIONS.length} operações e {GROUP_COMPANIES.length} marcas do Grupo Render Hub em um só lugar. Escolha uma marca ou siga para o consolidado.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             <Link to="/dashboard" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#06070a] transition-transform hover:scale-[1.02]">
               Abrir financeiro
             </Link>
             <span className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/75">
-              {inDb.size} de {GROUP_COMPANIES.length} empresas ativas
+              {GROUP_OPERATIONS.length} operações · {inDb.size} de {GROUP_COMPANIES.length} marcas ativas
             </span>
           </div>
         </div>
       </div>
 
-      <Section icon={Building2} title="Empresas do grupo">
+      <Section icon={Building2} title="Operações e marcas">
+        <div className="space-y-6">
+        {GROUP_OPERATIONS.map((op) => (
+        <div key={op.id}>
+        <h3 className="mb-2.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">{op.name}</h3>
         <div className="ros-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {GROUP_COMPANIES.map((c) => {
+          {companiesByOperation(op.id).map((c) => {
             const ready = inDb.has(c.slug);
             return (
               <button
@@ -88,6 +92,9 @@ function InicioPage() {
               </button>
             );
           })}
+        </div>
+        </div>
+        ))}
         </div>
       </Section>
 
