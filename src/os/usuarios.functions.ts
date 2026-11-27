@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { criarUsuarioSchema, definirSenhaSchema, trocarSenhaSchema, type UsuarioConta } from "./usuarios";
+import type { AcessoRow } from "./recursos";
+import { criarUsuarioSchema, definirSenhaSchema, salvarAcessosSchema, trocarSenhaSchema, type UsuarioConta } from "./usuarios";
+import { aplicarSelecao } from "./usuarios.server";
 
 const SEM_PERMISSAO = "Somente administradores do render.os gerenciam usuários.";
 
@@ -11,6 +13,20 @@ export const listarUsuarios = createServerFn({ method: "GET" })
     const { data: admin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "controller" });
     if (!admin) throw new Error(SEM_PERMISSAO);
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const admins = new Set<string>();
+    const acessos = new Map<string, AcessoRow[]>();
+    for (let de = 0; ; de += 1000) {
+      const { data, error } = await db.from("user_roles").select("user_id").eq("role", "controller").range(de, de + 999);
+      if (error) throw new Error("Não foi possível carregar os usuários.");
+      for (const r of data) admins.add(r.user_id);
+      if (data.length < 1000) break;
+    }
+    for (let de = 0; ; de += 1000) {
+      const { data, error } = await db.from("os_acessos").select("user_id,empresa,recurso,nivel").order("user_id").order("empresa").order("recurso").range(de, de + 999);
+      if (error) throw new Error("Não foi possível carregar os usuários.");
+      for (const r of data) acessos.set(r.user_id, [...(acessos.get(r.user_id) ?? []), { empresa: r.empresa, recurso: r.recurso, nivel: r.nivel as AcessoRow["nivel"] }]);
+      if (data.length < 1000) break;
+    }
     const contas: UsuarioConta[] = [];
     for (let page = 1; ; page++) {
       const { data, error } = await db.auth.admin.listUsers({ page, perPage: 1000 });
@@ -28,6 +44,8 @@ export const listarUsuarios = createServerFn({ method: "GET" })
           ultimo_acesso: u.last_sign_in_at ?? null,
           ativo: Boolean(u.email_confirmed_at),
           senha_provisoria: app["senha_provisoria"] === true,
+          admin: admins.has(u.id),
+          acessos: acessos.get(u.id) ?? [],
         });
       }
       if (data.users.length < 1000) break;
@@ -63,7 +81,7 @@ export const criarUsuario = createServerFn({ method: "POST" })
     const { data: admin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "controller" });
     if (!admin) throw new Error(SEM_PERMISSAO);
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-    const { error } = await db.auth.admin.createUser({
+    const { data: criado, error } = await db.auth.admin.createUser({
       email: data.email,
       password: data.senha,
       email_confirm: true,
@@ -74,7 +92,24 @@ export const criarUsuario = createServerFn({ method: "POST" })
       console.error("[usuarios] criar usuário falhou:", error.message);
       throw new Error(/already|registered|exists/i.test(error.message) ? "Já existe um usuário com este e-mail." : "Não foi possível criar o usuário.");
     }
+    if (data.selecao && criado.user) {
+      try {
+        await aplicarSelecao(context.supabase, criado.user.id, data.selecao);
+      } catch {
+        throw new Error("Usuário criado, mas os acessos não foram gravados. Abra Empresas e módulos e salve de novo.");
+      }
+    }
     return { ok: true };
+  });
+
+/** Administrador escolhe as marcas e os módulos que a pessoa vê e edita. */
+export const salvarEmpresasEModulos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => salvarAcessosSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: admin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "controller" });
+    if (!admin) throw new Error(SEM_PERMISSAO);
+    return aplicarSelecao(context.supabase, data.userId, data.selecao);
   });
 
 /** A própria pessoa troca a senha provisória pela definitiva. */

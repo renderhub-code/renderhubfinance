@@ -33,3 +33,10 @@ Importados 6.775 registros nas 16 bases; 174 clientes, 656 atividades e 661 ciê
 - [x] Link público para o cliente escolher um horário; horário escolhido fica esgotado.
 - [ ] Caio informar o link da videochamada e o endereço do escritório em Configurar — depende dele.
 - [ ] Ligação com o Google Agenda — adiada a pedido do usuário.
+
+## Empresas e módulos por usuário
+
+- [x] Regra "marcas + módulos" → telas liberadas, com testes.
+- [x] Gravação só por administrador; janela Empresas e módulos, resumo na lista e mesmas opções em Novo usuário.
+- [x] Só as duas contas do Syer continuam administradoras; as outras 12 veem o que está marcado.
+- [ ] Conferir a janela entrando como administrador — depende de o usuário abrir Pessoas › Usuários no preview (a conta do Lovable não corresponde a nenhuma conta do app).
