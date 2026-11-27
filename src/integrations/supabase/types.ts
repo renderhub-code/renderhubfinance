@@ -814,6 +814,376 @@ export type Database = {
           },
         ]
       }
+      cs_atualizacoes: {
+        Row: {
+          autor: string | null
+          autor_id: string | null
+          cliente_id: string
+          criado_em: string
+          id: string
+          mensagem: string
+          processo_id: string
+        }
+        Insert: {
+          autor?: string | null
+          autor_id?: string | null
+          cliente_id: string
+          criado_em?: string
+          id?: string
+          mensagem: string
+          processo_id: string
+        }
+        Update: {
+          autor?: string | null
+          autor_id?: string | null
+          cliente_id?: string
+          criado_em?: string
+          id?: string
+          mensagem?: string
+          processo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_atualizacoes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "cs_clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cs_atualizacoes_processo_id_fkey"
+            columns: ["processo_id"]
+            isOneToOne: false
+            referencedRelation: "cs_processos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cs_clientes: {
+        Row: {
+          comercial_responsavel: string | null
+          criado_em: string
+          cs_responsavel: string | null
+          emails: string[]
+          empresa: string
+          id: string
+          nome: string
+        }
+        Insert: {
+          comercial_responsavel?: string | null
+          criado_em?: string
+          cs_responsavel?: string | null
+          emails?: string[]
+          empresa?: string
+          id?: string
+          nome: string
+        }
+        Update: {
+          comercial_responsavel?: string | null
+          criado_em?: string
+          cs_responsavel?: string | null
+          emails?: string[]
+          empresa?: string
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      cs_equipe: {
+        Row: {
+          criado_em: string
+          email: string | null
+          nome: string
+          papel: Database["public"]["Enums"]["cs_papel"]
+          user_id: string
+        }
+        Insert: {
+          criado_em?: string
+          email?: string | null
+          nome?: string
+          papel?: Database["public"]["Enums"]["cs_papel"]
+          user_id: string
+        }
+        Update: {
+          criado_em?: string
+          email?: string | null
+          nome?: string
+          papel?: Database["public"]["Enums"]["cs_papel"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cs_processos: {
+        Row: {
+          atualizado_em: string
+          chegada_prevista: string | null
+          cliente_id: string
+          container: string | null
+          criado_em: string
+          data_embarque: string | null
+          etapa: Database["public"]["Enums"]["cs_etapa"]
+          id: string
+          invoice: string | null
+          mercadoria: string
+          pendencia: string | null
+          po: string
+          status_texto: string | null
+        }
+        Insert: {
+          atualizado_em?: string
+          chegada_prevista?: string | null
+          cliente_id: string
+          container?: string | null
+          criado_em?: string
+          data_embarque?: string | null
+          etapa?: Database["public"]["Enums"]["cs_etapa"]
+          id?: string
+          invoice?: string | null
+          mercadoria: string
+          pendencia?: string | null
+          po: string
+          status_texto?: string | null
+        }
+        Update: {
+          atualizado_em?: string
+          chegada_prevista?: string | null
+          cliente_id?: string
+          container?: string | null
+          criado_em?: string
+          data_embarque?: string | null
+          etapa?: Database["public"]["Enums"]["cs_etapa"]
+          id?: string
+          invoice?: string | null
+          mercadoria?: string
+          pendencia?: string | null
+          po?: string
+          status_texto?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_processos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "cs_clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ia_acesso: {
+        Row: {
+          criado_em: string
+          email: string | null
+          nome: string
+          papel: Database["public"]["Enums"]["ia_papel"]
+          user_id: string
+        }
+        Insert: {
+          criado_em?: string
+          email?: string | null
+          nome?: string
+          papel?: Database["public"]["Enums"]["ia_papel"]
+          user_id: string
+        }
+        Update: {
+          criado_em?: string
+          email?: string | null
+          nome?: string
+          papel?: Database["public"]["Enums"]["ia_papel"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ia_atualizacoes: {
+        Row: {
+          autor_id: string | null
+          autor_nome: string | null
+          criado_em: string
+          id: string
+          solucao_id: string
+          texto: string
+        }
+        Insert: {
+          autor_id?: string | null
+          autor_nome?: string | null
+          criado_em?: string
+          id?: string
+          solucao_id: string
+          texto: string
+        }
+        Update: {
+          autor_id?: string | null
+          autor_nome?: string | null
+          criado_em?: string
+          id?: string
+          solucao_id?: string
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ia_atualizacoes_solucao_id_fkey"
+            columns: ["solucao_id"]
+            isOneToOne: false
+            referencedRelation: "ia_solucoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ia_modulos: {
+        Row: {
+          criado_em: string
+          id: string
+          ordem: number
+          titulo: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          ordem?: number
+          titulo: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          ordem?: number
+          titulo?: string
+        }
+        Relationships: []
+      }
+      ia_pessoas: {
+        Row: {
+          cargo: string | null
+          criado_em: string
+          id: string
+          nome: string
+          ordem: number
+        }
+        Insert: {
+          cargo?: string | null
+          criado_em?: string
+          id?: string
+          nome: string
+          ordem?: number
+        }
+        Update: {
+          cargo?: string | null
+          criado_em?: string
+          id?: string
+          nome?: string
+          ordem?: number
+        }
+        Relationships: []
+      }
+      ia_progresso: {
+        Row: {
+          modulo_id: string
+          pessoa_id: string
+          status: number
+        }
+        Insert: {
+          modulo_id: string
+          pessoa_id: string
+          status?: number
+        }
+        Update: {
+          modulo_id?: string
+          pessoa_id?: string
+          status?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ia_progresso_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "ia_modulos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ia_progresso_pessoa_id_fkey"
+            columns: ["pessoa_id"]
+            isOneToOne: false
+            referencedRelation: "ia_pessoas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ia_solucoes: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          custo: number
+          descricao: string | null
+          empresas: string[]
+          ganho: number
+          horas: number
+          id: string
+          link: string | null
+          previsao: string | null
+          responsavel: string | null
+          status: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          custo?: number
+          descricao?: string | null
+          empresas?: string[]
+          ganho?: number
+          horas?: number
+          id?: string
+          link?: string | null
+          previsao?: string | null
+          responsavel?: string | null
+          status?: string
+          tipo?: string
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          custo?: number
+          descricao?: string | null
+          empresas?: string[]
+          ganho?: number
+          horas?: number
+          id?: string
+          link?: string | null
+          previsao?: string | null
+          responsavel?: string | null
+          status?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      os_acessos: {
+        Row: {
+          atualizado_em: string
+          atualizado_por: string | null
+          empresa: string
+          nivel: number
+          recurso: string
+          user_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          empresa: string
+          nivel: number
+          recurso: string
+          user_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          atualizado_por?: string | null
+          empresa?: string
+          nivel?: number
+          recurso?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -845,6 +1215,475 @@ export type Database = {
             columns: ["default_company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_asos: {
+        Row: {
+          colaborador_id: string
+          criado_em: string
+          data: string
+          id: string
+          obs: string | null
+          proxima: string | null
+          resultado: string
+          tipo: string
+        }
+        Insert: {
+          colaborador_id: string
+          criado_em?: string
+          data: string
+          id?: string
+          obs?: string | null
+          proxima?: string | null
+          resultado?: string
+          tipo: string
+        }
+        Update: {
+          colaborador_id?: string
+          criado_em?: string
+          data?: string
+          id?: string
+          obs?: string | null
+          proxima?: string | null
+          resultado?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_asos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "rh_colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_avaliacoes: {
+        Row: {
+          autor_id: string | null
+          ciclo: string
+          colaborador_id: string
+          criado_em: string
+          desempenho: number | null
+          fortes: string | null
+          gestor: string | null
+          id: string
+          media: number | null
+          melhorias: string | null
+          notas: number[] | null
+          plano: string | null
+          potencial: number | null
+          resultados: string | null
+          tipo: string
+        }
+        Insert: {
+          autor_id?: string | null
+          ciclo: string
+          colaborador_id: string
+          criado_em?: string
+          desempenho?: number | null
+          fortes?: string | null
+          gestor?: string | null
+          id?: string
+          media?: number | null
+          melhorias?: string | null
+          notas?: number[] | null
+          plano?: string | null
+          potencial?: number | null
+          resultados?: string | null
+          tipo: string
+        }
+        Update: {
+          autor_id?: string | null
+          ciclo?: string
+          colaborador_id?: string
+          criado_em?: string
+          desempenho?: number | null
+          fortes?: string | null
+          gestor?: string | null
+          id?: string
+          media?: number | null
+          melhorias?: string | null
+          notas?: number[] | null
+          plano?: string | null
+          potencial?: number | null
+          resultados?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_avaliacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "rh_colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_calendario: {
+        Row: {
+          atividade: string
+          ativo: boolean
+          criado_em: string
+          dia: number
+          empresa: string
+          id: string
+          recorrencia: string
+          responsavel: string | null
+        }
+        Insert: {
+          atividade: string
+          ativo?: boolean
+          criado_em?: string
+          dia: number
+          empresa: string
+          id?: string
+          recorrencia?: string
+          responsavel?: string | null
+        }
+        Update: {
+          atividade?: string
+          ativo?: boolean
+          criado_em?: string
+          dia?: number
+          empresa?: string
+          id?: string
+          recorrencia?: string
+          responsavel?: string | null
+        }
+        Relationships: []
+      }
+      rh_colaboradores: {
+        Row: {
+          admissao: string | null
+          atualizado_em: string
+          cargo: string | null
+          criado_em: string
+          desligamento: string | null
+          email: string | null
+          empresa: string
+          gestor: string | null
+          id: string
+          jornada: string | null
+          matricula: string | null
+          motivo_desligamento: string | null
+          nome: string
+          obs: string | null
+          setor: string | null
+          status: string
+          vinculo: string
+        }
+        Insert: {
+          admissao?: string | null
+          atualizado_em?: string
+          cargo?: string | null
+          criado_em?: string
+          desligamento?: string | null
+          email?: string | null
+          empresa: string
+          gestor?: string | null
+          id?: string
+          jornada?: string | null
+          matricula?: string | null
+          motivo_desligamento?: string | null
+          nome: string
+          obs?: string | null
+          setor?: string | null
+          status?: string
+          vinculo?: string
+        }
+        Update: {
+          admissao?: string | null
+          atualizado_em?: string
+          cargo?: string | null
+          criado_em?: string
+          desligamento?: string | null
+          email?: string | null
+          empresa?: string
+          gestor?: string | null
+          id?: string
+          jornada?: string | null
+          matricula?: string | null
+          motivo_desligamento?: string | null
+          nome?: string
+          obs?: string | null
+          setor?: string | null
+          status?: string
+          vinculo?: string
+        }
+        Relationships: []
+      }
+      rh_contratos_pj: {
+        Row: {
+          aviso_dias: number | null
+          cnpj: string | null
+          criado_em: string
+          empresa: string
+          fim: string | null
+          gestor: string | null
+          id: string
+          inicio: string | null
+          obs: string | null
+          prestador: string
+          reajuste: string | null
+          servico: string | null
+          status: string
+          valor_mensal: number
+        }
+        Insert: {
+          aviso_dias?: number | null
+          cnpj?: string | null
+          criado_em?: string
+          empresa: string
+          fim?: string | null
+          gestor?: string | null
+          id?: string
+          inicio?: string | null
+          obs?: string | null
+          prestador: string
+          reajuste?: string | null
+          servico?: string | null
+          status?: string
+          valor_mensal?: number
+        }
+        Update: {
+          aviso_dias?: number | null
+          cnpj?: string | null
+          criado_em?: string
+          empresa?: string
+          fim?: string | null
+          gestor?: string | null
+          id?: string
+          inicio?: string | null
+          obs?: string | null
+          prestador?: string
+          reajuste?: string | null
+          servico?: string | null
+          status?: string
+          valor_mensal?: number
+        }
+        Relationships: []
+      }
+      rh_custos: {
+        Row: {
+          autor_id: string | null
+          categoria: string
+          competencia: string
+          criado_em: string
+          descricao: string | null
+          empresa: string
+          id: string
+          valor: number
+        }
+        Insert: {
+          autor_id?: string | null
+          categoria: string
+          competencia: string
+          criado_em?: string
+          descricao?: string | null
+          empresa: string
+          id?: string
+          valor: number
+        }
+        Update: {
+          autor_id?: string | null
+          categoria?: string
+          competencia?: string
+          criado_em?: string
+          descricao?: string | null
+          empresa?: string
+          id?: string
+          valor?: number
+        }
+        Relationships: []
+      }
+      rh_documentos: {
+        Row: {
+          colaborador_id: string | null
+          criado_em: string
+          descricao: string | null
+          empresa: string
+          id: string
+          obs: string | null
+          responsavel: string | null
+          status: string
+          tipo: string
+          vencimento: string | null
+        }
+        Insert: {
+          colaborador_id?: string | null
+          criado_em?: string
+          descricao?: string | null
+          empresa: string
+          id?: string
+          obs?: string | null
+          responsavel?: string | null
+          status?: string
+          tipo: string
+          vencimento?: string | null
+        }
+        Update: {
+          colaborador_id?: string | null
+          criado_em?: string
+          descricao?: string | null
+          empresa?: string
+          id?: string
+          obs?: string | null
+          responsavel?: string | null
+          status?: string
+          tipo?: string
+          vencimento?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_documentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "rh_colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_folha: {
+        Row: {
+          beneficios: number
+          bruto: number
+          colaborador_id: string
+          competencia: string
+          criado_em: string
+          encargos_pct: number
+          gratificacao: number
+          id: string
+          inss_pct: number
+          irrf: number
+          outros_descontos: number
+          va: number
+          vt: number
+        }
+        Insert: {
+          beneficios?: number
+          bruto?: number
+          colaborador_id: string
+          competencia: string
+          criado_em?: string
+          encargos_pct?: number
+          gratificacao?: number
+          id?: string
+          inss_pct?: number
+          irrf?: number
+          outros_descontos?: number
+          va?: number
+          vt?: number
+        }
+        Update: {
+          beneficios?: number
+          bruto?: number
+          colaborador_id?: string
+          competencia?: string
+          criado_em?: string
+          encargos_pct?: number
+          gratificacao?: number
+          id?: string
+          inss_pct?: number
+          irrf?: number
+          outros_descontos?: number
+          va?: number
+          vt?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_folha_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "rh_colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_orcamentos: {
+        Row: {
+          ano: number
+          empresa: string
+          valor: number
+        }
+        Insert: {
+          ano: number
+          empresa: string
+          valor?: number
+        }
+        Update: {
+          ano?: number
+          empresa?: string
+          valor?: number
+        }
+        Relationships: []
+      }
+      rh_parametros: {
+        Row: {
+          atualizado_em: string
+          empresa: string
+          encargos_pct: number
+          meta_turnover: number
+          provisoes_pct: number
+        }
+        Insert: {
+          atualizado_em?: string
+          empresa: string
+          encargos_pct?: number
+          meta_turnover?: number
+          provisoes_pct?: number
+        }
+        Update: {
+          atualizado_em?: string
+          empresa?: string
+          encargos_pct?: number
+          meta_turnover?: number
+          provisoes_pct?: number
+        }
+        Relationships: []
+      }
+      rh_remuneracao: {
+        Row: {
+          autor_id: string | null
+          colaborador_id: string
+          competencia: string
+          criado_em: string
+          descricao: string | null
+          fim: string | null
+          id: string
+          tipo: string
+          valor: number
+        }
+        Insert: {
+          autor_id?: string | null
+          colaborador_id: string
+          competencia: string
+          criado_em?: string
+          descricao?: string | null
+          fim?: string | null
+          id?: string
+          tipo: string
+          valor: number
+        }
+        Update: {
+          autor_id?: string | null
+          colaborador_id?: string
+          competencia?: string
+          criado_em?: string
+          descricao?: string | null
+          fim?: string | null
+          id?: string
+          tipo?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_remuneracao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "rh_colaboradores"
             referencedColumns: ["id"]
           },
         ]
@@ -1161,6 +2000,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      acessos_usuarios: {
+        Args: never
+        Returns: {
+          acessos: Json
+          admin: boolean
+          cliente: boolean
+          criado_em: string
+          email: string
+          id: string
+          nome: string
+          ultimo_acesso: string
+        }[]
+      }
       bootstrap_first_controller: { Args: never; Returns: boolean }
       contabil_bootstrap_admin: { Args: never; Returns: boolean }
       contabil_global: { Args: { _uid: string }; Returns: boolean }
@@ -1178,7 +2030,23 @@ export type Database = {
         }[]
       }
       contabil_setor_de: { Args: { _uid: string }; Returns: string }
+      contabil_tem_acesso: { Args: { _uid: string }; Returns: boolean }
       contabil_usuarios_disponiveis: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+          nome: string
+        }[]
+      }
+      cs_bootstrap_admin: { Args: never; Returns: boolean }
+      cs_is_admin: { Args: { _uid: string }; Returns: boolean }
+      cs_is_cliente: {
+        Args: { _cliente_id: string; _uid: string }
+        Returns: boolean
+      }
+      cs_is_equipe: { Args: { _uid: string }; Returns: boolean }
+      cs_usuarios_disponiveis: {
         Args: never
         Returns: {
           email: string
@@ -1193,7 +2061,47 @@ export type Database = {
         }
         Returns: boolean
       }
+      ia_bootstrap_admin: { Args: never; Returns: boolean }
+      ia_is_admin: { Args: { _uid: string }; Returns: boolean }
+      ia_pode_editar: { Args: { _uid: string }; Returns: boolean }
+      ia_pode_ver: { Args: { _uid: string }; Returns: boolean }
+      ia_usuarios_disponiveis: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+          nome: string
+        }[]
+      }
       is_controller: { Args: { _user_id: string }; Returns: boolean }
+      os_empresa_de: { Args: { _company: string }; Returns: string }
+      os_nivel: {
+        Args: { _empresa: string; _recurso: string; _uid: string }
+        Returns: number
+      }
+      os_nivel_company: {
+        Args: { _company: string; _recurso: string; _uid: string }
+        Returns: number
+      }
+      os_nivel_modulo: {
+        Args: { _empresa: string; _prefixo: string; _uid: string }
+        Returns: number
+      }
+      os_pode: {
+        Args: { _empresa: string; _min?: number; _recurso: string }
+        Returns: boolean
+      }
+      os_pode_company: {
+        Args: { _company: string; _min?: number; _recurso: string }
+        Returns: boolean
+      }
+      render_os_perfil: { Args: never; Returns: Json }
+      rh_alertas: { Args: { _empresas: string[] }; Returns: Json }
+      rh_empresa_do_colaborador: { Args: { _id: string }; Returns: string }
+      rh_nivel: {
+        Args: { _empresa: string; _recursos: string[] }
+        Returns: number
+      }
       user_has_company: {
         Args: { _company_id: string; _user_id: string }
         Returns: boolean
@@ -1209,6 +2117,15 @@ export type Database = {
         | "em_andamento"
         | "concluido"
         | "atrasado"
+      cs_etapa:
+        | "pedido"
+        | "producao"
+        | "embarque"
+        | "transito"
+        | "porto"
+        | "desembaraco"
+        | "entregue"
+      cs_papel: "admin" | "equipe"
       dre_section:
         | "receita_bruta"
         | "deducoes"
@@ -1220,6 +2137,7 @@ export type Database = {
         | "despesas_financeiras"
         | "investimentos"
         | "nao_operacional"
+      ia_papel: "admin" | "colaborador" | "leitor"
       transaction_status: "previsto" | "realizado" | "cancelado" | "atrasado"
     }
     CompositeTypes: {
@@ -1357,6 +2275,16 @@ export const Constants = {
         "concluido",
         "atrasado",
       ],
+      cs_etapa: [
+        "pedido",
+        "producao",
+        "embarque",
+        "transito",
+        "porto",
+        "desembaraco",
+        "entregue",
+      ],
+      cs_papel: ["admin", "equipe"],
       dre_section: [
         "receita_bruta",
         "deducoes",
@@ -1369,6 +2297,7 @@ export const Constants = {
         "investimentos",
         "nao_operacional",
       ],
+      ia_papel: ["admin", "colaborador", "leitor"],
       transaction_status: ["previsto", "realizado", "cancelado", "atrasado"],
     },
   },
